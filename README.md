@@ -74,7 +74,7 @@ icon: mdi:home-outline
 icon_color: "#333333"
 name: Living Room
 secondary: '{{states("sensor.living_room_temperature")}} °C'
-action:
+tap_action:
   action: navigate
   navigation_path: /lovelace/living-room
 entities:

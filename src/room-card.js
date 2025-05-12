@@ -25,6 +25,10 @@ class RoomCard extends LitElement {
         super()
         this._templateResults = {}
         this._unsubRenderTemplates = new Map()
+        this._clickTimer = null
+        this._holdTimeout = null
+        this._holdFired = false
+        this._hasMoved = false
     }
 
     // Called by HAAS when config is changed
@@ -78,7 +82,7 @@ class RoomCard extends LitElement {
     render() {
         const secondary = this._getValueRawOrTemplate(this._config.secondary)
         return html`
-            <ha-card @click=${this._handleAction}>
+            <ha-card @click=${this._handleAction} @pointerdown=${this._handleHoldAction}>
                 <div class="container flex-column">
                     <div class="icon" style="--icon-color: ${this._getValueRawOrTemplate(this._config?.icon_color) ?? 'rgb(var(--rgb-white))'};">
                         <ha-icon .icon=${this._config.icon} />
@@ -148,15 +152,97 @@ class RoomCard extends LitElement {
             : item
     }
 
-    // Handle navigation on click
-    _handleAction() {
-        if (!this._config?.action) return
+    // Handle holding
+    _handleHoldAction(e) {
+        e.preventDefault()
+        this._holdFired = false
+        this._hasMoved = false
+
+        this._holdTimeout = setTimeout(() => {
+            if (window.isScrolling || this._hasMoved) return
+            this._holdFired = true
+
+            if (this._config?.double_tap_action) {
+                this._handleActionEvent("hold")
+            }
+        }, 300)
+
+        const cleanup = () => {
+            clearTimeout(this._holdTimeout)
+            this._holdTimeout = null
+            this._holdFired = false
+
+            this.removeEventListener("pointerup", endHandler)
+            this.removeEventListener("pointercancel", endHandler)
+            document.removeEventListener("pointerup", endHandler)
+            document.removeEventListener("scroll", scrollHandler);
+        }
+
+        const endHandler = (e) => {
+            e.preventDefault()
+            cleanup()
+        }
+
+        const scrollHandler = () => {
+            this._hasMoved = true
+            cleanup()
+        }
+
+        this.addEventListener("pointerup", endHandler, { once: true })
+        this.addEventListener("pointercancel", endHandler, { once: true });
+        document.addEventListener("pointerup", endHandler, { once: true })
+        document.addEventListener("scroll", scrollHandler, { once: true })
+    }
+
+    // Handle tap or double tap
+    _handleAction(e) {
+        if (window.isScrolling || this._hasMoved) return
+        e.preventDefault()
+
+        // If hold was fired, don't fire tap
+        if (this._holdFired) {
+            return
+        }
+
+        // If double tap is not enabled, just fire a tap event
+        if (!this._config?.double_tap_action) {
+            this.forwardHaptic("light")
+            this._handleActionEvent("tap")
+            return
+        }
+
+        if (this._clickTimer == null) {
+            this._clickTimer = setTimeout(() => {
+                this.forwardHaptic("light")
+                this._handleActionEvent("tap")
+                this._clickTimer = null
+            }, 200)
+        } else {
+            clearTimeout(this._clickTimer)
+            this._handleActionEvent("double_tap")
+            this._clickTimer = null
+        }
+    }
+
+    _handleActionEvent(action) {
+        const config = {}
+        if (this._config?.action) {
+            config.tap_action = this._config.action
+        }
+
+        if (this._config?.double_tap_action) {
+            config.double_tap_action = this._config.double_tap_action
+        } else {
+            config.double_tap_action = config.tap_action
+        }
+
+        if (this._config?.hold_action) {
+            config.hold_action = this._config.hold_action
+        }
 
         this._fireEvent(this, "hass-action", {
-            config: {
-                tap_action: this._config.action
-            },
-            action: "tap"
+            config: config,
+            action: action
         })
     }
 
@@ -227,6 +313,10 @@ class RoomCard extends LitElement {
             type: "render_template",
             ...params,
         })
+    }
+
+    forwardHaptic(hapticType) {
+        this._fireEvent(this, "haptic", hapticType);
     }
 
     // Send a dom event

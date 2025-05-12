@@ -169,7 +169,9 @@ class RoomCardEditor extends LitElement {
                 .schema=${[
                     {name: "name", label: "Name", required: true, selector: { text: {} }},
                     {name: "icon", label: "Icon", required: true, selector: { icon: {} }, context: { icon_entity: "entity" } },
-                    {name: "action", label: "Tap Action", selector: { "ui-action": {} }},
+                    {name: "tap_action", label: "Tap Action", selector: { "ui-action": {} }},
+                    {name: "hold_action", label: "Hold Action", selector: { "ui-action": {} }},
+                    {name: "double_tap_action", label: "Double Tap Action", selector: { "ui-action": {} }},
                     {name: "icon_color", label: "Icon Color", selector: { template: {} }},
                     {name: "secondary", label: "Secondary Info", selector: { template: {} }},
                 ]}

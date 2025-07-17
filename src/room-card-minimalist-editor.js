@@ -192,11 +192,15 @@ class RoomCardEditor extends LitElement {
 					},
 				],
 			},
-			{
-				name: 'use_light_color',
-				label: 'Use Light Color',
-				selector: { boolean: {} },
-			},
+			...(this._isLightEntity(item)
+				? [
+						{
+							name: 'use_light_color',
+							label: 'Use Light Color as icon and background color',
+							selector: { boolean: {} },
+						},
+				  ]
+				: []),
 		];
 		const templateSchema = [
 			{
@@ -387,6 +391,30 @@ class RoomCardEditor extends LitElement {
 
 			${this._renderEntities()}
 		`;
+	}
+
+	// Helper method to check if an entity is a light
+	_isLightEntity(entityConfig) {
+		if (!entityConfig || !entityConfig.entity) {
+			return false;
+		}
+
+		// Check if entity starts with 'light.'
+		if (entityConfig.entity.startsWith('light.')) {
+			return true;
+		}
+
+		// Also check if the entity exists in hass and has light domain
+		if (
+			this.hass &&
+			this.hass.states &&
+			this.hass.states[entityConfig.entity]
+		) {
+			const entityState = this.hass.states[entityConfig.entity];
+			return entityState.entity_id.startsWith('light.');
+		}
+
+		return false;
 	}
 }
 

@@ -899,12 +899,13 @@ class RoomCard extends LitElement {
 
 				.states {
 					height: 176px;
-					padding-top: 16px;
+					padding-top: 0;
+					gap: 8px;
 				}
 
 				.states.reverse-order {
-					padding-bottom: 16px;
 					padding-top: 0;
+					padding-bottom: 0;
 				}
 
 				:host {

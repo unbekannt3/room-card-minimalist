@@ -1,125 +1,179 @@
-# Room Card
+# Room Card Minimalist
+
 [![hacs][hacs-badge]][hacs-url]
 [![release][release-badge]][release-url]
 ![downloads][downloads-badge]
 ![build][build-badge]
 
-**Theme: Home Assisant**
+![Card - Dark Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-dark.png?raw=true)
+![Card - Light Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-light.png?raw=true)
 
-![Card - Default](https://github.com/patrickfnielsen/hass-room-card/blob/main/docs/images/theme-homeassistant.png?raw=true)
+## What is Room Card Minimalist
 
-**Theme: Noctis**
+Room Card Minimalist is based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/hass-room-card) but extensively redesigned with added functionality in the style of the [room-card from UI Lovelace Minimalist](https://ui-lovelace-minimalist.github.io/UI/usage/cards/card_room/) which I've used in the past and missed ever since for "normal" Lovelace setups.
 
-![Cards - Noctis](https://github.com/patrickfnielsen/hass-room-card/blob/main/docs/images/theme-noctis.png?raw=true)
-
-
-## What is Room Card
-Room Card is designed to quickly show the state of a room, and when pressed it can navigate to a different page.
+It provides a fixed size card with a room name, styled icon, and optional secondary info. You can configure up to 4 entities to be displayed as buttons with icons that change based on the entity state.
 
 ## Installation
 
-### HACS
-Room Card is available in [HACS][hacs] (Home Assistant Community Store).
+### HACS (Recommended)
+
+Room Card is available in [HACS][hacs] (Home Assistant Community Store):
+
+<!-- [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=unbekannt3&repository=room-card-minimalist)
+
+#### or Manually -->
+
 1. Install HACS if you don't have it already
 2. Open HACS in Home Assistant
 3. Press the 3 dots in the top right, and select "Custom repositories"
-4. For repository enter "https://github.com/patrickfnielsen/hass-room-card" and type select "Dashboard"
+4. For repository enter "https://github.com/unbekannt3/room-card-minimalist" and type select "Dashboard"
 5. Click button with "+" icon
-6. Search for "Room Card"
+6. Search for "Room Card Minimalist"
 
 ### Manual
-1. Download `room-card.js` file from the [latest release][release-url].
-2. Put `room-card.js` file into your `config/www` folder.
-3. Add reference to `room-card.js` in Dashboard. There's two way to do that:
-    - **Using UI:** _Settings_ → _Dashboards_ → _More Options icon_ → _Resources_ → _Add Resource_ → Set _Url_ as `/local/room-card.js` → Set _Resource type_ as `JavaScript Module`.
-      **Note:** If you do not see the Resources menu, you will need to enable _Advanced Mode_ in your _User Profile_
-    - **Using YAML:** Add following code to `lovelace` section.
-        ```yaml
-        resources:
-            - url: /local/room-card.js
-              type: module
-        ```
+
+1. Download `room-card-minimalist.js` file from the [latest release][release-url].
+2. Put `room-card-minimalist.js` file into your `config/www` folder.
+3. Add reference to `room-card-minimalist.js` in your Dashboard. There's two ways to do that:
+   - **Using UI:** _Settings_ → _Dashboards_ → _More Options icon_ → _Resources_ → _Add Resource_ → Set _Url_ as `/local/room-card-minimalist.js` → Set _Resource type_ as `JavaScript Module`.
+     **Note:** If you do not see the Resources menu, you will need to enable _Advanced Mode_ in your _User Profile_
+   - **Using YAML:** Add following code to `lovelace` section.
+     ```yaml
+     resources:
+       - url: /local/room-card-minimalist.js
+         type: module
+     ```
 
 ## Configuration variables
-The editor is supported from version 2.0.0, but if you want to use `yaml`, heres the properties:
 
-| Name                  | Type            | Default     | Description                                                                                                                         |
-| :-------------------- | :-------------- | :---------- | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                | string          | Required    | Name of the room to render.                                                                                                         |
-| `icon`                | string          | Required    | Icon to render.                                                                                                                     |
-| `icon_color`          | string          | Optional    | The color of the room icon.  May contain [templates](https://www.home-assistant.io/docs/configuration/)                                                                                                                   |
-| `secondary`           | string          | Optional    | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                    |
-| `action  `            | string          | Optional    | Action on tap                                                                                                       |
-| `entities`            | list            | Optional    | Room state entities                                                                       |
-<br>
+The editor is supported, but if you want to use `yaml`, here are the properties:
 
-Room State Entity
-| Name                  | Type            | Default     | Description                                                                                                                         |
-| :-------------------- | :-------------- | :---------- | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `type`                | enum            | Required    | Use `entity` or `template`                                                                                                          |
-| `icon`                | string          | Required    | Icon to render.                                                                                                                     |
-| `icon_off`            | string          | Optional    | Icon to render when state is off, if not set the icon will not be changed.                                                          |
-| `entity`              | string          | Required    | Required if type is `entity`, the state from this will be used.                                                                     |
-| `on_state`            | string          | Required    | Required if type is `entity`, the state that will be considered as on.                                                              |
-| `condition`           | string          | Required    | Required if type is `template`. Supports template values, return any value for on state, and empty for off.                         |
-| `color_on`   | string          | Optional    | The color for entitie icons when on. May contain [templates](https://www.home-assistant.io/docs/configuration/)                                                                           |
-| `color_off`  | string          | Optional    | The color for entitie icons when off. May contain [templates](https://www.home-assistant.io/docs/configuration/)                                                                          |
+### Card Configuration
 
+| Name                               | Type    | Default  | Description                                                                                                                                        |
+| :--------------------------------- | :------ | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                             | string  | Required | Name of the room to render.                                                                                                                        |
+| `icon`                             | string  | Required | Icon to render.                                                                                                                                    |
+| `icon_color`                       | string  | Optional | The color of the room icon. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                 |
+| `secondary`                        | string  | Optional | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                   |
+| `secondary_color`                  | string  | Optional | Color of the secondary text. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                |
+| `card_template`                    | string  | Optional | Color template for the card. See [Available Color Templates](#available-color-templates) for options.                                              |
+| `show_background_circle`           | boolean | `true`   | Whether to show the background circle behind the icon.                                                                                             |
+| `background_circle_color`          | string  | Optional | Color of the background circle or empty for template color. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
+| `tap_action`                       | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                         |
+| `hold_action`                      | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                        |
+| `entities_reverse_order`           | boolean | `false`  | Display entities from bottom to top instead of top to bottom.                                                                                      |
+| `use_template_color_for_title`     | boolean | `false`  | Use the card template color for the room title text.                                                                                               |
+| `use_template_color_for_secondary` | boolean | `false`  | Use the card template color for the secondary text/template.                                                                                       |
+| `entities`                         | list    | Optional | List of entities to display as buttons (max 4).                                                                                                    |
 
+### Entity Configuration
+
+| Name                   | Type    | Default  | Description                                                                                                                  |
+| :--------------------- | :------ | :------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| `type`                 | enum    | Required | Use `entity` or `template`.                                                                                                  |
+| `icon`                 | string  | Required | Icon to render.                                                                                                              |
+| `icon_off`             | string  | Optional | Icon to render when state is off. If not set, the icon will not change.                                                      |
+| `entity`               | string  | Required | Required if type is `entity`. The entity ID to monitor.                                                                      |
+| `on_state`             | string  | Required | Required if type is `entity`. The state value that will be considered as "on".                                               |
+| `condition`            | string  | Required | Required if type is `template`. Template that returns any value for "on" state, empty for "off".                             |
+| `color_on`             | string  | Optional | Color for entity icon when on. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).        |
+| `color_off`            | string  | Optional | Color for entity icon when off. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).       |
+| `background_color_on`  | string  | Optional | Background color for entity when on. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).  |
+| `background_color_off` | string  | Optional | Background color for entity when off. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
+| `template_on`          | string  | Optional | Color template to apply when entity is on (e.g., `blue`).                                                                    |
+| `template_off`         | string  | Optional | Color template to apply when entity is off (e.g., `red`).                                                                    |
+| `use_light_color`      | boolean | `false`  | For light entities: use the actual light color as the active state color.                                                    |
+| `tap_action`           | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                   |
+| `hold_action`          | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                  |
+
+### Available Color Templates
+
+The following color templates are available for `card_template`, `template_on`, and `template_off`:
+
+| Template Name | Color                                                           | Description                         |
+| :------------ | :-------------------------------------------------------------- | :---------------------------------- |
+| `blue`        | ![#3D5AFE](https://dummyimage.com/15/3d5afe/3d5afe) Blue        | Default blue color scheme `#3D5AFE` |
+| `lightblue`   | ![#03A9F4](https://dummyimage.com/15/03a9f4/03a9f4) Light Blue  | Light blue color scheme `#03A9F4`   |
+| `red`         | ![#F54436](https://dummyimage.com/15/f54436/f54436) Red         | Red color scheme `#F54436`          |
+| `green`       | ![#01C852](https://dummyimage.com/15/01c852/01c852) Green       | Green color scheme `#01C852`        |
+| `lightgreen`  | ![#8BC34A](https://dummyimage.com/15/8bc34a/8bc34a) Light Green | Light green color scheme `#8BC34A`  |
+| `yellow`      | ![#FF9101](https://dummyimage.com/15/ff9101/ff9101) Yellow      | Yellow/amber color scheme `#FF9101` |
+| `purple`      | ![#661FFF](https://dummyimage.com/15/661fff/661fff) Purple      | Purple color scheme `#661FFF`       |
+| `orange`      | ![#FF5722](https://dummyimage.com/15/ff5722/ff5722) Orange      | Orange color scheme `#FF5722`       |
+| `pink`        | ![#E91E63](https://dummyimage.com/15/e91e63/e91e63) Pink        | Pink color scheme `#E91E63`         |
+| `grey`        | ![#9E9E9E](https://dummyimage.com/15/9e9e9e/9e9e9e) Grey        | Grey/neutral color scheme `#9E9E9E` |
+| `teal`        | ![#009688](https://dummyimage.com/15/009688/009688) Teal        | Teal color scheme `#009688`         |
+| `indigo`      | ![#3F51B5](https://dummyimage.com/15/3f51b5/3f51b5) Indigo      | Indigo color scheme `#3F51B5`       |
+
+These templates use CSS variables that can be customized in your Home Assistant theme. If UI Lovelace Minimalist or another theme is installed which provides the `--color-*` variables, the templates will use these colors. Otherwise, fallback colors are provided (see [src/room-card-minimalist.js](https://github.com/unbekannt3/room-card-minimalist/blob/main/src/room-card-minimalist.js) => const COLOR_TEMPLATES for details).
 
 ### YAML Example
+
 ```yaml
-type: custom:room-card
-icon: mdi:home-outline
-icon_color: "#333333"
+type: custom:room-card-minimalist
 name: Living Room
+icon: mdi:sofa
+card_template: blue
+use_template_color_for_title: true
+use_template_color_for_secondary: true
+entities_reverse_order: false
 secondary: '{{states("sensor.living_room_temperature")}} °C'
 tap_action:
   action: navigate
   navigation_path: /lovelace/living-room
+hold_action:
+  action: more-info
 entities:
   - type: entity
-    entity: climate.climate_living_room
-    icon: mdi:heat-wave
-    on_state: heating
-  - type: template
+    entity: light.living_room_ceiling
     icon: mdi:ceiling-light
     icon_off: mdi:ceiling-light-outline
+    on_state: 'on'
+    use_light_color: true
+    color_off: grey
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+  - type: template
+    icon: mdi:lightbulb-group
+    icon_off: mdi:lightbulb-group-outline
     condition: >-
       {% set lights_on = expand(area_entities('Living Room')) |
       selectattr('domain','eq','light') | selectattr('state','eq','on') | list |
-      count %}{% if lights_on > 0 %}true{% endif %}
+      count %}{% if lights_on > 0 %}{{ lights_on }} lights on{% endif %}
+    color_on: yellow
   - type: entity
-    entity: binary_sensor.living_room_presence_presence
+    entity: binary_sensor.living_room_motion
     on_state: 'on'
     icon: mdi:motion-sensor
     icon_off: mdi:motion-sensor-off
+    color_on: green
   - type: entity
-    entity: media_player.living_room
-    on_state: playing
-    icon: mdi:speaker
-    icon_off: mdi:speaker-off
-  - type: entity
-    entity: media_player.living_room_tv
-    on_state: playing
-    icon: mdi:television-classic
-    icon_off: mdi:television-classic-off
-
+    entity: climate.living_room
+    on_state: heating
+    icon: mdi:radiator
+    icon_off: mdi:radiator-disabled
+    color_on: red
 ```
 
-
 ### Theme customization
-Room Card works without theme but you can add a theme like [Noctis](https://github.com/aFFekopp/noctis). If you want more information about themes, check out the official [Home Assistant documentation about themes][home-assitant-theme-docs].
+
+Room Card Minimalist works without a theme installed however, I personally use the awesome [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) from Nerwyn in combination with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).
 
 <!-- Badges -->
+
 [hacs-url]: https://github.com/hacs/integration
-[hacs-badge]: https://img.shields.io/badge/hacs-default-orange.svg?style=flat-square
-[release-badge]: https://img.shields.io/github/v/release/patrickfnielsen/hass-room-card?style=flat-square
-[downloads-badge]: https://img.shields.io/github/downloads/patrickfnielsen/hass-room-card/total?style=flat-square
-[build-badge]: https://img.shields.io/github/actions/workflow/status/patrickfnielsen/hass-room-card/build.yaml?branch=main&style=flat-square
+[hacs-badge]: https://img.shields.io/badge/hacs-custom-orange.svg?style=flat-square
+[release-badge]: https://img.shields.io/github/v/release/unbekannt3/room-card-minimalist?style=flat-square
+[downloads-badge]: https://img.shields.io/github/downloads/unbekannt3/room-card-minimalist/total?style=flat-square
+[build-badge]: https://img.shields.io/github/actions/workflow/status/unbekannt3/room-card-minimalist/build.yaml?branch=main&style=flat-square
 
 <!-- References -->
+
 [home-assistant]: https://www.home-assistant.io/
 [home-assitant-theme-docs]: https://www.home-assistant.io/integrations/frontend/#defining-themes
 [hacs]: https://hacs.xyz
-[release-url]: https://github.com/patrickfnielsen/hass-room-card/releases
+[release-url]: https://github.com/unbekannt3/room-card-minimalist/releases

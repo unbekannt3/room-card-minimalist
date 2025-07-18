@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.1...v1.0.1) (2025-07-18)
+
+
+### Bug Fixes
+
+* label permission for release-please ([7ef1363](https://github.com/unbekannt3/room-card-minimalist/commit/7ef1363f391acf11c792101aca27432c8524fda7))
+
+
+### Other
+
+* release 1.0.1 ([5b014a6](https://github.com/unbekannt3/room-card-minimalist/commit/5b014a664c3d9a564c288bb6900eb0a4b1d7fca2))
+
 ## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.0...v1.0.1) (2025-07-18)
 
 

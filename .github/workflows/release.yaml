@@ -32,24 +32,21 @@ jobs:
           manifest-file: .release-please-manifest.json
 
       - name: Setup Node.js
-        if: steps.release_please.outputs.release_created == 'true'
+        if: steps.release_please.outputs.release_created
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
       - name: Install
-        if: steps.release_please.outputs.release_created == 'true'
+        if: steps.release_please.outputs.release_created
         run: npm ci
 
       - name: Build
-        if: steps.release_please.outputs.release_created == 'true'
+        if: steps.release_please.outputs.release_created
         run: npm run build
 
       - name: Upload Release Artifacts
-        if: steps.release_please.outputs.release_created == 'true'
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: 'dist/*.js'
-          allowUpdates: true
-          tag: ${{ steps.release_please.outputs.tag_name }}
-          token: ${{ steps.generate_token.outputs.token }}
+        if: steps.release_please.outputs.release_created
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: gh release upload ${{ steps.release_please.outputs.tag_name }} ./dist/*.js

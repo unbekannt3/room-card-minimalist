@@ -51,3 +51,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: gh release upload ${{ steps.release_please.outputs.tag_name }} ./dist/*.js
+
+      - name: Add autorelease published label to PR
+        if: ${{ steps.release_please.outputs.release_created && steps.release_please.outputs.pr }}
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          gh pr edit ${{ steps.release_please.outputs.pr }} --add-label "autorelease: published"
+
+      - name: Delete release-please branch
+        if: ${{ steps.release_please.outputs.release_created && steps.release_please.outputs.pr }}
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          # Get the branch name from the PR
+          PR_BRANCH=$(gh pr view ${{ steps.release_please.outputs.pr }} --json headRefName --jq '.headRefName')
+          echo "Deleting branch: $PR_BRANCH"
+          git push origin --delete "$PR_BRANCH" || echo "Branch '$PR_BRANCH' doesn't exist"

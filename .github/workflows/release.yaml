@@ -1,54 +1,54 @@
 name: Release
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 permissions:
-    contents: write
-    pull-requests: write
+  contents: write
+  pull-requests: write
 
 jobs:
-    release-and-build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Generate PR token
-              id: generate_token
-              uses: actions/create-github-app-token@v1
-              with:
-                  app-id: ${{ secrets.UNBKBOT_APPID }}
-                  private-key: ${{ secrets.UNBKBOT_KEY }}
+  release-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate PR token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.UNBKBOT_APPID }}
+          private-key: ${{ secrets.UNBKBOT_KEY }}
 
-            - name: Checkout
-              uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Create Release PR or Release
-              id: release_please
-              uses: googleapis/release-please-action@v4
-              with:
-                  token: ${{ steps.generate_token.outputs.token }}
-                  release-type: node
+      - name: Create Release PR or Release
+        id: release_please
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          release-type: node
 
-            - name: Setup Node.js
-              if: steps.release_please.outputs.release_created == 'true'
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '22'
+      - name: Setup Node.js
+        if: steps.release_please.outputs.release_created == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-            - name: Install
-              if: steps.release_please.outputs.release_created == 'true'
-              run: npm ci
+      - name: Install
+        if: steps.release_please.outputs.release_created == 'true'
+        run: npm ci
 
-            - name: Build
-              if: steps.release_please.outputs.release_created == 'true'
-              run: npm run build
+      - name: Build
+        if: steps.release_please.outputs.release_created == 'true'
+        run: npm run build
 
-            - name: Upload Release Artifacts
-              if: steps.release_please.outputs.release_created == 'true'
-              uses: ncipollo/release-action@v1
-              with:
-                  artifacts: 'dist/*.js'
-                  allowUpdates: true
-                  tag: ${{ steps.release_please.outputs.tag_name }}
-                  token: ${{ steps.generate_token.outputs.token }}
+      - name: Upload Release Artifacts
+        if: steps.release_please.outputs.release_created == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'dist/*.js'
+          allowUpdates: true
+          tag: ${{ steps.release_please.outputs.tag_name }}
+          token: ${{ steps.generate_token.outputs.token }}

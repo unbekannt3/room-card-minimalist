@@ -8,7 +8,8 @@
 		"prepare": "husky install",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"format:js": "prettier --write \"src/**/*.js\""
+		"format:js": "prettier --write 'src/**/*.js'",
+		"format:yaml": "prettier --write '**/*.{yaml,yml}'"
 	},
 	"keywords": [],
 	"author": "",

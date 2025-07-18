@@ -28,7 +28,8 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          release-type: node
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       - name: Setup Node.js
         if: steps.release_please.outputs.release_created == 'true'

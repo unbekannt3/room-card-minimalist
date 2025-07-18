@@ -13,6 +13,13 @@ jobs:
   release-and-build:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate PR token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.UNBKBOT_APPID }}
+          private-key: ${{ secrets.UNBKBOT_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -20,7 +27,7 @@ jobs:
         id: release_please
         uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
           release-type: node
           package-name: 'room-card-minimalist'
 
@@ -45,3 +52,4 @@ jobs:
           artifacts: 'dist/*.js'
           allowUpdates: true
           tag: ${{ steps.release_please.outputs.tag_name }}
+          token: ${{ steps.generate_token.outputs.token }}

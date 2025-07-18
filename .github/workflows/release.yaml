@@ -1,28 +1,47 @@
 name: Release
+
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  release:
+  release-and-build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create Release PR or Release
+        id: release_please
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          release-type: node
+          package-name: 'room-card-minimalist'
+
       - name: Setup Node.js
+        if: steps.release_please.outputs.release_created == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Install
+        if: steps.release_please.outputs.release_created == 'true'
         run: npm ci
+
       - name: Build
+        if: steps.release_please.outputs.release_created == 'true'
         run: npm run build
-      - name: Create Release
+
+      - name: Upload Release Artifacts
+        if: steps.release_please.outputs.release_created == 'true'
         uses: ncipollo/release-action@v1
         with:
           artifacts: 'dist/*.js'
-          generateReleaseNotes: true
-          draft: false
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          allowUpdates: true
+          tag: ${{ steps.release_please.outputs.tag_name }}

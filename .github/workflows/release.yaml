@@ -29,13 +29,12 @@ jobs:
         with:
           token: ${{ steps.generate_token.outputs.token }}
           release-type: node
-          package-name: 'room-card-minimalist'
 
       - name: Setup Node.js
         if: steps.release_please.outputs.release_created == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install
         if: steps.release_please.outputs.release_created == 'true'

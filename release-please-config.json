@@ -4,6 +4,8 @@
 			"release-type": "node",
 			"include-component-in-tag": false,
 			"include-v-in-tag": true,
+			"changelog-type": "github",
+			"extra-files": [],
 			"changelog-sections": [
 				{
 					"type": "feat",
@@ -24,32 +26,38 @@
 				{
 					"type": "docs",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				},
 				{
 					"type": "style",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				},
 				{
 					"type": "chore",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				},
 				{
 					"type": "ci",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				},
 				{
 					"type": "ticket",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				},
 				{
 					"type": "revert",
 					"section": "Other",
-					"hidden": false
+					"hidden": false,
+					"includeInChangelog": true
 				}
 			]
 		}

@@ -5,7 +5,10 @@
 	"main": "src",
 	"scripts": {
 		"build": "npx webpack --mode production --output-filename room-card-minimalist.js",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"format:js": "prettier --write \"src/**/*.js\""
 	},
 	"keywords": [],
 	"author": "",
@@ -14,6 +17,7 @@
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"husky": "^8.0.0",
+		"prettier": "^3.6.2",
 		"webpack": "^5.89.0",
 		"webpack-cli": "^5.1.4"
 	},

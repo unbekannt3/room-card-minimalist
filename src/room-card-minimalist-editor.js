@@ -33,9 +33,7 @@ class RoomCardEditor extends LitElement {
 		if (!this._config) return;
 
 		this._config.entities.splice(idx, 1);
-		this.dispatchEvent(
-			new CustomEvent('config-changed', { detail: { config: this._config } })
-		);
+		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
 	_moveStateEntity(idx, pos) {
@@ -45,18 +43,14 @@ class RoomCardEditor extends LitElement {
 			this._config.entities[idx + pos],
 			this._config.entities[idx],
 		];
-		this.dispatchEvent(
-			new CustomEvent('config-changed', { detail: { config: this._config } })
-		);
+		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
 	_addEntityState() {
 		if (!this._config) return;
 
 		this._config.entities.push({ type: 'template' });
-		this.dispatchEvent(
-			new CustomEvent('config-changed', { detail: { config: this._config } })
-		);
+		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
 	_valueChanged(ev) {
@@ -199,7 +193,7 @@ class RoomCardEditor extends LitElement {
 							label: 'Use Light Color as icon and background color',
 							selector: { boolean: {} },
 						},
-				  ]
+					]
 				: []),
 		];
 		const templateSchema = [
@@ -270,9 +264,7 @@ class RoomCardEditor extends LitElement {
 							>
 								<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
 							</mwc-icon-button>
-							<mwc-icon-button
-								@click=${() => this._deleteStateEntity(entity_idx)}
-							>
+							<mwc-icon-button @click=${() => this._deleteStateEntity(entity_idx)}>
 								<ha-icon .icon=${'mdi:close'}></ha-icon>
 							</mwc-icon-button>
 
@@ -281,8 +273,7 @@ class RoomCardEditor extends LitElement {
 								.schema=${this._getEntitySchema(entity)}
 								.data=${entity}
 								.computeLabel=${(s) => s.label ?? s.name}
-								@value-changed=${(ev) =>
-									this._valueChangedEntity(entity_idx, ev)}
+								@value-changed=${(ev) => this._valueChangedEntity(entity_idx, ev)}
 							></ha-form>
 						</div>
 					</div>
@@ -336,8 +327,7 @@ class RoomCardEditor extends LitElement {
 					},
 					{
 						name: 'icon_color',
-						label:
-							'Icon Color - gets overwritten when using card color template',
+						label: 'Icon Color - gets overwritten when using card color template',
 						selector: { template: {} },
 					},
 					{
@@ -380,9 +370,7 @@ class RoomCardEditor extends LitElement {
 				@value-changed=${this._valueChanged}
 			></ha-form>
 
-			<div
-				style="display: flex;justify-content: space-between; margin-top: 20px;"
-			>
+			<div style="display: flex;justify-content: space-between; margin-top: 20px;">
 				<p>States</p>
 				<mwc-button style="margin-top: 5px;" @click=${this._addEntityState}>
 					<ha-icon .icon=${'mdi:plus'}></ha-icon>Add State
@@ -405,11 +393,7 @@ class RoomCardEditor extends LitElement {
 		}
 
 		// Also check if the entity exists in hass and has light domain
-		if (
-			this.hass &&
-			this.hass.states &&
-			this.hass.states[entityConfig.entity]
-		) {
+		if (this.hass && this.hass.states && this.hass.states[entityConfig.entity]) {
 			const entityState = this.hass.states[entityConfig.entity];
 			return entityState.entity_id.startsWith('light.');
 		}
@@ -425,7 +409,6 @@ window.customCards.push({
 	type: 'room-card-minimalist',
 	name: 'Room Card Minimalist',
 	preview: true,
-	description:
-		'Display the state of a room at a glance - in UI Lovelace Minimalist style',
+	description: 'Display the state of a room at a glance - in UI Lovelace Minimalist style',
 	documentationURL: 'https://github.com/unbekannt3/room-card-minimalist',
 });

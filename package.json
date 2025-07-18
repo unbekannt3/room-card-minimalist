@@ -4,12 +4,16 @@
 	"description": "",
 	"main": "src",
 	"scripts": {
-		"build": "npx webpack --mode production --output-filename room-card-minimalist.js"
+		"build": "npx webpack --mode production --output-filename room-card-minimalist.js",
+		"prepare": "husky install"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@commitlint/cli": "^19.8.1",
+		"@commitlint/config-conventional": "^19.8.1",
+		"husky": "^8.0.0",
 		"webpack": "^5.89.0",
 		"webpack-cli": "^5.1.4"
 	},

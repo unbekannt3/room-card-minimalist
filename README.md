@@ -20,16 +20,9 @@ It provides a fixed size card with a room name, styled icon, and optional second
 
 Room Card is available in [HACS][hacs] (Home Assistant Community Store):
 
-<!-- [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=unbekannt3&repository=room-card-minimalist)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=unbekannt3&repository=room-card-minimalist)
 
-#### or Manually -->
-
-1. Install HACS if you don't have it already
-2. Open HACS in Home Assistant
-3. Press the 3 dots in the top right, and select "Custom repositories"
-4. For repository enter "https://github.com/unbekannt3/room-card-minimalist" and type select "Dashboard"
-5. Click button with "+" icon
-6. Search for "Room Card Minimalist"
+or search for "room-card-minimalist" in HACS.
 
 ### Manual
 
@@ -166,7 +159,7 @@ Room Card Minimalist works without a theme installed however, I personally use t
 <!-- Badges -->
 
 [hacs-url]: https://github.com/hacs/integration
-[hacs-badge]: https://img.shields.io/badge/hacs-custom-orange.svg?style=flat-square
+[hacs-badge]: https://img.shields.io/badge/hacs-default-orange.svg?style=flat-square
 [release-badge]: https://img.shields.io/github/v/release/unbekannt3/room-card-minimalist?style=flat-square
 [downloads-badge]: https://img.shields.io/github/downloads/unbekannt3/room-card-minimalist/total?style=flat-square
 [build-badge]: https://img.shields.io/github/actions/workflow/status/unbekannt3/room-card-minimalist/build.yaml?branch=main&style=flat-square

@@ -69,7 +69,7 @@ The editor is supported, but if you want to use `yaml`, here are the properties:
 | `icon`                 | string  | Required | Icon to render.                                                                                                              |
 | `icon_off`             | string  | Optional | Icon to render when state is off. If not set, the icon will not change.                                                      |
 | `entity`               | string  | Required | Required if type is `entity`. The entity ID to monitor.                                                                      |
-| `on_state`             | string  | Required | Required if type is `entity`. The state value that will be considered as "on".                                               |
+| `on_state`             | string  | Required | Required if type is `entity` and not a climate entity. The state value that will be considered as "on".                      |
 | `condition`            | string  | Required | Required if type is `template`. Template that returns any value for "on" state, empty for "off".                             |
 | `color_on`             | string  | Optional | Color for entity icon when on. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).        |
 | `color_off`            | string  | Optional | Color for entity icon when off. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).       |
@@ -80,6 +80,20 @@ The editor is supported, but if you want to use `yaml`, here are the properties:
 | `use_light_color`      | boolean | `false`  | For light entities: use the actual light color as the active state color.                                                    |
 | `tap_action`           | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                   |
 | `hold_action`          | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                  |
+
+### Climate Entity Configuration
+
+For climate entities (entities starting with `climate.`), the card automatically detects the available HVAC modes and provides mode-specific configuration options instead of the generic `on_state`, `color_on/off`, `template_on/off`, and `background_color_on/off` fields.
+
+| Name                      | Type   | Default  | Description                                                                                                                                    |
+| :------------------------ | :----- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color_[mode]`            | string | Optional | Color for entity icon when in specific HVAC mode. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).       |
+| `background_color_[mode]` | string | Optional | Background color for entity when in specific HVAC mode. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
+| `template_[mode]`         | string | Optional | Color template to apply when entity is in specific HVAC mode (e.g., `blue`, `red`).                                                            |
+
+**Available HVAC modes:** `off`, `heat`, `cool`, `heat_cool`, `auto`, `dry`, `fan_only`
+
+**Note:** The actual available modes depend on your specific climate entity. The card will automatically show configuration options only for the modes your climate entity supports.
 
 ### Available Color Templates
 
@@ -146,10 +160,14 @@ entities:
     color_on: green
   - type: entity
     entity: climate.living_room
-    on_state: heating
-    icon: mdi:radiator
-    icon_off: mdi:radiator-disabled
-    color_on: red
+    icon: mdi:thermostat
+    icon_off: mdi:thermostat-off
+    # Climate entities use mode-specific configuration:
+    color_off: grey
+    template_off: grey
+    template_heat: red
+    template_cool: lightblue
+    template_auto: green
 ```
 
 ### Theme customization

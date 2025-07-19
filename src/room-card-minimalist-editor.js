@@ -118,58 +118,63 @@ class RoomCardEditor extends LitElement {
 					},
 				],
 			},
-			{
-				type: 'grid',
-				name: '',
-				schema: [
-					{ name: 'color_on', label: 'Color On', selector: { text: {} } },
-					{ name: 'color_off', label: 'Color Off', selector: { text: {} } },
-				],
-			},
-			{
-				type: 'grid',
-				name: '',
-				schema: [
-					{
-						name: 'template_on',
-						label: 'Template On',
-						selector: {
-							select: {
-								multiple: false,
-								mode: 'dropdown',
-								options: TEMPLATE_OPTIONS,
-							},
+			// Only show color/template fields for non-climate entities
+			...(item.type === 'entity' && this._isClimateEntity(item)
+				? []
+				: [
+						{
+							type: 'grid',
+							name: '',
+							schema: [
+								{ name: 'color_on', label: 'Color On', selector: { text: {} } },
+								{ name: 'color_off', label: 'Color Off', selector: { text: {} } },
+							],
 						},
-					},
-					{
-						name: 'template_off',
-						label: 'Template Off',
-						selector: {
-							select: {
-								multiple: false,
-								mode: 'dropdown',
-								options: TEMPLATE_OPTIONS,
-							},
+						{
+							type: 'grid',
+							name: '',
+							schema: [
+								{
+									name: 'template_on',
+									label: 'Template On',
+									selector: {
+										select: {
+											multiple: false,
+											mode: 'dropdown',
+											options: TEMPLATE_OPTIONS,
+										},
+									},
+								},
+								{
+									name: 'template_off',
+									label: 'Template Off',
+									selector: {
+										select: {
+											multiple: false,
+											mode: 'dropdown',
+											options: TEMPLATE_OPTIONS,
+										},
+									},
+								},
+							],
 						},
-					},
-				],
-			},
-			{
-				type: 'grid',
-				name: '',
-				schema: [
-					{
-						name: 'background_color_on',
-						label: 'Background Color On',
-						selector: { text: {} },
-					},
-					{
-						name: 'background_color_off',
-						label: 'Background Color Off',
-						selector: { text: {} },
-					},
-				],
-			},
+						{
+							type: 'grid',
+							name: '',
+							schema: [
+								{
+									name: 'background_color_on',
+									label: 'Background Color On',
+									selector: { text: {} },
+								},
+								{
+									name: 'background_color_off',
+									label: 'Background Color Off',
+									selector: { text: {} },
+								},
+							],
+						},
+					]),
 			{
 				type: 'grid',
 				name: '',
@@ -212,12 +217,16 @@ class RoomCardEditor extends LitElement {
 				required: true,
 				selector: { entity: {} },
 			},
-			{
-				name: 'on_state',
-				label: 'On State',
-				required: true,
-				selector: { text: {} },
-			},
+			...(this._isClimateEntity(item)
+				? this._getClimateEntitySchema(item)
+				: [
+						{
+							name: 'on_state',
+							label: 'On State',
+							required: true,
+							selector: { text: {} },
+						},
+					]),
 		];
 
 		if (item.type === 'template') {
@@ -399,6 +408,108 @@ class RoomCardEditor extends LitElement {
 		}
 
 		return false;
+	}
+
+	// Helper method to check if an entity is a climate entity
+	_isClimateEntity(entityConfig) {
+		if (!entityConfig || !entityConfig.entity) {
+			return false;
+		}
+
+		// Check if entity starts with 'climate.'
+		if (entityConfig.entity.startsWith('climate.')) {
+			return true;
+		}
+
+		// Also check if the entity exists in hass and has climate domain
+		if (this.hass && this.hass.states && this.hass.states[entityConfig.entity]) {
+			const entityState = this.hass.states[entityConfig.entity];
+			return entityState.entity_id.startsWith('climate.');
+		}
+
+		return false;
+	}
+
+	// Get available HVAC modes for a climate entity
+	_getClimateHvacModes(entityConfig) {
+		if (!this._isClimateEntity(entityConfig) || !this.hass || !this.hass.states) {
+			return [];
+		}
+
+		const entityState = this.hass.states[entityConfig.entity];
+		if (!entityState || !entityState.attributes || !entityState.attributes.hvac_modes) {
+			return [];
+		}
+
+		return entityState.attributes.hvac_modes;
+	}
+
+	// Get schema for climate entity configuration
+	_getClimateEntitySchema(item) {
+		const hvacModes = this._getClimateHvacModes(item);
+
+		if (hvacModes.length === 0) {
+			// Fallback to regular on_state if no HVAC modes available
+			return [
+				{
+					name: 'on_state',
+					label: 'On State',
+					required: true,
+					selector: { text: {} },
+				},
+			];
+		}
+
+		const schema = [];
+
+		// Create configuration fields for each HVAC mode
+		hvacModes.forEach((mode) => {
+			const modeLabel = mode.charAt(0).toUpperCase() + mode.slice(1).replace('_', ' ');
+
+			schema.push({
+				type: 'expandable',
+				expanded: false,
+				name: '',
+				title: `${modeLabel} Mode`,
+				schema: [
+					{
+						type: 'grid',
+						name: '',
+						schema: [
+							{
+								name: `color_${mode}`,
+								label: `Color for ${modeLabel}`,
+								selector: { text: {} },
+							},
+							{
+								name: `background_color_${mode}`,
+								label: `Background Color for ${modeLabel}`,
+								selector: { text: {} },
+							},
+						],
+					},
+					{
+						type: 'grid',
+						name: '',
+						schema: [
+							{
+								name: `template_${mode}`,
+								label: `Template for ${modeLabel}`,
+								selector: {
+									select: {
+										multiple: false,
+										mode: 'dropdown',
+										options: TEMPLATE_OPTIONS,
+									},
+								},
+							},
+						],
+					},
+				],
+			});
+		});
+
+		return schema;
 	}
 }
 

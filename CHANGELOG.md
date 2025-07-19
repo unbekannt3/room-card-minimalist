@@ -3,33 +3,6 @@
 ## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.1...v1.0.1) (2025-07-18)
 
 
-### Bug Fixes
-
-* hacs validation only on main branch and PRs ([db3ad8c](https://github.com/unbekannt3/room-card-minimalist/commit/db3ad8c3202b34174be4051d9d4d00135d664b14))
-* label permission for release-please ([7ef1363](https://github.com/unbekannt3/room-card-minimalist/commit/7ef1363f391acf11c792101aca27432c8524fda7))
-
-
-### Other
-
-* **main:** release 1.0.1 ([6d4c7b9](https://github.com/unbekannt3/room-card-minimalist/commit/6d4c7b9286b078cd331654c1bc646603df1c628e))
-* **main:** release 1.0.1 ([1e10906](https://github.com/unbekannt3/room-card-minimalist/commit/1e109061bc0aeff497866c9761f1b4daf257c01b))
-* release 1.0.1 ([5b014a6](https://github.com/unbekannt3/room-card-minimalist/commit/5b014a664c3d9a564c288bb6900eb0a4b1d7fca2))
-
-## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.1...v1.0.1) (2025-07-18)
-
-
-### Bug Fixes
-
-* label permission for release-please ([7ef1363](https://github.com/unbekannt3/room-card-minimalist/commit/7ef1363f391acf11c792101aca27432c8524fda7))
-
-
-### Other
-
-* release 1.0.1 ([5b014a6](https://github.com/unbekannt3/room-card-minimalist/commit/5b014a664c3d9a564c288bb6900eb0a4b1d7fca2))
-
-## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.0...v1.0.1) (2025-07-18)
-
-
 ### Features
 
 * hacs repo release ([0c566e8](https://github.com/unbekannt3/room-card-minimalist/commit/0c566e8255850eb2300ec6bb5c37c5a63740e869))
@@ -37,7 +10,8 @@
 
 ### Bug Fixes
 
-* squashed looking icons on small/mobile screens ([c81c063](https://github.com/unbekannt3/room-card-minimalist/commit/c81c063fbd7a23ce13e1115aa13832a0aa9a9830))
+* hacs validation only on main branch and PRs ([db3ad8c](https://github.com/unbekannt3/room-card-minimalist/commit/db3ad8c3202b34174be4051d9d4d00135d664b14))
+* label permission for release-please ([7ef1363](https://github.com/unbekannt3/room-card-minimalist/commit/7ef1363f391acf11c792101aca27432c8524fda7))
 
 
 ### Other

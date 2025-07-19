@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.1...v1.0.2) (2025-07-19)
+
+
+### Bug Fixes
+
+* hvac modes support for "on" color state ([49ef289](https://github.com/unbekannt3/room-card-minimalist/commit/49ef2890ad67ae99f404253e137bbed2decce284))
+
+
+### Other
+
+* manually fixed CHANGELOG for failed build attempts ([6f05932](https://github.com/unbekannt3/room-card-minimalist/commit/6f05932534815c33f67e29dc2b64eeb82b04a8d5))
+* tag release pr and remove pr branch after release created ([6a5170b](https://github.com/unbekannt3/room-card-minimalist/commit/6a5170b52518d410c7961e44abf48e43b8f176fb))
+
 ## [1.0.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.1...v1.0.1) (2025-07-18)
 
 

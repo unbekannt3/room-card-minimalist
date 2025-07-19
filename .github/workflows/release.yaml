@@ -52,19 +52,24 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: gh release upload ${{ steps.release_please.outputs.tag_name }} ./dist/*.js
 
-      - name: Add autorelease published label to PR
-        if: ${{ steps.release_please.outputs.release_created && steps.release_please.outputs.pr }}
+      - name: Label release PR and cleanup branch
+        if: steps.release_please.outputs.release_created
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          gh pr edit ${{ steps.release_please.outputs.pr }} --add-label "autorelease: published"
+          # Find the PR that was merged for this release
+          PR_NUMBER=$(gh pr list --state merged --limit 50 --json number,title,mergedAt --jq '.[] | select(.title | startswith("chore(main): release")) | .number' | head -1)
 
-      - name: Delete release-please branch
-        if: ${{ steps.release_please.outputs.release_created && steps.release_please.outputs.pr }}
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-        run: |
-          # Get the branch name from the PR
-          PR_BRANCH=$(gh pr view ${{ steps.release_please.outputs.pr }} --json headRefName --jq '.headRefName')
-          echo "Deleting branch: $PR_BRANCH"
-          git push origin --delete "$PR_BRANCH" || echo "Branch '$PR_BRANCH' doesn't exist"
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Found release PR: #$PR_NUMBER"
+            gh pr edit $PR_NUMBER --add-label "autorelease: published" || echo "Failed to add label to PR #$PR_NUMBER"
+
+            # Get the branch name and delete it
+            PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
+            if [ -n "$PR_BRANCH" ] && [ "$PR_BRANCH" != "main" ]; then
+              echo "Deleting branch: $PR_BRANCH"
+              git push origin --delete "$PR_BRANCH" || echo "Branch '$PR_BRANCH' doesn't exist or already deleted"
+            fi
+          else
+            echo "No recent release PR found to label"
+          fi

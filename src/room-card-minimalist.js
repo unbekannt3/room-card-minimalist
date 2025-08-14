@@ -1,9 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import packageInfo from '../package.json';
 
-// Template colors
-// if the user selected theme provides the --color- variables it will be used
-// otherwise fallback colors are used
 const COLOR_TEMPLATES = {
 	blue: {
 		icon_color: 'rgba(var(--color-blue, 61, 90, 254),1)',
@@ -108,17 +105,43 @@ class RoomCard extends LitElement {
 			throw new Error('You need to define an Icon for the room');
 		}
 
+		// Migrate old config to new background_type system
+		let migratedBackgroundType = config.background_type;
+		
+		if (!migratedBackgroundType || migratedBackgroundType === '') {
+			if (config.use_background_image === true) {
+				if (config.background_person_entity) {
+					migratedBackgroundType = 'person';
+				} else if (config.background_image) {
+					migratedBackgroundType = 'image';
+				} else {
+					migratedBackgroundType = 'color';
+				}
+			} else if (config.show_background_circle === false) {
+				migratedBackgroundType = 'none';
+			} else {
+				migratedBackgroundType = 'color';
+			}
+		}
+
 		this._config = {
 			secondary: '',
 			secondary_color: 'var(--secondary-text-color)',
 			entities: [],
-			show_background_circle: true,
 			background_circle_color: 'var(--accent-color)',
+			background_type: migratedBackgroundType,
+			background_image: '',
+			background_person_entity: '',
 			entities_reverse_order: false,
 			use_template_color_for_title: false,
 			use_template_color_for_secondary: false,
 			...config,
 		};
+
+		// Clean up old properties
+		delete this._config.show_background_circle;
+		delete this._config.use_background_image;
+		delete this._config.background_settings;
 	}
 
 	// Called by HASS
@@ -149,11 +172,24 @@ class RoomCard extends LitElement {
 
 	// Provide stub config for preview
 	static getStubConfig() {
+		// Pick a random color template
+		const availableTemplates = Object.keys(COLOR_TEMPLATES);
+		const randomTemplate = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
+		
 		return {
 			name: 'Living Room',
 			icon: 'mdi:sofa',
-			card_template: 'blue_no_state',
+			card_template: randomTemplate,
 			secondary: '22.5°C',
+			background_type: 'color',
+			tap_action: {
+				action: 'none'
+			},
+			hold_action: {
+				action: 'none',
+			},
+			use_template_color_for_title: true,
+			use_template_color_for_secondary: true,
 			entities: [
 				{
 					type: 'template',
@@ -180,7 +216,6 @@ class RoomCard extends LitElement {
 		};
 	}
 
-	// Apply card template to get background circle color and icon color
 	_applyCardTemplate() {
 		if (
 			this._config.card_template &&
@@ -209,9 +244,8 @@ class RoomCard extends LitElement {
 		const secondaryColor = this._getValueRawOrTemplate(
 			this._config.secondary_color
 		);
-		let entitiesToShow = this._config.entities.slice(0, 4); // Always show max 4 entities
+		let entitiesToShow = this._config.entities.slice(0, 4);
 
-		// Reverse order if configured
 		if (this._config.entities_reverse_order) {
 			entitiesToShow = [...entitiesToShow].reverse();
 		}
@@ -219,7 +253,6 @@ class RoomCard extends LitElement {
 		const { background_circle_color, icon_color, text_color } =
 			this._applyCardTemplate();
 
-		// Determine title and secondary colors
 		const titleColor = this._config.use_template_color_for_title
 			? this._getValueRawOrTemplate(text_color)
 			: 'var(--primary-text-color)';
@@ -255,24 +288,35 @@ class RoomCard extends LitElement {
 						</div>
 
 						<div class="icon-container">
-							${this._config.show_background_circle !== false
+							${this._config.background_type !== 'none'
+								? this._shouldUseBackgroundImage() && this._getBackgroundImageUrl()
+									? html`
+											<div
+												class="icon-background icon-background-image"
+												style="background-image: url('${this._getBackgroundImageUrl()}');"
+											></div>
+									  `
+									: html`
+											<div
+												class="icon-background"
+												style="background-color: ${this._getValueRawOrTemplate(
+													background_circle_color
+												)}"
+											></div>
+									  `
+								: ''}
+							${!this._shouldUseBackgroundImage() || !this._getBackgroundImageUrl()
 								? html`
 										<div
-											class="icon-background"
-											style="background-color: ${this._getValueRawOrTemplate(
-												background_circle_color
-											)}"
-										></div>
+											class="icon"
+											style="--icon-color: ${this._getValueRawOrTemplate(
+												icon_color
+											)};"
+										>
+											<ha-icon .icon=${this._config.icon} />
+										</div>
 								  `
 								: ''}
-							<div
-								class="icon"
-								style="--icon-color: ${this._getValueRawOrTemplate(
-									icon_color
-								)};"
-							>
-								<ha-icon .icon=${this._config.icon} />
-							</div>
 						</div>
 					</div>
 
@@ -292,14 +336,11 @@ class RoomCard extends LitElement {
 		`;
 	}
 
-	// Check if an entity is a climate entity
-	_isClimateEntity(entityId) {
-		return entityId && entityId.startsWith('climate.');
+	_isClimateEntity(entity) {
+		return entity && entity.startsWith('climate.');
 	}
 
-	// Apply templates to get final colors
 	_applyTemplates(item, state, currentHvacMode = null) {
-		// For climate entities, use mode-specific configuration if available
 		if (this._isClimateEntity(item.entity) && currentHvacMode) {
 			const modeTemplate = item[`template_${currentHvacMode}`];
 			const modeColor = item[`color_${currentHvacMode}`];
@@ -311,12 +352,10 @@ class RoomCard extends LitElement {
 				text_color: 'var(--primary-text-color)',
 			};
 
-			// Apply mode-specific template
 			if (modeTemplate && COLOR_TEMPLATES[modeTemplate]) {
 				result = { ...result, ...COLOR_TEMPLATES[modeTemplate] };
 			}
 
-			// Override with mode-specific colors
 			if (modeColor) result.icon_color = modeColor;
 			if (modeBackgroundColor) result.background_color = modeBackgroundColor;
 
@@ -368,25 +407,20 @@ class RoomCard extends LitElement {
 		this._fireHassAction(this._config, 'tap');
 	}
 
-	// Handle card mouse down
 	_handleCardMouseDown(e) {
 		if (e.button !== 0) return; // Only left mouse button
-		// Don't start hold timer if clicking on a state item
 		if (e.target.closest('.state-item')) return;
 		this._startHoldTimer(() => this._fireHassAction(this._config, 'hold'));
 	}
 
-	// Handle card mouse up
 	_handleCardMouseUp() {
 		this._clearHoldTimer();
 	}
 
-	// Handle card mouse leave
 	_handleCardMouseLeave() {
 		this._clearHoldTimer();
 	}
 
-	// Handle card touch start
 	_handleCardTouchStart(e) {
 		// Don't start hold timer if touching a state item
 		if (e.target.closest('.state-item')) return;
@@ -398,14 +432,12 @@ class RoomCard extends LitElement {
 		this._clearHoldTimer();
 	}
 
-	// Handle card context menu (right-click)
 	_handleCardContextMenu(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		this._fireHassAction(this._config, 'hold');
 	}
 
-	// Handle item click
 	_handleItemClick(e, item) {
 		if (this._holdFired) {
 			this._holdFired = false;
@@ -415,26 +447,23 @@ class RoomCard extends LitElement {
 		this._fireHassAction(item, 'tap');
 	}
 
-	// Handle item mouse down
 	_handleItemMouseDown(e, item) {
-		if (e.button !== 0) return; // Only left mouse button
-		e.stopPropagation(); // Prevent card from handling this
+		if (e.button !== 0) return;
+		e.stopPropagation();
 		this._startHoldTimer(() => this._fireHassAction(item, 'hold'));
 	}
 
-	// Handle item mouse up
 	_handleItemMouseUp() {
 		this._clearHoldTimer();
 	}
 
-	// Handle item mouse leave
 	_handleItemMouseLeave() {
 		this._clearHoldTimer();
 	}
 
 	// Handle item touch start
 	_handleItemTouchStart(e, item) {
-		e.stopPropagation(); // Prevent card from handling this
+		e.stopPropagation();
 		this._startHoldTimer(() => this._fireHassAction(item, 'hold'));
 	}
 
@@ -450,17 +479,15 @@ class RoomCard extends LitElement {
 		this._fireHassAction(item, 'hold');
 	}
 
-	// Start hold timer
 	_startHoldTimer(callback) {
 		this._clearHoldTimer();
 		this._holdFired = false;
 		this._holdTimeout = setTimeout(() => {
 			this._holdFired = true;
 			callback();
-		}, 500); // 500ms hold time
+		}, 500);
 	}
 
-	// Clear hold timer
 	_clearHoldTimer() {
 		if (this._holdTimeout) {
 			clearTimeout(this._holdTimeout);
@@ -468,14 +495,12 @@ class RoomCard extends LitElement {
 		}
 	}
 
-	// Fire HA action event
 	_fireHassAction(config, action) {
 		const event = new Event('hass-action', {
 			bubbles: true,
 			composed: true,
 		});
 
-		// Create action config with entity if available
 		const actionConfig = {
 			entity: config.entity,
 			tap_action: config.tap_action || this._getDefaultAction(config),
@@ -491,14 +516,11 @@ class RoomCard extends LitElement {
 		this.dispatchEvent(event);
 	}
 
-	// Get default action for config
 	_getDefaultAction(config) {
-		// For main card, default to more-info or navigation
 		if (!config.type) {
 			return config.tap_action || { action: 'more-info' };
 		}
 
-		// For entity items, default to toggle for certain domains
 		if (config.type === 'entity' && config.entity) {
 			const domain = config.entity.split('.')[0];
 			if (
@@ -637,6 +659,26 @@ class RoomCard extends LitElement {
 		return this._isTemplate(item)
 			? this._templateResults[item]?.result?.toString()
 			: item;
+	}
+
+	_getBackgroundImageUrl() {
+		if (this._config.background_type === 'person' && this._config.background_person_entity) {
+			const personEntity = this.hass.states[this._config.background_person_entity];
+			if (personEntity && personEntity.attributes.entity_picture) {
+				return personEntity.attributes.entity_picture;
+			}
+		}
+		
+		if (this._config.background_type === 'image' && this._config.background_image) {
+			const imageUrl = this._getValueRawOrTemplate(this._config.background_image);
+			return imageUrl;
+		}
+		
+		return null;
+	}
+
+	_shouldUseBackgroundImage() {
+		return this._config.background_type === 'image' || this._config.background_type === 'person';
 	}
 
 	// Disconnect all template subscriptions
@@ -840,6 +882,13 @@ class RoomCard extends LitElement {
 				z-index: 1;
 			}
 
+			.icon-background-image {
+				background-size: cover;
+				background-position: center;
+				background-repeat: no-repeat;
+				opacity: 1 !important; /* Override the base opacity for images */
+			}
+
 			.icon {
 				position: relative;
 				z-index: 2;
@@ -854,6 +903,10 @@ class RoomCard extends LitElement {
 				--mdc-icon-size: var(--icon-size);
 				color: var(--icon-color);
 				filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+			}
+
+			.icon-background-image ~ .icon ha-icon {
+				filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 			}
 
 			.primary {

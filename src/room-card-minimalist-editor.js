@@ -1,7 +1,6 @@
-import { LitElement, html } from 'lit-element';
+import { LitElement, html, css } from 'lit-element';
 
-// Template colors
-const TEMPLATE_OPTIONS = [
+const COLOR_TEMPLATE_OPTIONS = [
 	{ label: 'Blue', value: 'blue' },
 	{ label: 'Light Blue', value: 'lightblue' },
 	{ label: 'Red', value: 'red' },
@@ -18,15 +17,70 @@ const TEMPLATE_OPTIONS = [
 
 class RoomCardEditor extends LitElement {
 	setConfig(config) {
-		this._config = config;
+		// Migrate old config to new background_type system
+		let migratedBackgroundType = config.background_type;
+
+		if (!migratedBackgroundType || migratedBackgroundType === '') {
+			if (config.use_background_image === true) {
+				if (config.background_person_entity) {
+					migratedBackgroundType = 'person';
+				} else if (config.background_image) {
+					migratedBackgroundType = 'image';
+				} else {
+					migratedBackgroundType = 'color';
+				}
+			} else if (config.show_background_circle === false) {
+				migratedBackgroundType = 'none';
+			} else {
+				migratedBackgroundType = 'color';
+			}
+		}
+
+		this._config = {
+			background_type: migratedBackgroundType,
+			...config,
+		};
 		this._currentTab = 0;
+
+		// Clean up old properties
+		delete this._config.show_background_circle;
+		delete this._config.use_background_image;
+		delete this._config.background_settings;
+
+		// If we migrated or cleaned up, dispatch the config change to save the new format
+		if (
+			migratedBackgroundType !== config.background_type ||
+			config.show_background_circle !== undefined ||
+			config.use_background_image !== undefined
+		) {
+			setTimeout(() => {
+				this.dispatchEvent(
+					new CustomEvent('config-changed', { detail: { config: this._config } })
+				);
+			}, 0);
+		}
 	}
 
 	static get properties() {
 		return {
 			hass: { attribute: false },
 			_config: { state: true },
+			_backgroundType: { state: true }, // Track background type for reactive schema
 		};
+	}
+
+	updated(changedProps) {
+		super.updated(changedProps);
+
+		// Update background type for reactive schema
+		if (changedProps.has('_config') && this._config) {
+			const newBackgroundType = this._config.background_type || 'color';
+			if (this._backgroundType !== newBackgroundType) {
+				this._backgroundType = newBackgroundType;
+				// Force re-render of the form
+				this.requestUpdate();
+			}
+		}
 	}
 
 	_deleteStateEntity(idx) {
@@ -64,14 +118,32 @@ class RoomCardEditor extends LitElement {
 			return;
 		}
 
+		const newConfig = ev.detail.value;
+
+		// Special handling for background_type changes
+		if (newConfig.background_type !== this._config.background_type) {
+			if (newConfig.background_type === 'person' && !newConfig.background_person_entity) {
+				// Auto-select first person when switching to person mode
+				const firstPerson = this._getFirstPersonEntity();
+				if (firstPerson) {
+					newConfig.background_person_entity = firstPerson;
+				}
+			}
+		}
+
+		// Update internal config to trigger re-render
+		this._config = newConfig;
+
+		// Clean up old config keys that might still be present
+		delete newConfig.background_settings;
+
 		const event = new CustomEvent('config-changed', {
-			detail: { config: ev.detail.value },
+			detail: { config: newConfig },
 			bubbles: true,
 			composed: true,
 		});
 		this.dispatchEvent(event);
 	}
-
 	_valueChangedEntity(entity, ev) {
 		if (!this._config || !this.hass) {
 			return;
@@ -148,7 +220,7 @@ class RoomCardEditor extends LitElement {
 										select: {
 											multiple: false,
 											mode: 'dropdown',
-											options: TEMPLATE_OPTIONS,
+											options: COLOR_TEMPLATE_OPTIONS,
 										},
 									},
 								},
@@ -159,7 +231,7 @@ class RoomCardEditor extends LitElement {
 										select: {
 											multiple: false,
 											mode: 'dropdown',
-											options: TEMPLATE_OPTIONS,
+											options: COLOR_TEMPLATE_OPTIONS,
 										},
 									},
 								},
@@ -327,7 +399,7 @@ class RoomCardEditor extends LitElement {
 							select: {
 								multiple: false,
 								mode: 'dropdown',
-								options: TEMPLATE_OPTIONS,
+								options: COLOR_TEMPLATE_OPTIONS,
 							},
 						},
 					},
@@ -357,15 +429,22 @@ class RoomCardEditor extends LitElement {
 						selector: { template: {} },
 					},
 					{
-						name: 'show_background_circle',
-						label: 'Show Background Circle behind card icon',
-						selector: { boolean: true },
+						name: 'background_type',
+						label: 'Background Type',
+						selector: {
+							select: {
+								multiple: false,
+								mode: 'dropdown',
+								options: [
+									{ value: 'none', label: 'No Background' },
+									{ value: 'color', label: 'Color Circle' },
+									{ value: 'image', label: 'Custom Image' },
+									{ value: 'person', label: 'Person Profile Picture' },
+								],
+							},
+						},
 					},
-					{
-						name: 'background_circle_color',
-						label: 'Background Circle Color - empty for template color',
-						selector: { template: {} },
-					},
+					...this._getBackgroundSchema(),
 					{
 						name: 'entities_reverse_order',
 						label: 'Entities from bottom to top',
@@ -403,12 +482,10 @@ class RoomCardEditor extends LitElement {
 			return false;
 		}
 
-		// Check if entity starts with 'light.'
 		if (entityConfig.entity.startsWith('light.')) {
 			return true;
 		}
 
-		// Also check if the entity exists in hass and has light domain
 		if (this.hass && this.hass.states && this.hass.states[entityConfig.entity]) {
 			const entityState = this.hass.states[entityConfig.entity];
 			return entityState.entity_id.startsWith('light.');
@@ -417,18 +494,15 @@ class RoomCardEditor extends LitElement {
 		return false;
 	}
 
-	// Helper method to check if an entity is a climate entity
 	_isClimateEntity(entityConfig) {
 		if (!entityConfig || !entityConfig.entity) {
 			return false;
 		}
 
-		// Check if entity starts with 'climate.'
 		if (entityConfig.entity.startsWith('climate.')) {
 			return true;
 		}
 
-		// Also check if the entity exists in hass and has climate domain
 		if (this.hass && this.hass.states && this.hass.states[entityConfig.entity]) {
 			const entityState = this.hass.states[entityConfig.entity];
 			return entityState.entity_id.startsWith('climate.');
@@ -437,7 +511,6 @@ class RoomCardEditor extends LitElement {
 		return false;
 	}
 
-	// Get available HVAC modes for a climate entity
 	_getClimateHvacModes(entityConfig) {
 		if (!this._isClimateEntity(entityConfig) || !this.hass || !this.hass.states) {
 			return [];
@@ -506,7 +579,7 @@ class RoomCardEditor extends LitElement {
 									select: {
 										multiple: false,
 										mode: 'dropdown',
-										options: TEMPLATE_OPTIONS,
+										options: COLOR_TEMPLATE_OPTIONS,
 									},
 								},
 							},
@@ -517,6 +590,78 @@ class RoomCardEditor extends LitElement {
 		});
 
 		return schema;
+	}
+
+	_getFirstPersonEntity() {
+		if (!this.hass || !this.hass.states) return '';
+
+		const personEntities = Object.keys(this.hass.states)
+			.filter((entityId) => entityId.startsWith('person.'))
+			.sort();
+
+		return personEntities.length > 0 ? personEntities[0] : '';
+	}
+
+	_getBackgroundSchema() {
+		let backgroundType = this._config?.background_type;
+
+		// Migration logic for editor
+		if (!backgroundType || backgroundType === '') {
+			if (this._config?.use_background_image === true) {
+				if (this._config?.background_person_entity) {
+					backgroundType = 'person';
+				} else if (this._config?.background_image) {
+					backgroundType = 'image';
+				} else {
+					backgroundType = 'color';
+				}
+			} else {
+				backgroundType = 'color';
+			}
+		}
+
+		switch (backgroundType) {
+			case 'none':
+				return [];
+
+			case 'color':
+				return [
+					{
+						name: 'background_circle_color',
+						label: 'Background Circle Color - empty for template color',
+						selector: { template: {} },
+					},
+				];
+
+			case 'image':
+				return [
+					{
+						name: 'background_image',
+						label: 'File Path to Image (/local/...)',
+						selector: { text: {} },
+					},
+				];
+
+			case 'person':
+				return [
+					{
+						name: 'background_person_entity',
+						label: 'Person Entity',
+						required: true,
+						selector: { entity: { domain: 'person' } },
+					},
+				];
+
+			default:
+				// Fallback to old color circle schema (should be migrated automatically when opening the editor but you never know what happens to the beatuy of JS)
+				return [
+					{
+						name: 'background_circle_color',
+						label: 'Background Circle Color - empty for template color',
+						selector: { template: {} },
+					},
+				];
+		}
 	}
 }
 

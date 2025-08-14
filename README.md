@@ -44,22 +44,56 @@ The editor is supported, but if you want to use `yaml`, here are the properties:
 
 ### Card Configuration
 
-| Name                               | Type    | Default  | Description                                                                                                                                        |
-| :--------------------------------- | :------ | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                             | string  | Required | Name of the room to render.                                                                                                                        |
-| `icon`                             | string  | Required | Icon to render.                                                                                                                                    |
-| `icon_color`                       | string  | Optional | The color of the room icon. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                 |
-| `secondary`                        | string  | Optional | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                   |
-| `secondary_color`                  | string  | Optional | Color of the secondary text. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                |
-| `card_template`                    | string  | Optional | Color template for the card. See [Available Color Templates](#available-color-templates) for options.                                              |
-| `show_background_circle`           | boolean | `true`   | Whether to show the background circle behind the icon.                                                                                             |
-| `background_circle_color`          | string  | Optional | Color of the background circle or empty for template color. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
-| `tap_action`                       | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                         |
-| `hold_action`                      | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                        |
-| `entities_reverse_order`           | boolean | `false`  | Display entities from bottom to top instead of top to bottom.                                                                                      |
-| `use_template_color_for_title`     | boolean | `false`  | Use the card template color for the room title text.                                                                                               |
-| `use_template_color_for_secondary` | boolean | `false`  | Use the card template color for the secondary text/template.                                                                                       |
-| `entities`                         | list    | Optional | List of entities to display as buttons (max 4).                                                                                                    |
+| Name                               | Type    | Default  | Description                                                                                                                                                                        |
+| :--------------------------------- | :------ | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                             | string  | Required | Name of the room to render.                                                                                                                                                        |
+| `icon`                             | string  | Required | Icon to render.                                                                                                                                                                    |
+| `icon_color`                       | string  | Optional | The color of the room icon. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                 |
+| `secondary`                        | string  | Optional | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                   |
+| `secondary_color`                  | string  | Optional | Color of the secondary text. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                |
+| `card_template`                    | string  | Optional | Color template for the card. See [Available Color Templates](#available-color-templates) for options.                                                                              |
+| `background_type`                  | enum    | `color`  | Background type behind the icon: `none`, `color`, `image`, or `person`.                                                                                                            |
+| `background_circle_color`          | string  | Optional | Color of the background circle when `background_type` is `color`. Empty for template color. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
+| `background_image`                 | string  | Optional | Image URL or path when `background_type` is `image`. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                        |
+| `background_person`                | string  | Optional | Person entity ID when `background_type` is `person` (e.g., `person.john`). Uses the person's profile picture.                                                                      |
+| `tap_action`                       | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                                         |
+| `hold_action`                      | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                                        |
+| `entities_reverse_order`           | boolean | `false`  | Display entities from bottom to top instead of top to bottom.                                                                                                                      |
+| `use_template_color_for_title`     | boolean | `false`  | Use the card template color for the room title text.                                                                                                                               |
+| `use_template_color_for_secondary` | boolean | `false`  | Use the card template color for the secondary text/template.                                                                                                                       |
+| `entities`                         | list    | Optional | List of entities to display as buttons (max 4).                                                                                                                                    |
+
+### Background Type Options
+
+The card supports different background types behind the room icon:
+
+| Background Type | Description                                          | Configuration Fields      |
+| :-------------- | :--------------------------------------------------- | :------------------------ |
+| `none`          | No background circle or image behind the icon        | None                      |
+| `color`         | Traditional colored circle behind the icon (default) | `background_circle_color` |
+| `image`         | Custom image as background behind the icon           | `background_image`        |
+| `person`        | Profile picture from a Home Assistant person entity  | `background_person`       |
+
+**Example configurations:**
+
+```yaml
+# Color background (default)
+background_type: color
+background_circle_color: "#FF5722"  # or leave empty for template color
+
+# Image background
+background_type: image
+background_image: "/local/images/bedroom.jpg"
+
+# Person profile picture
+background_type: person
+background_person: person.john
+
+# No background
+background_type: none
+```
+
+**Migration Note:** Existing cards using `show_background_circle: false` will automatically migrate to `background_type: none`, and cards with custom background images will migrate to the new `background_type: image` system.
 
 ### Entity Configuration
 
@@ -123,6 +157,8 @@ type: custom:room-card-minimalist
 name: Living Room
 icon: mdi:sofa
 card_template: blue
+background_type: image
+background_image: '/local/images/living-room.jpg'
 use_template_color_for_title: true
 use_template_color_for_secondary: true
 entities_reverse_order: false

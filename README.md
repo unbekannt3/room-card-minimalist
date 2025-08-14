@@ -174,6 +174,38 @@ entities:
 
 Room Card Minimalist works without a theme installed however, I personally use the awesome [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) from Nerwyn in combination with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).
 
+## Development Setup
+
+For local development:
+
+1. **Enable live build:**
+
+   ```bash
+   npm run watch
+   ```
+
+   This will automatically bundle your code whenever you make changes in the `src` folder to the `dist` folder.
+
+2. **Start the local Home Assistant dev instance:**
+
+   ```bash
+   npm run docker:start
+   ```
+
+   This will start a local Home Assistant instance in a Docker container on [localhost:8123](http://localhost:8123).
+
+3. **Add the card to your Lovelace dashboard:**
+   - Go to Settings → Dashboards → Resources → Add Resource
+   - URL: `/local/room-card-minimalist/room-card-minimalist.js`
+   - Type: JavaScript Module
+
+   You can then use the card as described above.
+
+4. **Stop the Home Assistant dev instance:**
+   ```bash
+   npm run docker:stop
+   ```
+
 <!-- Badges -->
 
 [hacs-url]: https://github.com/hacs/integration

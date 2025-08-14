@@ -5,6 +5,9 @@
 	"main": "src",
 	"scripts": {
 		"build": "npx webpack --mode production --output-filename room-card-minimalist.js",
+		"watch": "npx webpack --watch --mode development --output-filename room-card-minimalist.js",
+		"docker:start": "docker compose -f docker/docker-compose.yml up",
+		"docker:stop": "docker compose -f docker/docker-compose.yml down",
 		"prepare": "husky install",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",

@@ -93,8 +93,6 @@ background_person: person.john
 background_type: none
 ```
 
-**Migration Note:** Existing cards using `show_background_circle: false` will automatically migrate to `background_type: none`, and cards with custom background images will migrate to the new `background_type: image` system.
-
 ### Entity Configuration
 
 | Name                   | Type    | Default  | Description                                                                                                                  |

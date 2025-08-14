@@ -184,7 +184,7 @@ For local development:
    npm run watch
    ```
 
-   This will automatically bundle your code whenever you make changes in the `src` folder to the `dist` folder.
+   This will create a webpack dev server on localhost:8080 which will serve the live built room-card-minimalist.js file.
 
 2. **Start the local Home Assistant dev instance:**
 
@@ -196,7 +196,7 @@ For local development:
 
 3. **Add the card to your Lovelace dashboard:**
    - Go to Settings → Dashboards → Resources → Add Resource
-   - URL: `/local/room-card-minimalist/room-card-minimalist.js`
+   - URL: `http://localhost:8080/room-card-minimalist.js`
    - Type: JavaScript Module
 
    You can then use the card as described above.

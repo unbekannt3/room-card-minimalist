@@ -6,6 +6,10 @@ on:
     branches-ignore:
       - main
       - 'release-please--*'
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest

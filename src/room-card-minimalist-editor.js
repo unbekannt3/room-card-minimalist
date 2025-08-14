@@ -32,24 +32,30 @@ class RoomCardEditor extends LitElement {
 	_deleteStateEntity(idx) {
 		if (!this._config) return;
 
-		this._config.entities.splice(idx, 1);
+		const entities = [...this._config.entities];
+		entities.splice(idx, 1);
+
+		this._config = { ...this._config, entities };
 		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
 	_moveStateEntity(idx, pos) {
 		if (!this._config) return;
 
-		[this._config.entities[idx], this._config.entities[idx + pos]] = [
-			this._config.entities[idx + pos],
-			this._config.entities[idx],
-		];
+		const entities = [...this._config.entities];
+		[entities[idx], entities[idx + pos]] = [entities[idx + pos], entities[idx]];
+
+		this._config = { ...this._config, entities };
 		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
 	_addEntityState() {
 		if (!this._config) return;
 
-		this._config.entities.push({ type: 'template' });
+		const entities = [...this._config.entities];
+		entities.push({ type: 'template' });
+
+		this._config = { ...this._config, entities };
 		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
 	}
 
@@ -73,7 +79,8 @@ class RoomCardEditor extends LitElement {
 
 		const entities = [...this._config.entities];
 		entities[entity] = ev.detail.value;
-		this._config.entities = entities;
+
+		this._config = { ...this._config, entities };
 
 		const event = new CustomEvent('config-changed', {
 			detail: { config: this._config },
@@ -253,7 +260,7 @@ class RoomCardEditor extends LitElement {
 
 	_renderEntities() {
 		if (this._config.entities === undefined) {
-			this._config.entities = [];
+			this._config = { ...this._config, entities: [] };
 		}
 
 		return html`

@@ -71,6 +71,8 @@ class RoomCard extends LitElement {
 	// The height of your card. Home Assistant uses this to automatically
 	// distribute all cards over the available columns.
 	getCardSize() {
+		// Always return 2 for consistent sizing across all layouts
+		// The card is designed to accommodate up to 4 entities with fixed height
 		return 2;
 	}
 
@@ -760,6 +762,8 @@ class RoomCard extends LitElement {
 					var(--material-shadow-elevation-2)
 				);
 				transition: box-shadow 0.3s ease;
+				display: block;
+				height: 236px;
 			}
 
 			:host:hover {
@@ -948,6 +952,14 @@ class RoomCard extends LitElement {
 
 			/* Responsive adjustments */
 			@media (max-width: 768px) {
+				:host {
+					height: 200px;
+					--icon-size: 60px;
+					--icon-background-size: 140px;
+					--state-item-size: 38px;
+					--state-icon-size: 1.4rem;
+				}
+
 				.container {
 					padding: 12px 6px 12px 12px;
 					height: 176px; /* 200px - 24px padding = 176px */
@@ -962,13 +974,6 @@ class RoomCard extends LitElement {
 				.states.reverse-order {
 					padding-top: 0;
 					padding-bottom: 0;
-				}
-
-				:host {
-					--icon-size: 60px;
-					--icon-background-size: 140px;
-					--state-item-size: 38px;
-					--state-icon-size: 1.4rem;
 				}
 			}
 		`;

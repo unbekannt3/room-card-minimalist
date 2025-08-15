@@ -67,12 +67,12 @@ The editor is supported, but if you want to use `yaml`, here are the properties:
 
 The card supports different background types behind the room icon:
 
-| Background Type | Description                                          | Configuration Fields      |
-| :-------------- | :--------------------------------------------------- | :------------------------ |
-| `none`          | No background circle or image behind the icon        | None                      |
-| `color`         | Traditional colored circle behind the icon (default) | `background_circle_color` |
-| `image`         | Custom image as background behind the icon           | `background_image`        |
-| `person`        | Profile picture from a Home Assistant person entity  | `background_person`       |
+| Background Type | Description                                          | Configuration Fields                           |
+| :-------------- | :--------------------------------------------------- | :--------------------------------------------- |
+| `none`          | No background circle or image behind the icon        | None                                           |
+| `color`         | Traditional colored circle behind the icon (default) | `background_circle_color`                      |
+| `image`         | Custom image as background behind the icon           | `background_image`, `background_image_square`  |
+| `person`        | Profile picture from a Home Assistant person entity  | `background_person`, `background_image_square` |
 
 **Example configurations:**
 
@@ -88,6 +88,7 @@ background_image: "/local/images/bedroom.jpg"
 # Person profile picture
 background_type: person
 background_person: person.john
+background_image_square: true # OPTIONAL: square image instead of circle
 
 # No background
 background_type: none

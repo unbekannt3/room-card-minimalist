@@ -5,6 +5,9 @@
 	"main": "src",
 	"scripts": {
 		"build": "npx webpack --mode production --output-filename room-card-minimalist.js",
+		"build:dev": "npx webpack --mode development --output-filename room-card-minimalist.js",
+		"build:stats": "npx webpack --mode production --output-filename room-card-minimalist.js --json stats",
+		"build:analyze": "npm run build:stats && npx webpack-bundle-analyzer stats",
 		"watch": "npx webpack serve",
 		"docker:start": "docker compose -f docker/docker-compose.yml up",
 		"docker:stop": "docker compose -f docker/docker-compose.yml down",

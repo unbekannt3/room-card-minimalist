@@ -16,6 +16,135 @@ const COLOR_TEMPLATE_OPTIONS = [
 ];
 
 class RoomCardEditor extends LitElement {
+	static get styles() {
+		return css`
+			:host {
+				display: block;
+				box-sizing: border-box;
+				width: 100%;
+				overflow-x: hidden;
+			}
+
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
+
+			.box {
+				border: 1px solid var(--divider-color);
+				border-radius: 8px;
+				margin: 8px 0;
+				padding: 16px;
+				transition: all 0.2s ease;
+				background: var(--card-background-color, white);
+				box-sizing: border-box;
+				width: 100%;
+				max-width: 100%;
+			}
+
+			.box:hover {
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			.box.drag-over {
+				border-color: var(--primary-color);
+				background-color: var(--primary-color-fade, rgba(var(--rgb-primary-color), 0.1));
+				transform: scale(1.02);
+			}
+
+			.entity-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 12px;
+				padding-bottom: 8px;
+				border-bottom: 1px solid var(--divider-color);
+			}
+
+			.entity-info {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex: 1;
+				min-width: 0; /* Allow shrinking */
+			}
+
+			.entity-icon {
+				color: var(--primary-color);
+				--mdc-icon-size: 20px;
+				flex-shrink: 0; /* Don't shrink the icon */
+			}
+
+			.entity-title {
+				font-weight: 500;
+				color: var(--primary-text-color);
+				font-size: 14px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0; /* Allow shrinking */
+			}
+
+			.entity-controls {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				flex-shrink: 0; /* Never shrink the controls */
+			}
+
+			.drag-handle {
+				color: var(--secondary-text-color);
+				cursor: grab;
+				padding: 8px;
+				border-radius: 4px;
+				transition: all 0.2s ease;
+				--mdc-icon-size: 20px;
+				margin: -4px;
+				flex-shrink: 0;
+				user-select: none;
+			}
+
+			.drag-handle:hover {
+				color: var(--primary-color);
+				background-color: var(--divider-color);
+				cursor: grab;
+			}
+
+			.drag-handle:active {
+				cursor: grabbing !important;
+				color: var(--primary-color);
+			}
+
+			.drag-handle[draggable='true']:active {
+				cursor: grabbing !important;
+			}
+
+			/* Force cursor during drag operation */
+			.box.dragging .drag-handle,
+			.drag-handle.dragging {
+				cursor: grabbing !important;
+			}
+
+			/* Global cursor override during drag */
+			:host(.dragging) * {
+				cursor: grabbing !important;
+			}
+
+			.toolbar {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 12px;
+			}
+
+			/* Ensure forms don't interfere with dragging */
+			ha-form {
+				pointer-events: auto;
+			}
+		`;
+	}
+
 	setConfig(config) {
 		// Migrate old config to new background_type system
 		let migratedBackgroundType = config.background_type;
@@ -116,6 +245,141 @@ class RoomCardEditor extends LitElement {
 
 		this._config = { ...this._config, entities };
 		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
+	}
+
+	_handleDragStart(ev, index) {
+		ev.dataTransfer.setData('text/plain', index.toString());
+		ev.dataTransfer.effectAllowed = 'move';
+
+		// Create visual feedback and cursor control
+		const dragElement = ev.target.closest('.box');
+		if (dragElement) {
+			dragElement.classList.add('dragging');
+		}
+
+		// Add dragging class to handle and host
+		ev.target.classList.add('dragging');
+		this.classList.add('dragging');
+
+		// Force cursor
+		document.body.style.cursor = 'grabbing';
+	}
+
+	_handleDragEnd(ev) {
+		// Remove all drag classes and reset cursor
+		this.shadowRoot.querySelectorAll('.box').forEach((box) => {
+			box.classList.remove('dragging', 'drag-over');
+		});
+
+		// Remove dragging classes
+		this.shadowRoot.querySelectorAll('.drag-handle').forEach((handle) => {
+			handle.classList.remove('dragging');
+		});
+
+		this.classList.remove('dragging');
+
+		// Reset body cursor
+		document.body.style.cursor = '';
+	}
+
+	_handleDragOver(ev) {
+		ev.preventDefault();
+		ev.dataTransfer.dropEffect = 'move';
+
+		// Add visual feedback for drop target
+		const dropTarget = ev.target.closest('.box');
+		if (dropTarget) {
+			dropTarget.classList.add('drag-over');
+		}
+	}
+
+	_handleDragLeave(ev) {
+		const dropTarget = ev.target.closest('.box');
+		if (dropTarget) {
+			dropTarget.classList.remove('drag-over');
+		}
+	}
+
+	_handleDrop(ev, dropIndex) {
+		ev.preventDefault();
+
+		const dropTarget = ev.target.closest('.box');
+		if (dropTarget) {
+			dropTarget.classList.remove('drag-over');
+		}
+
+		const dragIndex = parseInt(ev.dataTransfer.getData('text/plain'));
+
+		if (dragIndex === dropIndex) return;
+
+		const entities = [...this._config.entities];
+		const draggedEntity = entities[dragIndex];
+
+		// Remove the dragged entity
+		entities.splice(dragIndex, 1);
+		// Insert it at the new position
+		entities.splice(dropIndex, 0, draggedEntity);
+
+		this._config = { ...this._config, entities };
+		this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
+	}
+
+	_getEntityIcon(entity) {
+		if (entity.type === 'template') {
+			if (entity.icon_on) {
+				return entity.icon_on;
+			}
+			if (entity.icon_off) {
+				return entity.icon_off;
+			}
+			return 'mdi:code-braces';
+		}
+
+		if (entity.type === 'entity' && entity.entity && this.hass) {
+			const entityObj = this.hass.states[entity.entity];
+			if (entityObj) {
+				// Use entity's icon or derive from domain
+				if (entityObj.attributes.icon) {
+					return entityObj.attributes.icon;
+				}
+
+				// Fallback icons based on domain
+				const domain = entity.entity.split('.')[0];
+				const domainIcons = {
+					light: 'mdi:lightbulb',
+					switch: 'mdi:toggle-switch',
+					fan: 'mdi:fan',
+					climate: 'mdi:thermostat',
+					cover: 'mdi:window-shutter',
+					lock: 'mdi:lock',
+					sensor: 'mdi:gauge',
+					binary_sensor: 'mdi:checkbox-marked-circle',
+					camera: 'mdi:camera',
+					media_player: 'mdi:speaker',
+					automation: 'mdi:robot',
+					script: 'mdi:script-text',
+					scene: 'mdi:palette',
+				};
+
+				return domainIcons[domain] || 'mdi:help-circle';
+			}
+		}
+
+		return 'mdi:help-circle'; // Default fallback
+	}
+
+	_getEntityDisplayName(entity, index) {
+		const baseText = entity.type === 'template' ? 'Template' : 'Entity';
+
+		if (entity.entity && this.hass) {
+			const entityObj = this.hass.states[entity.entity];
+			if (entityObj && entityObj.attributes.friendly_name) {
+				return `${baseText}: ${entityObj.attributes.friendly_name}`;
+			}
+			return `${baseText}: ${entity.entity}`;
+		}
+
+		return `${baseText} ${index + 1}`;
 	}
 
 	_valueChanged(ev) {
@@ -343,32 +607,60 @@ class RoomCardEditor extends LitElement {
 		return html`
 			${this._config.entities?.map(
 				(entity, entity_idx) => html`
-					<div class="box">
-						<div class="toolbar">
-							<mwc-icon-button
-								.disabled=${entity_idx === 0}
-								@click=${() => this._moveStateEntity(entity_idx, -1)}
-							>
-								<ha-icon .icon=${'mdi:arrow-up'}></ha-icon>
-							</mwc-icon-button>
-							<mwc-icon-button
-								.disabled=${entity_idx === this._config.entities.length - 1}
-								@click=${() => this._moveStateEntity(entity_idx, 1)}
-							>
-								<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
-							</mwc-icon-button>
-							<mwc-icon-button @click=${() => this._deleteStateEntity(entity_idx)}>
-								<ha-icon .icon=${'mdi:close'}></ha-icon>
-							</mwc-icon-button>
-
-							<ha-form
-								.hass=${this.hass}
-								.schema=${this._getEntitySchema(entity)}
-								.data=${entity}
-								.computeLabel=${(s) => s.label ?? s.name}
-								@value-changed=${(ev) => this._valueChangedEntity(entity_idx, ev)}
-							></ha-form>
+					<div
+						class="box"
+						@dragover=${this._handleDragOver}
+						@dragleave=${this._handleDragLeave}
+						@drop=${(ev) => this._handleDrop(ev, entity_idx)}
+					>
+						<div class="entity-header">
+							<div class="entity-info">
+								<ha-icon
+									.icon=${'mdi:drag'}
+									class="drag-handle"
+									draggable="true"
+									@dragstart=${(ev) => this._handleDragStart(ev, entity_idx)}
+									@dragend=${this._handleDragEnd}
+								></ha-icon>
+								<ha-icon
+									.icon=${this._getEntityIcon(entity)}
+									class="entity-icon"
+								></ha-icon>
+								<span class="entity-title">
+									${this._getEntityDisplayName(entity, entity_idx)}
+								</span>
+							</div>
+							<div class="entity-controls">
+								<mwc-icon-button
+									.disabled=${entity_idx === 0}
+									@click=${() => this._moveStateEntity(entity_idx, -1)}
+									title="Move up"
+								>
+									<ha-icon .icon=${'mdi:arrow-up'}></ha-icon>
+								</mwc-icon-button>
+								<mwc-icon-button
+									.disabled=${entity_idx === this._config.entities.length - 1}
+									@click=${() => this._moveStateEntity(entity_idx, 1)}
+									title="Move down"
+								>
+									<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
+								</mwc-icon-button>
+								<mwc-icon-button
+									@click=${() => this._deleteStateEntity(entity_idx)}
+									title="Delete"
+								>
+									<ha-icon .icon=${'mdi:close'}></ha-icon>
+								</mwc-icon-button>
+							</div>
 						</div>
+
+						<ha-form
+							.hass=${this.hass}
+							.schema=${this._getEntitySchema(entity)}
+							.data=${entity}
+							.computeLabel=${(s) => s.label ?? s.name}
+							@value-changed=${(ev) => this._valueChangedEntity(entity_idx, ev)}
+						></ha-form>
 					</div>
 				`
 			)}

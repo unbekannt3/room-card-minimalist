@@ -945,8 +945,13 @@ class RoomCardEditor extends LitElement {
 				return [
 					{
 						name: 'background_image',
-						label: 'File Path to Image (/local/...)',
+						label: 'File Path to Image (/local/...) or URL',
 						selector: { text: {} },
+					},
+					{
+						name: 'background_image_square',
+						label: 'Square Image',
+						selector: { boolean: {} },
 					},
 				];
 
@@ -957,6 +962,11 @@ class RoomCardEditor extends LitElement {
 						label: 'Person Entity',
 						required: true,
 						selector: { entity: { domain: 'person' } },
+					},
+					{
+						name: 'background_image_square',
+						label: 'Square Image',
+						selector: { boolean: {} },
 					},
 				];
 

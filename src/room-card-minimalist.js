@@ -143,6 +143,7 @@ class RoomCard extends LitElement {
 			background_type: migratedBackgroundType,
 			background_image: '',
 			background_person_entity: '',
+			background_image_square: false,
 			entities_reverse_order: false,
 			use_template_color_for_title: false,
 			use_template_color_for_secondary: false,
@@ -295,7 +296,10 @@ class RoomCard extends LitElement {
 								? this._shouldUseBackgroundImage() && this._getBackgroundImageUrl()
 									? html`
 											<div
-												class="icon-background icon-background-image"
+												class="icon-background icon-background-image ${this
+													._config.background_image_square
+													? 'icon-background-square'
+													: ''}"
 												style="background-image: url('${this._getBackgroundImageUrl()}');"
 											></div>
 										`
@@ -866,7 +870,14 @@ class RoomCard extends LitElement {
 				background-size: cover;
 				background-position: center;
 				background-repeat: no-repeat;
-				opacity: 1 !important; /* Override the base opacity for images */
+				opacity: 1 !important;
+			}
+
+			.icon-background-square {
+				border-radius: var(--border-radius);
+				width: 140px !important;
+				height: 140px !important;
+				left: -16px !important;
 			}
 
 			.icon {
@@ -993,6 +1004,13 @@ class RoomCard extends LitElement {
 					height: 176px;
 					padding-top: 0;
 					gap: 8px;
+				}
+
+				.icon-background-square {
+					width: 115px !important;
+					height: 115px !important;
+					top: -45px !important;
+					left: -13px !important;
 				}
 			}
 		`;

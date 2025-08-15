@@ -1,7 +1,7 @@
 {
 	"name": "room-card-minimalist",
 	"version": "1.0.2",
-	"description": "",
+	"description": "UI-Lovelace-Minimalist styled room overview card",
 	"main": "src",
 	"scripts": {
 		"build": "npx webpack --mode production --output-filename room-card-minimalist.js",

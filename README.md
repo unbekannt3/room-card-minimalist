@@ -230,7 +230,12 @@ For local development:
 
 3. **Add the card to your Lovelace dashboard:**
    - Go to Settings → Dashboards → Resources → Add Resource
-   - URL: `http://localhost:8080/room-card-minimalist.js`
+   - URL:
+
+   ```bash
+   http://localhost:8080/room-card-minimalist.js
+   ```
+
    - Type: JavaScript Module
 
    You can then use the card as described above.

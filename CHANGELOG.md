@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0-beta.0...v1.1.0-beta.1) (2025-08-15)
+
+
+### Bug Fixes
+
+* background image floating + profile images not loading ([6126db6](https://github.com/unbekannt3/room-card-minimalist/commit/6126db67ac8f9a318576585ae2bca61d78cb317b))
+
+
+### Other
+
+* release 1.1.0-beta.1 ([cbcbc04](https://github.com/unbekannt3/room-card-minimalist/commit/cbcbc04b24a8e2b89430ecef08202ba04ce6e8e8))
+* release please beta config ([d2642cb](https://github.com/unbekannt3/room-card-minimalist/commit/d2642cb84928ee24d77a2bf0369be261982a1f7c))
+
 ## [1.1.0-beta.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.0.2...v1.1.0-beta.0) (2025-08-15)
 
 

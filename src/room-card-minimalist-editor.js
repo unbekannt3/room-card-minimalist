@@ -726,6 +726,16 @@ class RoomCardEditor extends LitElement {
 						selector: { template: {} },
 					},
 					{
+						name: 'use_template_color_for_title',
+						label: 'Use template color for Name',
+						selector: { boolean: {} },
+					},
+					{
+						name: 'use_template_color_for_secondary',
+						label: 'Use template color for secondary info',
+						selector: { boolean: {} },
+					},
+					{
 						name: 'background_type',
 						label: 'Background Type',
 						selector: {
@@ -745,16 +755,6 @@ class RoomCardEditor extends LitElement {
 					{
 						name: 'entities_reverse_order',
 						label: 'Entities from bottom to top',
-						selector: { boolean: {} },
-					},
-					{
-						name: 'use_template_color_for_title',
-						label: 'Use template color for Name',
-						selector: { boolean: {} },
-					},
-					{
-						name: 'use_template_color_for_secondary',
-						label: 'Use template color for secondary info',
 						selector: { boolean: {} },
 					},
 				]}

@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.1.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0-beta.1...v1.1.0) (2025-08-15)
+
+
+### Features
+
+* editor drag'n drop of configured entities ([40924d1](https://github.com/unbekannt3/room-card-minimalist/commit/40924d154f0bb047548134e5afc87ab79bd4b3f3))
+* implement background type configuration ([7f4144b](https://github.com/unbekannt3/room-card-minimalist/commit/7f4144b2855e468c19573c808637f5bb5bd33c3f))
+
+
+### Bug Fixes
+
+* background image floating + profile images not loading ([6126db6](https://github.com/unbekannt3/room-card-minimalist/commit/6126db67ac8f9a318576585ae2bca61d78cb317b))
+* card sizing in different view modes ([7ce9cf9](https://github.com/unbekannt3/room-card-minimalist/commit/7ce9cf9a8d87c284be489d264eb8a9307b0d6635))
+* editor grid sizing after DnD implementation ([59fcdc4](https://github.com/unbekannt3/room-card-minimalist/commit/59fcdc400a78957083d3f1b702759a0a5387d27a))
+* editor read-only arrays ([c158523](https://github.com/unbekannt3/room-card-minimalist/commit/c158523ae551d55092ff84b4c8d46d4886cd5523))
+* enforce entity limit in editor ([8bfdf7f](https://github.com/unbekannt3/room-card-minimalist/commit/8bfdf7f61ca633b96904066a26df1f9a02db3315))
+* fix card layout in non horizontal-stacks ([1c2988f](https://github.com/unbekannt3/room-card-minimalist/commit/1c2988f19535f6b94949ee4af6b2f807ca417a73))
+* reverse ordering not working ([1991039](https://github.com/unbekannt3/room-card-minimalist/commit/1991039817dd1e71dae8c359010f812784b80ee1))
+
+
+### Other
+
+* release 1.1.0 ([078caac](https://github.com/unbekannt3/room-card-minimalist/commit/078caac39dbcd34cd1d71996569d293e2e65c6cd))
+* release please changelog generation ([d19e57e](https://github.com/unbekannt3/room-card-minimalist/commit/d19e57ec156062be00cbb804bc29099687283aca))
+* add read permission to build workflow ([a96028f](https://github.com/unbekannt3/room-card-minimalist/commit/a96028fcf9d5c55ce1a8e602dec087e37808b366))
+* added background_image_square info to README ([169e4de](https://github.com/unbekannt3/room-card-minimalist/commit/169e4de0383c630c215912876acef6a39fa5147d))
+* background_image_square README explanation ([d319300](https://github.com/unbekannt3/room-card-minimalist/commit/d319300bc9221774416255bca260667206b706e9))
+* card image options adjustments ([63fdd07](https://github.com/unbekannt3/room-card-minimalist/commit/63fdd074a6d54875e4e25416950a81286ca833b6))
+* commitlint allow 200 body length ([f438e6d](https://github.com/unbekannt3/room-card-minimalist/commit/f438e6df3b16b2e9bf18ac45a1fde5c67550d6dc))
+* dev server changes ([4ab311e](https://github.com/unbekannt3/room-card-minimalist/commit/4ab311e6746e245c8129ca4dbe53b3ada21b926f))
+* disable webpack error messages ([84dea6e](https://github.com/unbekannt3/room-card-minimalist/commit/84dea6efed4aff2a4f447b543635f00800ad1101))
+* docker development setup ([f0b6ef0](https://github.com/unbekannt3/room-card-minimalist/commit/f0b6ef0885122b0501673b53798f9c639203e375))
+* editor template color options reordering ([05999b0](https://github.com/unbekannt3/room-card-minimalist/commit/05999b088e99caa1c9a0b64a13ccde2ac74d473b))
+* fix release PR steps ([9b7aca4](https://github.com/unbekannt3/room-card-minimalist/commit/9b7aca4f907fc8415a0430f53c33c92955fe5485))
+* new repo images ([f7cb2b6](https://github.com/unbekannt3/room-card-minimalist/commit/f7cb2b689e573a42f709c4a1a37d060d1768f01d))
+* readme copy link ([4f77cc4](https://github.com/unbekannt3/room-card-minimalist/commit/4f77cc4017b817635a31eb75b252c5a26f843a43))
+* release 1.1.0-beta.0 ([237db90](https://github.com/unbekannt3/room-card-minimalist/commit/237db904b5e7630f39f37b7340180a87113e9147))
+* remove usless migration note from README ([e3e0768](https://github.com/unbekannt3/room-card-minimalist/commit/e3e07687bee85f7c755eecd05eedf545583970b7))
+
 ## [1.1.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0-beta.0...v1.1.0-beta.1) (2025-08-15)
 
 

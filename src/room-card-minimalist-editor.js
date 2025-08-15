@@ -141,6 +141,29 @@ class RoomCardEditor extends LitElement {
 			/* Ensure forms don't interfere with dragging */
 			ha-form {
 				pointer-events: auto;
+				width: 100%;
+			}
+
+			/* Force grid layout to work properly in forms - override HA's responsive behavior */
+			ha-form .grid,
+			ha-form [data-type='grid'],
+			ha-form .form-group.grid {
+				display: grid !important;
+				grid-template-columns: 1fr 1fr !important;
+				gap: 12px !important;
+				width: 100% !important;
+			}
+
+			/* Ensure individual form elements don't break the grid */
+			ha-form .form-group.grid > * {
+				min-width: 0 !important;
+				width: 100% !important;
+			}
+
+			/* Make the boxes more compact to give more space for the form */
+			.box {
+				padding: 12px !important;
+				margin: 6px 0 !important;
 			}
 		`;
 	}
@@ -551,30 +574,43 @@ class RoomCardEditor extends LitElement {
 		];
 		const templateSchema = [
 			{
-				name: 'condition',
-				label: 'Template Condition',
-				required: true,
-				selector: { template: {} },
+				type: 'grid',
+				name: '',
+				schema: [
+					{
+						name: 'condition',
+						label: 'Template Condition',
+						required: true,
+						selector: { template: {} },
+					},
+				],
 			},
 		];
 
 		const entitySchema = [
 			{
-				name: 'entity',
-				label: 'Entity',
-				required: true,
-				selector: { entity: {} },
+				type: 'grid',
+				name: '',
+				schema: [
+					{
+						name: 'entity',
+						label: 'Entity',
+						required: true,
+						selector: { entity: {} },
+					},
+					...(this._isClimateEntity(item)
+						? []
+						: [
+								{
+									name: 'on_state',
+									label: 'On State',
+									required: true,
+									selector: { text: {} },
+								},
+							]),
+				],
 			},
-			...(this._isClimateEntity(item)
-				? this._getClimateEntitySchema(item)
-				: [
-						{
-							name: 'on_state',
-							label: 'On State',
-							required: true,
-							selector: { text: {} },
-						},
-					]),
+			...(this._isClimateEntity(item) ? this._getClimateEntitySchema(item) : []),
 		];
 
 		if (item.type === 'template') {

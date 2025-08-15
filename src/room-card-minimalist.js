@@ -66,11 +66,22 @@ const COLOR_TEMPLATES = {
 
 class RoomCard extends LitElement {
 	// The height of your card. Home Assistant uses this to automatically
-	// distribute all cards over the available columns.
+	// distribute all cards over the available columns (https://developers.home-assistant.io/docs/frontend/custom-ui/custom-card#sizing-in-masonry-view).
 	getCardSize() {
-		// Always return 2 for consistent sizing across all layouts
-		// The card is designed to accommodate up to 4 entities with fixed height
-		return 2;
+		// Card height is 200px, so return 4 (4 * 50px = 200px)
+		return 4;
+	}
+
+	// Grid options for sections view - card takes specific size based on design
+	getGridOptions() {
+		return {
+			columns: 6, // Default to 6 columns (multiple of 3 as recommended)
+			min_columns: 6, // Minimum 6 columns for proper layout
+			max_columns: 12, // Can expand to full width
+			rows: 4, // Default to 4 rows (4 * 56px + gaps ≈ 200px)
+			min_rows: 4, // Fixed height, minimum 4 rows
+			max_rows: 4, // Fixed height, maximum 4 rows
+		};
 	}
 
 	// This will make parts of the card rerender when this.hass or this._config is changed.
@@ -107,7 +118,7 @@ class RoomCard extends LitElement {
 
 		// Migrate old config to new background_type system
 		let migratedBackgroundType = config.background_type;
-		
+
 		if (!migratedBackgroundType || migratedBackgroundType === '') {
 			if (config.use_background_image === true) {
 				if (config.background_person_entity) {
@@ -174,8 +185,9 @@ class RoomCard extends LitElement {
 	static getStubConfig() {
 		// Pick a random color template
 		const availableTemplates = Object.keys(COLOR_TEMPLATES);
-		const randomTemplate = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
-		
+		const randomTemplate =
+			availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
+
 		return {
 			name: 'Living Room',
 			icon: 'mdi:sofa',
@@ -183,7 +195,7 @@ class RoomCard extends LitElement {
 			secondary: '22.5°C',
 			background_type: 'color',
 			tap_action: {
-				action: 'none'
+				action: 'none',
 			},
 			hold_action: {
 				action: 'none',
@@ -217,10 +229,7 @@ class RoomCard extends LitElement {
 	}
 
 	_applyCardTemplate() {
-		if (
-			this._config.card_template &&
-			COLOR_TEMPLATES[this._config.card_template]
-		) {
+		if (this._config.card_template && COLOR_TEMPLATES[this._config.card_template]) {
 			const template = COLOR_TEMPLATES[this._config.card_template];
 			return {
 				background_circle_color: template.background_color,
@@ -229,8 +238,7 @@ class RoomCard extends LitElement {
 			};
 		}
 		return {
-			background_circle_color:
-				this._config.background_circle_color || 'var(--accent-color)',
+			background_circle_color: this._config.background_circle_color || 'var(--accent-color)',
 			icon_color: this._config.icon_color || 'rgb(var(--rgb-white))',
 			text_color: 'var(--primary-text-color)',
 		};
@@ -241,17 +249,14 @@ class RoomCard extends LitElement {
 	// replaced with the new values.  Check https://lit.dev for more info.
 	render() {
 		const secondary = this._getValueRawOrTemplate(this._config.secondary);
-		const secondaryColor = this._getValueRawOrTemplate(
-			this._config.secondary_color
-		);
+		const secondaryColor = this._getValueRawOrTemplate(this._config.secondary_color);
 		let entitiesToShow = this._config.entities.slice(0, 4);
 
 		if (this._config.entities_reverse_order) {
 			entitiesToShow = [...entitiesToShow].reverse();
 		}
 
-		const { background_circle_color, icon_color, text_color } =
-			this._applyCardTemplate();
+		const { background_circle_color, icon_color, text_color } = this._applyCardTemplate();
 
 		const titleColor = this._config.use_template_color_for_title
 			? this._getValueRawOrTemplate(text_color)
@@ -279,11 +284,9 @@ class RoomCard extends LitElement {
 								>${this._config.name}</span
 							>
 							${secondary
-								? html`<span
-										class="secondary"
-										style="color: ${finalSecondaryColor}"
+								? html`<span class="secondary" style="color: ${finalSecondaryColor}"
 										>${secondary}</span
-								  >`
+									>`
 								: ''}
 						</div>
 
@@ -295,7 +298,7 @@ class RoomCard extends LitElement {
 												class="icon-background icon-background-image"
 												style="background-image: url('${this._getBackgroundImageUrl()}');"
 											></div>
-									  `
+										`
 									: html`
 											<div
 												class="icon-background"
@@ -303,7 +306,7 @@ class RoomCard extends LitElement {
 													background_circle_color
 												)}"
 											></div>
-									  `
+										`
 								: ''}
 							${!this._shouldUseBackgroundImage() || !this._getBackgroundImageUrl()
 								? html`
@@ -315,7 +318,7 @@ class RoomCard extends LitElement {
 										>
 											<ha-icon .icon=${this._config.icon} />
 										</div>
-								  `
+									`
 								: ''}
 						</div>
 					</div>
@@ -382,12 +385,10 @@ class RoomCard extends LitElement {
 		// Override with explicit colors if provided
 		if (state === 'on') {
 			if (item.color_on) result.icon_color = item.color_on;
-			if (item.background_color_on)
-				result.background_color = item.background_color_on;
+			if (item.background_color_on) result.background_color = item.background_color_on;
 		} else {
 			if (item.color_off) result.icon_color = item.color_off;
-			if (item.background_color_off)
-				result.background_color = item.background_color_off;
+			if (item.background_color_off) result.background_color = item.background_color_off;
 		}
 
 		return result;
@@ -520,14 +521,7 @@ class RoomCard extends LitElement {
 		if (config.type === 'entity' && config.entity) {
 			const domain = config.entity.split('.')[0];
 			if (
-				[
-					'light',
-					'switch',
-					'fan',
-					'automation',
-					'script',
-					'input_boolean',
-				].includes(domain)
+				['light', 'switch', 'fan', 'automation', 'script', 'input_boolean'].includes(domain)
 			) {
 				return {
 					action: 'call-service',
@@ -598,11 +592,7 @@ class RoomCard extends LitElement {
 			}
 		} else {
 			// For regular entities, use on/off logic
-			icon = stateIsOn
-				? item.icon
-				: item.icon_off
-				? item.icon_off
-				: item.icon;
+			icon = stateIsOn ? item.icon : item.icon_off ? item.icon_off : item.icon;
 		}
 		const iconClass = !stateIsOn ? 'off' : 'on';
 
@@ -652,9 +642,7 @@ class RoomCard extends LitElement {
 			this._tryConnect(item);
 		}
 
-		return this._isTemplate(item)
-			? this._templateResults[item]?.result?.toString()
-			: item;
+		return this._isTemplate(item) ? this._templateResults[item]?.result?.toString() : item;
 	}
 
 	_getBackgroundImageUrl() {
@@ -664,17 +652,19 @@ class RoomCard extends LitElement {
 				return personEntity.attributes.entity_picture;
 			}
 		}
-		
+
 		if (this._config.background_type === 'image' && this._config.background_image) {
 			const imageUrl = this._getValueRawOrTemplate(this._config.background_image);
 			return imageUrl;
 		}
-		
+
 		return null;
 	}
 
 	_shouldUseBackgroundImage() {
-		return this._config.background_type === 'image' || this._config.background_type === 'person';
+		return (
+			this._config.background_type === 'image' || this._config.background_type === 'person'
+		);
 	}
 
 	// Disconnect all template subscriptions
@@ -789,16 +779,10 @@ class RoomCard extends LitElement {
 				border-radius: var(--ha-card-border-radius, 12px);
 				border-width: var(--ha-card-border-width, 1px);
 				border-style: solid;
-				border-color: var(
-					--ha-card-border-color,
-					var(--divider-color, #e0e0e0)
-				);
+				border-color: var(--ha-card-border-color, var(--divider-color, #e0e0e0));
 
 				/* Card shadows */
-				box-shadow: var(
-					--ha-card-box-shadow,
-					var(--material-shadow-elevation-2)
-				);
+				box-shadow: var(--ha-card-box-shadow, var(--material-shadow-elevation-2));
 				transition: box-shadow 0.3s ease;
 				display: block;
 				height: 236px;
@@ -982,10 +966,7 @@ class RoomCard extends LitElement {
 			/* Material-You Theme Compatibility */
 			@media (prefers-color-scheme: dark) {
 				ha-card {
-					background: var(
-						--card-background-color,
-						var(--ha-card-background, #1f1f1f)
-					);
+					background: var(--card-background-color, var(--ha-card-background, #1f1f1f));
 				}
 
 				.icon-background {

@@ -653,7 +653,22 @@ class RoomCard extends LitElement {
 		if (this._config.background_type === 'person' && this._config.background_person_entity) {
 			const personEntity = this.hass.states[this._config.background_person_entity];
 			if (personEntity && personEntity.attributes.entity_picture) {
-				return personEntity.attributes.entity_picture;
+				let entityPicture = personEntity.attributes.entity_picture;
+				if (entityPicture.startsWith('http')) {
+					return entityPicture;
+				}
+
+				// Ensure the path starts with / for local images
+				if (!entityPicture.startsWith('/')) {
+					entityPicture = `/${entityPicture}`;
+				}
+				// For non-admin users, try to use Home Assistant's image proxy for profile images
+				if (entityPicture.includes('/api/image/serve/')) {
+					return `${window.location.origin}${entityPicture}`;
+				} else {
+					// For other entity pictures, use them directly
+					return `${window.location.origin}${entityPicture}`;
+				}
 			}
 		}
 
@@ -878,6 +893,7 @@ class RoomCard extends LitElement {
 				width: 140px !important;
 				height: 140px !important;
 				left: -16px !important;
+				top: -45px !important;
 			}
 
 			.icon {

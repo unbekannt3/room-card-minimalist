@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.1-beta.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0...v1.1.1-beta.0) (2025-08-16)
+
+
+### Features
+
+* internationalization support ([6ca2a6b](https://github.com/unbekannt3/room-card-minimalist/commit/6ca2a6bdb01f9dbff2b8883766672e2bdaa63939))
+
+
+### Bug Fixes
+
+* reverse ordering of states not starting at card bottom ([f24c25b](https://github.com/unbekannt3/room-card-minimalist/commit/f24c25b40e1510657b31c19a71c4f77c6ebda3da))
+
+
+### Other
+
+* add pr-version commit script ([2fc4fc2](https://github.com/unbekannt3/room-card-minimalist/commit/2fc4fc28226804e0a91c6daed7dcc2196c9c7e94))
+* fix github actions for i18n implementation ([50d2f19](https://github.com/unbekannt3/room-card-minimalist/commit/50d2f1969bdc6c8039e6a646185555cca3378c01))
+* localization fixes ([122364f](https://github.com/unbekannt3/room-card-minimalist/commit/122364f2d523dfea2f9be02555fc8594a23192b8))
+* release 1.1.1-beta.0 ([c9fc34b](https://github.com/unbekannt3/room-card-minimalist/commit/c9fc34b5febb6d409e4cc57a7deffe78ad74acd4))
+* webpack proper minification of css/html in literals ([a4bd648](https://github.com/unbekannt3/room-card-minimalist/commit/a4bd64891f1fc62d914ca6fe16a1787455106a31))
+
 ## [1.1.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0-beta.1...v1.1.0) (2025-08-15)
 
 

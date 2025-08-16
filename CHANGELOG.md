@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.0...v1.1.1-beta.1) (2025-08-16)
+
+
+### Other
+
+* add few more badges to readme ([5b231f4](https://github.com/unbekannt3/room-card-minimalist/commit/5b231f4b7543e57b96784ce6d6ffb73b09698da8))
+* add LICENSE ([42a6ec4](https://github.com/unbekannt3/room-card-minimalist/commit/42a6ec455959a39c401148fd54ecee35726c3338))
+* clarify template capabilities in README ([f10ecb5](https://github.com/unbekannt3/room-card-minimalist/commit/f10ecb5d3ae7c8656b61a8092de1fa0400fefa36))
+* prereleases from next branch ([e4a9a20](https://github.com/unbekannt3/room-card-minimalist/commit/e4a9a20ede9e8ddbc83c15f523839e4d465695b7))
+* release 1.1.1-beta.1 ([37440a8](https://github.com/unbekannt3/room-card-minimalist/commit/37440a8da9bee86b5d5773bb06de1354b9a20787))
+
 ## [1.1.1-beta.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.0...v1.1.1-beta.0) (2025-08-16)
 
 

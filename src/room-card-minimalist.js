@@ -332,7 +332,11 @@ class RoomCard extends LitElement {
 					</div>
 
 					<div class="content-right">
-						<div class="states">
+						<div
+							class="states ${this._config.entities_reverse_order
+								? 'states-reverse'
+								: ''}"
+						>
 							${entitiesToShow.map((item) => {
 								return this._getItemHTML(item);
 							})}
@@ -963,6 +967,12 @@ class RoomCard extends LitElement {
 				padding-top: 20px;
 			}
 
+			.states-reverse {
+				justify-content: flex-end;
+				padding-top: 0;
+				padding-bottom: 20px;
+			}
+
 			.state-item {
 				display: flex;
 				align-items: center;
@@ -1030,6 +1040,10 @@ class RoomCard extends LitElement {
 					height: 176px;
 					padding-top: 0;
 					gap: 8px;
+				}
+
+				.states-reverse {
+					padding-bottom: 0;
 				}
 
 				.icon-background-square {

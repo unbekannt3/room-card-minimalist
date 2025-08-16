@@ -8,13 +8,14 @@ To add a new language, simply copy the English template and translate it:
 
 1. **Fork this repository** on GitHub
 2. **Create a branch** with a descriptive name like `translation-fr` or `translation-es`
-3. **Copy the English template**:
+3. **Install packages** `npm install`
+4. **Copy the English template**:
    - Copy `src/localize/locales/en.json`
    - Rename it to your language code (e.g., `fr.json` for French, `es.json` for Spanish)
-4. **Translate the values** in your new file (keep the keys in English)
-5. Add your Language to the [README](../README.md#supported-languages) for others to know its supported
-6. Commit your changes with "**i18n: add [Language] translation**" as commit message
-7. **Create a Pull Request** with your translation
+5. **Translate the values** in your new file (keep the keys in English)
+6. Add your Language to the [README](../README.md#supported-languages) for others to know its supported
+7. Commit your changes with "**i18n: add [Language] translation**" as commit message
+8. **Create a Pull Request** with your translation
 
 ### Detailed Step-by-Step Guide
 
@@ -34,7 +35,7 @@ To add a new language, simply copy the English template and translate it:
 4. **Translate the content**
    - Translate all the **values** (the text after the colons)
    - Keep all the **keys** (the text before the colons) in English
-   - Ensure your JSON syntax is valid
+   - Ensure your JSON syntax is valid by using a JSON validator like [JSONLint](https://jsonlint.com/)
 
 5. **Add the import to localize.js**
    - The new language needs to be imported in `src/localize/localize.js`
@@ -50,6 +51,8 @@ To add a new language, simply copy the English template and translate it:
      fr: frTranslations, // <- New language
    };
    ```
+
+   - Format your touched files with Prettier: `npm run format`
 
 6. **Test your translation** (optional but recommended)
    - Setup a local HomeAssistant instance as described in the README

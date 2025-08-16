@@ -224,9 +224,15 @@ For detailed instructions, see our [Internationalization Guide](docs/Internation
 
 ## Development Setup
 
-For local development:
+For local development make sure to have at least Node 22 installed (earlier version might work but untested).
 
-1. **Enable live build:**
+1. **Install Packages:**
+
+   ```bash
+   npm install
+   ```
+
+2. **Enable live build:**
 
    ```bash
    npm run watch
@@ -234,7 +240,7 @@ For local development:
 
    This will create a webpack dev server on localhost:8080 which will serve the live built room-card-minimalist.js file.
 
-2. **Start the local Home Assistant dev instance:**
+3. **Start the local Home Assistant dev instance:**
 
    ```bash
    npm run docker:start
@@ -242,7 +248,7 @@ For local development:
 
    This will start a local Home Assistant instance in a Docker container on [localhost:8123](http://localhost:8123).
 
-3. **Add the card to your Lovelace dashboard:**
+4. **Add the card to your Lovelace dashboard:**
    - Go to Settings → Dashboards → Resources → Add Resource
    - URL:
 
@@ -254,7 +260,7 @@ For local development:
 
    You can then use the card as described above.
 
-4. **Stop the Home Assistant dev instance:**
+5. **Stop the Home Assistant dev instance:**
    ```bash
    npm run docker:stop
    ```

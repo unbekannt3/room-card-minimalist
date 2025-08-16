@@ -139,7 +139,6 @@ class RoomCard extends LitElement {
 			secondary: '',
 			secondary_color: 'var(--secondary-text-color)',
 			entities: [],
-			background_circle_color: 'var(--accent-color)',
 			background_type: migratedBackgroundType,
 			background_image: '',
 			background_person_entity: '',
@@ -233,8 +232,13 @@ class RoomCard extends LitElement {
 		if (this._config.card_template && COLOR_TEMPLATES[this._config.card_template]) {
 			const template = COLOR_TEMPLATES[this._config.card_template];
 			return {
-				background_circle_color: template.background_color,
-				icon_color: template.icon_color,
+				background_circle_color:
+					(this._config.background_circle_color &&
+						this._config.background_circle_color.trim()) ||
+					template.background_color,
+				icon_color:
+					(this._config.icon_color && this._config.icon_color.trim()) ||
+					template.icon_color,
 				text_color: template.text_color,
 			};
 		}

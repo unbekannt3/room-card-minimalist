@@ -2,8 +2,8 @@
 	"packages": {
 		".": {
 			"release-type": "node",
-			"prerelease": false,
-			"skip-unstable": false,
+			"prerelease": true,
+			"skip-unstable": true,
 			"include-component-in-tag": false,
 			"include-v-in-tag": true,
 			"changelog-sections": [

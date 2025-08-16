@@ -67,6 +67,7 @@ module.exports = (env, argv) => {
 		},
 		optimization: {
 			minimize: isProduction,
+			splitChunks: false,
 			minimizer: [
 				new TerserPlugin({
 					terserOptions: {

@@ -36,12 +36,27 @@ To add a new language, simply copy the English template and translate it:
    - Keep all the **keys** (the text before the colons) in English
    - Ensure your JSON syntax is valid
 
-5. **Test your translation** (optional but recommended)
+5. **Add the import to localize.js**
+   - The new language needs to be imported in `src/localize/localize.js`
+   - Add the import line and include it in the translations object
+   - Example for French:
+
+   ```javascript
+   import frTranslations from './locales/fr.json';
+
+   const translations = {
+     en: enTranslations,
+     de: deTranslations,
+     fr: frTranslations, // <- New language
+   };
+   ```
+
+6. **Test your translation** (optional but recommended)
    - Setup a local HomeAssistant instance as described in the README
    - Set your Home Assistant language to your translation language
    - Test the card editor to see how your translations look
 
-6. **Submit your Pull Request**
+7. **Submit your Pull Request**
    - Commit your new language file with message: `i18n: add [Language] translation`
    - Push to your fork
    - Create a Pull Request to the main repository

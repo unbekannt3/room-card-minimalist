@@ -1,9 +1,12 @@
 # Room Card Minimalist
 
+[![homeassistant][homeassistant]][home-assistant]
 [![hacs][hacs-badge]][hacs-url]
 [![release][release-badge]][release-url]
+[![prerelease][prerelease-badge]][release-url]
 ![downloads][downloads-badge]
 ![build][build-badge]
+[![license][license-badge]][license-url]
 
 ![Card - Dark Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-dark.png?raw=true)
 ![Card - Light Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-light.png?raw=true)
@@ -267,11 +270,14 @@ For local development make sure to have at least Node 22 installed (earlier vers
 
 <!-- Badges -->
 
+[homeassistant]: https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=flat-square&logo=home-assistant&logoColor=white
 [hacs-url]: https://github.com/hacs/integration
 [hacs-badge]: https://img.shields.io/badge/hacs-default-orange.svg?style=flat-square
 [release-badge]: https://img.shields.io/github/v/release/unbekannt3/room-card-minimalist?style=flat-square
+[prerelease-badge]: https://img.shields.io/github/v/release/unbekannt3/room-card-minimalist?include_prereleases&style=flat-square&label=prerelease
 [downloads-badge]: https://img.shields.io/github/downloads/unbekannt3/room-card-minimalist/total?style=flat-square
 [build-badge]: https://img.shields.io/github/actions/workflow/status/unbekannt3/room-card-minimalist/build.yaml?branch=main&style=flat-square
+[license-badge]: https://img.shields.io/github/license/unbekannt3/room-card-minimalist?style=flat-square&logo=opensourceinitiative&logoColor=white&color=0080ff
 
 <!-- References -->
 
@@ -279,3 +285,4 @@ For local development make sure to have at least Node 22 installed (earlier vers
 [home-assitant-theme-docs]: https://www.home-assistant.io/integrations/frontend/#defining-themes
 [hacs]: https://hacs.xyz
 [release-url]: https://github.com/unbekannt3/room-card-minimalist/releases
+[license-url]: https://github.com/unbekannt3/room-card-minimalist/blob/main/LICENSE

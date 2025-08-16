@@ -210,6 +210,18 @@ entities:
 
 Room Card Minimalist works without a theme installed however, I personally use the awesome [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) from Nerwyn in combination with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).
 
+## Internationalization
+
+Room Card Minimalist supports multiple languages and automatically adapts to your Home Assistant language setting.
+
+### Supported Languages
+
+- 🇺🇸 English
+- 🇩🇪 German
+
+More languages can be easily added by contributing JSON translation files.
+For detailed instructions, see our [Internationalization Guide](docs/Internationalization.md).
+
 ## Development Setup
 
 For local development:

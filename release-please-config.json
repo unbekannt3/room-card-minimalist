@@ -24,6 +24,11 @@
 					"section": "Code Refactoring"
 				},
 				{
+					"type": "i18n",
+					"section": "🌐 Translations",
+					"hidden": false
+				},
+				{
 					"type": "docs",
 					"section": "Other",
 					"hidden": false

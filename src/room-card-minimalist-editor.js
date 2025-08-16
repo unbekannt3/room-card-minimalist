@@ -1,21 +1,11 @@
 import { LitElement, html, css } from 'lit-element';
-
-const COLOR_TEMPLATE_OPTIONS = [
-	{ label: 'Blue', value: 'blue' },
-	{ label: 'Light Blue', value: 'lightblue' },
-	{ label: 'Red', value: 'red' },
-	{ label: 'Green', value: 'green' },
-	{ label: 'Light Green', value: 'lightgreen' },
-	{ label: 'Yellow', value: 'yellow' },
-	{ label: 'Purple', value: 'purple' },
-	{ label: 'Orange', value: 'orange' },
-	{ label: 'Pink', value: 'pink' },
-	{ label: 'Grey', value: 'grey' },
-	{ label: 'Teal', value: 'teal' },
-	{ label: 'Indigo', value: 'indigo' },
-];
+import { localize, getColorTemplateOptions } from './localize/localize.js';
 
 class RoomCardEditor extends LitElement {
+	constructor() {
+		super();
+	}
+
 	static get styles() {
 		return css`
 			:host {
@@ -190,6 +180,7 @@ class RoomCardEditor extends LitElement {
 
 		this._config = {
 			background_type: migratedBackgroundType,
+			entities: [],
 			...config,
 		};
 		this._currentTab = 0;
@@ -392,7 +383,10 @@ class RoomCardEditor extends LitElement {
 	}
 
 	_getEntityDisplayName(entity, index) {
-		const baseText = entity.type === 'template' ? 'Template' : 'Entity';
+		const baseText =
+			entity.type === 'template'
+				? localize(this.hass, 'entity_type_template', 'Template')
+				: localize(this.hass, 'entity_type_entity', 'Entity');
 
 		if (entity.entity && this.hass) {
 			const entityObj = this.hass.states[entity.entity];
@@ -458,14 +452,20 @@ class RoomCardEditor extends LitElement {
 		let baseSchema = [
 			{
 				name: 'type',
-				label: 'State Type',
+				label: localize(this.hass, 'state_type', 'State Type'),
 				selector: {
 					select: {
 						multiple: false,
 						mode: 'dropdown',
 						options: [
-							{ label: 'Entity', value: 'entity' },
-							{ label: 'Template', value: 'template' },
+							{
+								label: localize(this.hass, 'entity_type_entity', 'Entity'),
+								value: 'entity',
+							},
+							{
+								label: localize(this.hass, 'entity_type_template', 'Template'),
+								value: 'template',
+							},
 						],
 					},
 				},
@@ -476,14 +476,14 @@ class RoomCardEditor extends LitElement {
 				schema: [
 					{
 						name: 'icon',
-						label: 'Icon On',
+						label: localize(this.hass, 'icon_on', 'Icon (On)'),
 						required: true,
 						selector: { icon: {} },
 						context: { icon_entity: 'entity' },
 					},
 					{
 						name: 'icon_off',
-						label: 'Icon Off',
+						label: localize(this.hass, 'icon_off', 'Icon (Off)'),
 						selector: { icon: {} },
 						context: { icon_entity: 'entity' },
 					},
@@ -497,8 +497,16 @@ class RoomCardEditor extends LitElement {
 							type: 'grid',
 							name: '',
 							schema: [
-								{ name: 'color_on', label: 'Color On', selector: { text: {} } },
-								{ name: 'color_off', label: 'Color Off', selector: { text: {} } },
+								{
+									name: 'color_on',
+									label: localize(this.hass, 'color_on', 'Color (On)'),
+									selector: { text: {} },
+								},
+								{
+									name: 'color_off',
+									label: localize(this.hass, 'color_off', 'Color (Off)'),
+									selector: { text: {} },
+								},
 							],
 						},
 						{
@@ -507,23 +515,23 @@ class RoomCardEditor extends LitElement {
 							schema: [
 								{
 									name: 'template_on',
-									label: 'Template On',
+									label: localize(this.hass, 'template_on', 'Template (On)'),
 									selector: {
 										select: {
 											multiple: false,
 											mode: 'dropdown',
-											options: COLOR_TEMPLATE_OPTIONS,
+											options: getColorTemplateOptions(this.hass),
 										},
 									},
 								},
 								{
 									name: 'template_off',
-									label: 'Template Off',
+									label: localize(this.hass, 'template_off', 'Template (Off)'),
 									selector: {
 										select: {
 											multiple: false,
 											mode: 'dropdown',
-											options: COLOR_TEMPLATE_OPTIONS,
+											options: getColorTemplateOptions(this.hass),
 										},
 									},
 								},
@@ -535,12 +543,20 @@ class RoomCardEditor extends LitElement {
 							schema: [
 								{
 									name: 'background_color_on',
-									label: 'Background Color On',
+									label: localize(
+										this.hass,
+										'background_color_on',
+										'Background Color (On)'
+									),
 									selector: { text: {} },
 								},
 								{
 									name: 'background_color_off',
-									label: 'Background Color Off',
+									label: localize(
+										this.hass,
+										'background_color_off',
+										'Background Color (Off)'
+									),
 									selector: { text: {} },
 								},
 							],
@@ -552,12 +568,18 @@ class RoomCardEditor extends LitElement {
 				schema: [
 					{
 						name: 'tap_action',
-						label: 'Tap Action',
+						label:
+							this.hass?.localize?.(
+								'ui.panel.lovelace.editor.card.generic.tap_action'
+							) || 'Tap Action',
 						selector: { 'ui-action': {} },
 					},
 					{
 						name: 'hold_action',
-						label: 'Hold Action',
+						label:
+							this.hass?.localize?.(
+								'ui.panel.lovelace.editor.card.generic.hold_action'
+							) || 'Hold Action',
 						selector: { 'ui-action': {} },
 					},
 				],
@@ -566,7 +588,11 @@ class RoomCardEditor extends LitElement {
 				? [
 						{
 							name: 'use_light_color',
-							label: 'Use Light Color as icon and background color',
+							label: localize(
+								this.hass,
+								'use_light_color_description',
+								'Use Light Color as icon and background color'
+							),
 							selector: { boolean: {} },
 						},
 					]
@@ -579,7 +605,7 @@ class RoomCardEditor extends LitElement {
 				schema: [
 					{
 						name: 'condition',
-						label: 'Template Condition',
+						label: localize(this.hass, 'template_condition', 'Template Condition'),
 						required: true,
 						selector: { template: {} },
 					},
@@ -603,7 +629,7 @@ class RoomCardEditor extends LitElement {
 						: [
 								{
 									name: 'on_state',
-									label: 'On State',
+									label: localize(this.hass, 'on_state', 'On State'),
 									required: true,
 									selector: { text: {} },
 								},
@@ -629,7 +655,7 @@ class RoomCardEditor extends LitElement {
 				type: 'expandable',
 				expanded: shouldExpand,
 				name: '',
-				title: `State: ${item.type}`,
+				title: `${localize(this.hass, 'state_label', 'State')}: ${localize(this.hass, `entity_type_${item.type}`, item.type)}`,
 				schema: baseSchema,
 			},
 		];
@@ -670,20 +696,21 @@ class RoomCardEditor extends LitElement {
 								<mwc-icon-button
 									.disabled=${entity_idx === 0}
 									@click=${() => this._moveStateEntity(entity_idx, -1)}
-									title="Move up"
+									title="${localize(this.hass, 'move_up', 'Move Up')}"
 								>
 									<ha-icon .icon=${'mdi:arrow-up'}></ha-icon>
 								</mwc-icon-button>
 								<mwc-icon-button
-									.disabled=${entity_idx === this._config.entities.length - 1}
+									.disabled=${entity_idx ===
+									(this._config.entities?.length || 0) - 1}
 									@click=${() => this._moveStateEntity(entity_idx, 1)}
-									title="Move down"
+									title="${localize(this.hass, 'move_down', 'Move Down')}"
 								>
 									<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
 								</mwc-icon-button>
 								<mwc-icon-button
 									@click=${() => this._deleteStateEntity(entity_idx)}
-									title="Delete"
+									title="${localize(this.hass, 'delete', 'Delete')}"
 								>
 									<ha-icon .icon=${'mdi:close'}></ha-icon>
 								</mwc-icon-button>
@@ -707,6 +734,10 @@ class RoomCardEditor extends LitElement {
 	// properties defined above are updated, the correct parts of the rendered html are magically
 	// replaced with the new values.  Check https://lit.dev for more info.
 	render() {
+		if (!this._config) {
+			return html`<div>Loading...</div>`;
+		}
+
 		return html`
 			<ha-form
 				.hass=${this.hass}
@@ -714,75 +745,121 @@ class RoomCardEditor extends LitElement {
 				.schema=${[
 					{
 						name: 'name',
-						label: 'Name',
+						label:
+							this.hass?.localize?.('ui.panel.lovelace.editor.card.generic.name') ||
+							'Name',
 						required: true,
 						selector: { text: {} },
 					},
 					{
 						name: 'icon',
-						label: 'Icon',
+						label:
+							this.hass?.localize?.('ui.panel.lovelace.editor.card.generic.icon') ||
+							'Icon',
 						required: true,
 						selector: { icon: {} },
 						context: { icon_entity: 'entity' },
 					},
 					{
 						name: 'card_template',
-						label: 'Card Color Template',
+						label: localize(this.hass, 'card_template', 'Card Color Template'),
 						selector: {
 							select: {
 								multiple: false,
 								mode: 'dropdown',
-								options: COLOR_TEMPLATE_OPTIONS,
+								options: getColorTemplateOptions(this.hass),
 							},
 						},
 					},
 					{
 						name: 'tap_action',
-						label: 'Tap Action',
+						label:
+							this.hass?.localize?.(
+								'ui.panel.lovelace.editor.card.generic.tap_action'
+							) || 'Tap Action',
 						selector: { 'ui-action': {} },
 					},
 					{
 						name: 'hold_action',
-						label: 'Hold Action',
+						label:
+							this.hass?.localize?.(
+								'ui.panel.lovelace.editor.card.generic.hold_action'
+							) || 'Hold Action',
 						selector: { 'ui-action': {} },
 					},
 					{
 						name: 'icon_color',
-						label: 'Icon Color - gets overwritten when using card color template',
+						label: localize(this.hass, 'icon_color', 'Icon Color'),
 						selector: { template: {} },
 					},
 					{
 						name: 'secondary',
-						label: 'Secondary Info',
+						label: localize(this.hass, 'secondary', 'Secondary Info'),
 						selector: { template: {} },
 					},
 					{
 						name: 'secondary_color',
-						label: 'Secondary Info Color',
+						label: localize(this.hass, 'secondary_color', 'Secondary Info Color'),
 						selector: { template: {} },
 					},
 					{
 						name: 'use_template_color_for_title',
-						label: 'Use template color for Name',
+						label: localize(
+							this.hass,
+							'use_template_color_for_title',
+							'Use template color for Name'
+						),
 						selector: { boolean: {} },
 					},
 					{
 						name: 'use_template_color_for_secondary',
-						label: 'Use template color for secondary info',
+						label: localize(
+							this.hass,
+							'use_template_color_for_secondary',
+							'Use template color for secondary info'
+						),
 						selector: { boolean: {} },
 					},
 					{
 						name: 'background_type',
-						label: 'Background Type',
+						label: localize(this.hass, 'background_type', 'Background Type'),
 						selector: {
 							select: {
 								multiple: false,
 								mode: 'dropdown',
 								options: [
-									{ value: 'none', label: 'No Background' },
-									{ value: 'color', label: 'Color Circle' },
-									{ value: 'image', label: 'Custom Image' },
-									{ value: 'person', label: 'Person Profile Picture' },
+									{
+										value: 'none',
+										label: localize(
+											this.hass,
+											'background_type_none',
+											'No Background'
+										),
+									},
+									{
+										value: 'color',
+										label: localize(
+											this.hass,
+											'background_type_color',
+											'Color Circle'
+										),
+									},
+									{
+										value: 'image',
+										label: localize(
+											this.hass,
+											'background_type_image',
+											'Custom Image'
+										),
+									},
+									{
+										value: 'person',
+										label: localize(
+											this.hass,
+											'background_type_person',
+											'Person Profile Picture'
+										),
+									},
 								],
 							},
 						},
@@ -790,7 +867,11 @@ class RoomCardEditor extends LitElement {
 					...this._getBackgroundSchema(),
 					{
 						name: 'entities_reverse_order',
-						label: 'Entities from bottom to top',
+						label: localize(
+							this.hass,
+							'entities_reverse_order',
+							'Reverse Entity Order'
+						),
 						selector: { boolean: {} },
 					},
 				]}
@@ -799,20 +880,32 @@ class RoomCardEditor extends LitElement {
 			></ha-form>
 
 			<div style="display: flex;justify-content: space-between; margin-top: 20px;">
-				<p>States</p>
+				<p>${localize(this.hass, 'states', 'States')}</p>
 				${this._config.entities && this._config.entities.length >= 4
 					? html`<mwc-button
 							style="margin-top: 5px; cursor: not-allowed;"
 							disabled
-							title="Maximum 4 states reached"
+							title="${localize(
+								this.hass,
+								'maximum_states_reached',
+								'Maximum 4 states reached'
+							)}"
 						>
-							<ha-icon .icon=${'mdi:plus'}></ha-icon>Add State
+							<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+								this.hass,
+								'add_state',
+								'Add State'
+							)}
 						</mwc-button>`
 					: html`<mwc-button
 							style="margin-top: 5px; cursor: pointer;"
 							@click=${this._addEntityState}
 						>
-							<ha-icon .icon=${'mdi:plus'}></ha-icon>Add State
+							<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+								this.hass,
+								'add_state',
+								'Add State'
+							)}
 						</mwc-button>`}
 			</div>
 
@@ -907,7 +1000,7 @@ class RoomCardEditor extends LitElement {
 							},
 							{
 								name: `background_color_${mode}`,
-								label: `Background Color for ${modeLabel}`,
+								label: `${localize(this.hass, 'background_color_for', 'Background Color for')} ${modeLabel}`,
 								selector: { text: {} },
 							},
 						],
@@ -923,7 +1016,7 @@ class RoomCardEditor extends LitElement {
 									select: {
 										multiple: false,
 										mode: 'dropdown',
-										options: COLOR_TEMPLATE_OPTIONS,
+										options: getColorTemplateOptions(this.hass),
 									},
 								},
 							},
@@ -972,7 +1065,11 @@ class RoomCardEditor extends LitElement {
 				return [
 					{
 						name: 'background_circle_color',
-						label: 'Background Circle Color - empty for template color',
+						label: localize(
+							this.hass,
+							'background_circle_color_template_hint',
+							'Background Circle Color - empty for template color'
+						),
 						selector: { template: {} },
 					},
 				];
@@ -981,12 +1078,12 @@ class RoomCardEditor extends LitElement {
 				return [
 					{
 						name: 'background_image',
-						label: 'File Path to Image (/local/...) or URL',
+						label: localize(this.hass, 'background_image', 'Background Image'),
 						selector: { text: {} },
 					},
 					{
 						name: 'background_image_square',
-						label: 'Square Image',
+						label: localize(this.hass, 'background_image_square', 'Square Background'),
 						selector: { boolean: {} },
 					},
 				];
@@ -995,13 +1092,13 @@ class RoomCardEditor extends LitElement {
 				return [
 					{
 						name: 'background_person_entity',
-						label: 'Person Entity',
+						label: localize(this.hass, 'background_person_entity', 'Person Entity'),
 						required: true,
 						selector: { entity: { domain: 'person' } },
 					},
 					{
 						name: 'background_image_square',
-						label: 'Square Image',
+						label: localize(this.hass, 'background_image_square', 'Square Background'),
 						selector: { boolean: {} },
 					},
 				];
@@ -1011,7 +1108,11 @@ class RoomCardEditor extends LitElement {
 				return [
 					{
 						name: 'background_circle_color',
-						label: 'Background Circle Color - empty for template color',
+						label: localize(
+							this.hass,
+							'background_circle_color_template_hint',
+							'Background Circle Color - empty for template color'
+						),
 						selector: { template: {} },
 					},
 				];

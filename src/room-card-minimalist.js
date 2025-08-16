@@ -169,7 +169,7 @@ class RoomCard extends LitElement {
 	// Called by HASS
 	connectedCallback() {
 		super.connectedCallback();
-		this._tryConnect(this._config.secondary);
+		this._tryConnect(this._config?.secondary);
 	}
 
 	// Called by HASS
@@ -563,7 +563,7 @@ class RoomCard extends LitElement {
 			stateValue = this._getValue(item.condition);
 			stateIsOn = stateValue != '';
 		} else {
-			return html`<span class="invalid-entity">invalid type</span>`;
+			return this._renderInvalidEntity();
 		}
 
 		const { icon_color, background_color } = this._applyTemplates(
@@ -773,6 +773,12 @@ class RoomCard extends LitElement {
 		event.detail = detail;
 		node.dispatchEvent(event);
 		return event;
+	}
+
+	// Render invalid entity with localization
+	_renderInvalidEntity() {
+		const text = this.hass?.localize?.('ui.card.common.invalid_entity') || 'Invalid Entity';
+		return html`<span class="invalid-entity">${text}</span>`;
 	}
 
 	static get styles() {

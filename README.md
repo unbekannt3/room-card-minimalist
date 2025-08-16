@@ -15,7 +15,7 @@
 
 Room Card Minimalist is based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/hass-room-card) but extensively redesigned with added functionality in the style of the [room-card from UI Lovelace Minimalist](https://ui-lovelace-minimalist.github.io/UI/usage/cards/card_room/) which I've used in the past and missed ever since for "normal" Lovelace setups.
 
-It provides a fixed size card with a room name, styled icon, and optional secondary info. You can configure up to 4 entities to be displayed as buttons with icons that change based on the entity state.
+It provides a fixed size card with a room name, styled icon, and optional secondary info. You can configure up to 4 entities or templates to be displayed as buttons with icons that change based on the entity/template state.
 
 ## Installation
 

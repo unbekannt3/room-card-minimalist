@@ -820,7 +820,6 @@ class RoomCard extends LitElement {
 				display: block;
 				height: 236px;
 			}
-
 			:host:hover {
 				box-shadow: var(--material-shadow-elevation-4);
 			}

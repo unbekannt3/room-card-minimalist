@@ -209,6 +209,15 @@ entities:
     template_auto: green
 ```
 
+## Layout Considerations
+
+**Note:** Due to the fixed size of this card, it won't align perfectly with Home Assistant's automatic grid sizes in some layouts, which can result in padding/spacing below the cards.
+
+**Workaround:** To achieve better layout control and eliminate unwanted spacing:
+
+- Use `horizontal-stack` when you want multiple cards side by side
+- Use `vertical-stack` when you want multiple cards stacked vertically
+
 ### Theme customization
 
 Room Card Minimalist works without a theme installed however, I personally use the awesome [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) from Nerwyn in combination with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).

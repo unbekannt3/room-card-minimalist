@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.1-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.1...v1.1.1-beta.2) (2025-10-04)
+
+
+### Bug Fixes
+
+* editor entity select width ([2b3fee3](https://github.com/unbekannt3/room-card-minimalist/commit/2b3fee34b76f7d5cc3a0360098061357b4a8b204))
+
+
+### Other
+
+* add padding workaround info to README ([711b8d3](https://github.com/unbekannt3/room-card-minimalist/commit/711b8d3a21580536ccf17a7e6d96f55db60d308e))
+* release 1.1.1-beta.2 ([0d6d13e](https://github.com/unbekannt3/room-card-minimalist/commit/0d6d13edfb6c78635adadf0786d6f691d0dce9e2))
+* translation string changes ([2b3fee3](https://github.com/unbekannt3/room-card-minimalist/commit/2b3fee34b76f7d5cc3a0360098061357b4a8b204))
+
 ## [1.1.1-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.0...v1.1.1-beta.1) (2025-08-16)
 
 

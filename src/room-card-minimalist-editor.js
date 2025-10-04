@@ -615,27 +615,21 @@ class RoomCardEditor extends LitElement {
 
 		const entitySchema = [
 			{
-				type: 'grid',
-				name: '',
-				schema: [
-					{
-						name: 'entity',
-						label: 'Entity',
-						required: true,
-						selector: { entity: {} },
-					},
-					...(this._isClimateEntity(item)
-						? []
-						: [
-								{
-									name: 'on_state',
-									label: localize(this.hass, 'on_state', 'On State'),
-									required: true,
-									selector: { text: {} },
-								},
-							]),
-				],
+				name: 'entity',
+				label: localize(this.hass, 'entity_type_entity', 'Entity'),
+				required: true,
+				selector: { entity: {} },
 			},
+			...(this._isClimateEntity(item)
+				? []
+				: [
+						{
+							name: 'on_state',
+							label: localize(this.hass, 'on_state', 'On State'),
+							required: true,
+							selector: { text: {} },
+						},
+					]),
 			...(this._isClimateEntity(item) ? this._getClimateEntitySchema(item) : []),
 		];
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.2-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.2...v1.1.2-beta.2) (2025-10-05)
+
+
+### 🌐 Translations
+
+* translation changes ([434ea7b](https://github.com/unbekannt3/room-card-minimalist/commit/434ea7ba1d5bf88546787d1d9732ab965ca7e84d))
+
+
+### Other
+
+* fix release.yaml ([12693e7](https://github.com/unbekannt3/room-card-minimalist/commit/12693e7b5dee0cee5f01a864d6aae60331e3e02d))
+
 ## [1.1.1-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.1...v1.1.1-beta.2) (2025-10-04)
 
 

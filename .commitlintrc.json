@@ -4,7 +4,19 @@
 		"type-enum": [
 			2,
 			"always",
-			["ci", "chore", "docs", "ticket", "feat", "fix", "perf", "refactor", "revert", "style"]
+			[
+				"ci",
+				"chore",
+				"docs",
+				"ticket",
+				"feat",
+				"fix",
+				"perf",
+				"refactor",
+				"revert",
+				"style",
+				"i18n"
+			]
 		],
 		"body-max-line-length": [2, "always", 200]
 	}

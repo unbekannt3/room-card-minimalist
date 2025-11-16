@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.2.0-beta.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.2...v1.2.0-beta.0) (2025-11-16)
+
+
+### Features
+
+* allow HTML in secondary info ([02103e3](https://github.com/unbekannt3/room-card-minimalist/commit/02103e3160c87d9b0f136572caff2fd3877506a6))
+
+
+### Bug Fixes
+
+* disable click listener on card if no action/target is selected ([02103e3](https://github.com/unbekannt3/room-card-minimalist/commit/02103e3160c87d9b0f136572caff2fd3877506a6))
+
+
+### 🌐 Translations
+
+* translation changes ([434ea7b](https://github.com/unbekannt3/room-card-minimalist/commit/434ea7ba1d5bf88546787d1d9732ab965ca7e84d))
+
+
+### Other
+
+* **deps-dev:** bump js-yaml from 4.1.0 to 4.1.1 ([f9d6fcb](https://github.com/unbekannt3/room-card-minimalist/commit/f9d6fcb150f40ee4a6db131ca79d240103680b34))
+* **deps-dev:** bump js-yaml from 4.1.0 to 4.1.1 ([0e23aa5](https://github.com/unbekannt3/room-card-minimalist/commit/0e23aa5c825de5381c5daf6a700cabdb1adf19ba))
+* fix release.yaml ([12693e7](https://github.com/unbekannt3/room-card-minimalist/commit/12693e7b5dee0cee5f01a864d6aae60331e3e02d))
+* release 1.2.0-beta.0 ([94521fd](https://github.com/unbekannt3/room-card-minimalist/commit/94521fd2450535fd4d9f1c60bf162c54e8be0295))
+
 ## [1.1.1-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.1...v1.1.1-beta.2) (2025-10-04)
 
 

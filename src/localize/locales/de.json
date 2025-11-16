@@ -12,6 +12,7 @@
 	"background_person_entity": "Person auswählen",
 	"use_template_color_for_title": "Vorlagenfarbe für Name verwenden",
 	"use_template_color_for_secondary": "Vorlagenfarbe für Zusatzinfo verwenden",
+	"secondary_allow_html": "HTML in Zusatzinfo erlauben",
 	"entities_reverse_order": "Zustände von unten nach oben anzeigen",
 	"secondary": "Zusatzinfo",
 	"secondary_color": "Zusatzinfo-Farbe",

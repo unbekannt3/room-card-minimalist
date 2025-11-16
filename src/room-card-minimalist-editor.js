@@ -815,6 +815,15 @@ class RoomCardEditor extends LitElement {
 						selector: { boolean: {} },
 					},
 					{
+						name: 'secondary_allow_html',
+						label: localize(
+							this.hass,
+							'secondary_allow_html',
+							'Allow HTML in secondary info'
+						),
+						selector: { boolean: {} },
+					},
+					{
 						name: 'background_type',
 						label: localize(this.hass, 'background_type', 'Background Type'),
 						selector: {

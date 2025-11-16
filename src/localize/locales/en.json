@@ -12,6 +12,7 @@
 	"background_person_entity": "Person Entity",
 	"use_template_color_for_title": "Use Preset Color for Title",
 	"use_template_color_for_secondary": "Use Preset Color for Secondary",
+	"secondary_allow_html": "Allow HTML in Secondary Info",
 	"entities_reverse_order": "Reverse Entity Order",
 	"secondary": "Secondary Info",
 	"secondary_color": "Secondary Info Color",

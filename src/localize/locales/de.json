@@ -16,6 +16,7 @@
 	"entities_reverse_order": "Zustände von unten nach oben anzeigen",
 	"secondary": "Zusatzinfo",
 	"secondary_color": "Zusatzinfo-Farbe",
+	"secondary_entity": "Zusatzinfo-Entität (für Aktionen)",
 	"icon_color": "Symbolfarbe",
 	"add_entity": "Entität hinzufügen",
 	"move_up": "Nach oben",

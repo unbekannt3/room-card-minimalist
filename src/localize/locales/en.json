@@ -16,6 +16,7 @@
 	"entities_reverse_order": "Reverse Entity Order",
 	"secondary": "Secondary Info",
 	"secondary_color": "Secondary Info Color",
+	"secondary_entity": "Secondary Info Entity (for actions)",
 	"icon_color": "Icon Color",
 	"add_entity": "Add Entity",
 	"move_up": "Move Up",

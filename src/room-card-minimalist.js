@@ -139,6 +139,7 @@ class RoomCard extends LitElement {
 		this._config = {
 			secondary: '',
 			secondary_color: 'var(--secondary-text-color)',
+			secondary_entity: '',
 			entities: [],
 			background_type: migratedBackgroundType,
 			background_image: '',
@@ -269,6 +270,28 @@ class RoomCard extends LitElement {
 		return hasTapAction || hasHoldAction || hasDoubleTapAction;
 	}
 
+	// Check if the secondary text should be clickable
+	_isSecondaryClickable() {
+		if (!this._config || !this._config.secondary) return false;
+
+		// Check if secondary_tap_action is defined and not 'none'
+		const hasTapAction =
+			this._config.secondary_tap_action &&
+			this._config.secondary_tap_action.action !== 'none';
+
+		// Check if secondary_hold_action is defined and not 'none'
+		const hasHoldAction =
+			this._config.secondary_hold_action &&
+			this._config.secondary_hold_action.action !== 'none';
+
+		// Check if secondary_double_tap_action is defined and not 'none'
+		const hasDoubleTapAction =
+			this._config.secondary_double_tap_action &&
+			this._config.secondary_double_tap_action.action !== 'none';
+
+		return hasTapAction || hasHoldAction || hasDoubleTapAction;
+	}
+
 	// The render() function of a LitElement returns the HTML of your card, and any time one or the
 	// properties defined above are updated, the correct parts of the rendered html are magically
 	// replaced with the new values.  Check https://lit.dev for more info.
@@ -291,6 +314,7 @@ class RoomCard extends LitElement {
 			: secondaryColor;
 
 		const isClickable = this._isCardClickable();
+		const isSecondaryClickable = this._isSecondaryClickable();
 
 		return html`
 			<ha-card
@@ -314,13 +338,61 @@ class RoomCard extends LitElement {
 							${secondary
 								? this._config.secondary_allow_html
 									? html`<span
-											class="secondary"
+											class="secondary ${isSecondaryClickable
+												? 'clickable'
+												: ''}"
 											style="color: ${finalSecondaryColor}"
+											@click=${isSecondaryClickable
+												? (e) => this._handleSecondaryClick(e)
+												: null}
+											@mousedown=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseDown(e)
+												: null}
+											@mouseup=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseUp(e)
+												: null}
+											@mouseleave=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseLeave(e)
+												: null}
+											@touchstart=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchStart(e)
+												: null}
+											@touchend=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchEnd(e)
+												: null}
+											@contextmenu=${isSecondaryClickable
+												? (e) => this._handleSecondaryContextMenu(e)
+												: null}
+											tabindex="${isSecondaryClickable ? '0' : '-1'}"
 											>${unsafeHTML(secondary)}</span
 										>`
 									: html`<span
-											class="secondary"
+											class="secondary ${isSecondaryClickable
+												? 'clickable'
+												: ''}"
 											style="color: ${finalSecondaryColor}"
+											@click=${isSecondaryClickable
+												? (e) => this._handleSecondaryClick(e)
+												: null}
+											@mousedown=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseDown(e)
+												: null}
+											@mouseup=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseUp(e)
+												: null}
+											@mouseleave=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseLeave(e)
+												: null}
+											@touchstart=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchStart(e)
+												: null}
+											@touchend=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchEnd(e)
+												: null}
+											@contextmenu=${isSecondaryClickable
+												? (e) => this._handleSecondaryContextMenu(e)
+												: null}
+											tabindex="${isSecondaryClickable ? '0' : '-1'}"
 											>${secondary}</span
 										>`
 								: ''}
@@ -476,6 +548,81 @@ class RoomCard extends LitElement {
 		e.preventDefault();
 		e.stopPropagation();
 		this._fireHassAction(this._config, 'hold');
+	}
+
+	// Handle secondary text click
+	_handleSecondaryClick(e) {
+		if (this._holdFired) {
+			this._holdFired = false;
+			return;
+		}
+		e.stopPropagation();
+		this._fireHassAction(
+			{
+				entity: this._config.secondary_entity,
+				tap_action: this._config.secondary_tap_action,
+				hold_action: this._config.secondary_hold_action,
+				double_tap_action: this._config.secondary_double_tap_action,
+			},
+			'tap'
+		);
+	}
+
+	_handleSecondaryMouseDown(e) {
+		if (e.button !== 0) return;
+		e.stopPropagation();
+		this._startHoldTimer(() =>
+			this._fireHassAction(
+				{
+					entity: this._config.secondary_entity,
+					tap_action: this._config.secondary_tap_action,
+					hold_action: this._config.secondary_hold_action,
+					double_tap_action: this._config.secondary_double_tap_action,
+				},
+				'hold'
+			)
+		);
+	}
+
+	_handleSecondaryMouseUp() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryMouseLeave() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryTouchStart(e) {
+		e.stopPropagation();
+		this._startHoldTimer(() =>
+			this._fireHassAction(
+				{
+					entity: this._config.secondary_entity,
+					tap_action: this._config.secondary_tap_action,
+					hold_action: this._config.secondary_hold_action,
+					double_tap_action: this._config.secondary_double_tap_action,
+				},
+				'hold'
+			)
+		);
+	}
+
+	_handleSecondaryTouchEnd() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryContextMenu(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		this._fireHassAction(
+			{
+				entity: this._config.secondary_entity,
+				tap_action: this._config.secondary_tap_action,
+				hold_action: this._config.secondary_hold_action,
+				double_tap_action: this._config.secondary_double_tap_action,
+			},
+			'hold'
+		);
 	}
 
 	_handleItemClick(e, item) {
@@ -1014,6 +1161,15 @@ class RoomCard extends LitElement {
 				text-overflow: ellipsis;
 				overflow: hidden;
 				white-space: nowrap;
+			}
+
+			.secondary.clickable {
+				cursor: pointer;
+				transition: opacity 0.2s ease;
+			}
+
+			.secondary.clickable:hover {
+				opacity: 0.8;
 			}
 
 			.content-right {

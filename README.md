@@ -54,6 +54,10 @@ The editor is supported, but if you want to use `yaml`, here are the properties:
 | `icon_color`                       | string  | Optional | The color of the room icon. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                 |
 | `secondary`                        | string  | Optional | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                   |
 | `secondary_color`                  | string  | Optional | Color of the secondary text. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                |
+| `secondary_allow_html`             | boolean | `false`  | Allow HTML in secondary text for custom styling (font-size, colors, etc.). **Security warning:** Only enable if you trust the template source.                                     |
+| `secondary_entity`                 | string  | Optional | Entity ID for secondary text actions (e.g., `sensor.temperature`). Used for `more-info` dialog and other actions.                                                                  |
+| `secondary_tap_action`             | object  | Optional | Action to perform when tapping the secondary text. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                |
+| `secondary_hold_action`            | object  | Optional | Action to perform when holding the secondary text. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                |
 | `card_template`                    | string  | Optional | Color template for the card. See [Available Color Templates](#available-color-templates) for options.                                                                              |
 | `background_type`                  | enum    | `color`  | Background type behind the icon: `none`, `color`, `image`, or `person`.                                                                                                            |
 | `background_circle_color`          | string  | Optional | Color of the background circle when `background_type` is `color`. Empty for template color. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
@@ -97,6 +101,81 @@ background_image_square: true # OPTIONAL: square image instead of circle
 # No background
 background_type: none
 ```
+
+### HTML in Secondary Info
+
+You can enable HTML in the secondary info text to apply custom styling like font-size, colors, bold text, etc.
+
+**⚠️ Security Warning:** Only enable `secondary_allow_html` if you trust the source of your templates. HTML content is rendered without sanitization when enabled.
+
+**Basic example:**
+
+```yaml
+type: custom:room-card-minimalist
+name: Living Room
+icon: mdi:sofa
+secondary: '<span style="font-size: 16px; font-weight: bold; color: #FF5722;">22.5°C</span>'
+secondary_allow_html: true
+```
+
+**Template example with conditional styling:**
+
+```yaml
+secondary_allow_html: true
+secondary: >
+  {% set temp = states('sensor.living_room_temperature') | float %}
+  {% if temp > 25 %}
+    <span style="color: #F54436; font-size: 14px; font-weight: bold;">🔥 {{ temp }}°C</span>
+  {% elif temp < 18 %}
+    <span style="color: #03A9F4; font-size: 14px;">❄️ {{ temp }}°C</span>
+  {% else %}
+    <span style="font-size: 12px;">{{ temp }}°C</span>
+  {% endif %}
+```
+
+**Multiple lines example:**
+
+```yaml
+secondary_allow_html: true
+secondary: >
+  <div style="line-height: 1.4;">
+    <span style="font-size: 14px; font-weight: bold;">{{ states('sensor.bedroom_temperature') }}°C</span><br>
+    <span style="font-size: 11px; opacity: 0.8;">{{ states('sensor.bedroom_humidity') }}% humidity</span>
+  </div>
+```
+
+### Secondary Info Actions
+
+You can make the secondary info text clickable to perform actions like opening the history dialog or navigating to a dashboard.
+
+**Example - Show history dialog for temperature sensor:**
+
+```yaml
+type: custom:room-card-minimalist
+name: Living Room
+icon: mdi:sofa
+secondary: '{{states("sensor.living_room_temperature")}} °C'
+secondary_entity: sensor.living_room_temperature
+secondary_tap_action:
+  action: more-info
+```
+
+**Example - Navigate to climate dashboard:**
+
+```yaml
+type: custom:room-card-minimalist
+name: Living Room
+icon: mdi:sofa
+secondary: '{{states("sensor.living_room_temperature")}} °C'
+secondary_tap_action:
+  action: navigate
+  navigation_path: /lovelace/climate
+secondary_hold_action:
+  action: more-info
+  entity: sensor.living_room_temperature
+```
+
+**Note:** When secondary actions are configured, the secondary text will show a pointer cursor on hover and become clickable.
 
 ### Entity Configuration
 
@@ -166,6 +245,13 @@ use_template_color_for_title: true
 use_template_color_for_secondary: true
 entities_reverse_order: false
 secondary: '{{states("sensor.living_room_temperature")}} °C'
+# Optional: Make secondary text clickable to show history
+secondary_entity: sensor.living_room_temperature
+secondary_tap_action:
+  action: more-info
+# Optional: Enable HTML in secondary for custom styling
+# secondary_allow_html: true
+# secondary: '<span style="font-size: 14px; font-weight: bold;">{{states("sensor.living_room_temperature")}} °C</span>'
 tap_action:
   action: navigate
   navigation_path: /lovelace/living-room

@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import packageInfo from '../package.json';
 
 const COLOR_TEMPLATES = {
@@ -138,6 +139,7 @@ class RoomCard extends LitElement {
 		this._config = {
 			secondary: '',
 			secondary_color: 'var(--secondary-text-color)',
+			secondary_entity: '',
 			entities: [],
 			background_type: migratedBackgroundType,
 			background_image: '',
@@ -146,6 +148,7 @@ class RoomCard extends LitElement {
 			entities_reverse_order: false,
 			use_template_color_for_title: false,
 			use_template_color_for_secondary: false,
+			secondary_allow_html: false,
 			...config,
 		};
 
@@ -249,6 +252,46 @@ class RoomCard extends LitElement {
 		};
 	}
 
+	// Check if the card should be clickable (has any action defined)
+	_isCardClickable() {
+		if (!this._config) return false;
+
+		// Check if tap_action is defined and not 'none'
+		const hasTapAction = this._config.tap_action && this._config.tap_action.action !== 'none';
+
+		// Check if hold_action is defined and not 'none'
+		const hasHoldAction =
+			this._config.hold_action && this._config.hold_action.action !== 'none';
+
+		// Check if double_tap_action is defined and not 'none'
+		const hasDoubleTapAction =
+			this._config.double_tap_action && this._config.double_tap_action.action !== 'none';
+
+		return hasTapAction || hasHoldAction || hasDoubleTapAction;
+	}
+
+	// Check if the secondary text should be clickable
+	_isSecondaryClickable() {
+		if (!this._config || !this._config.secondary) return false;
+
+		// Check if secondary_tap_action is defined and not 'none'
+		const hasTapAction =
+			this._config.secondary_tap_action &&
+			this._config.secondary_tap_action.action !== 'none';
+
+		// Check if secondary_hold_action is defined and not 'none'
+		const hasHoldAction =
+			this._config.secondary_hold_action &&
+			this._config.secondary_hold_action.action !== 'none';
+
+		// Check if secondary_double_tap_action is defined and not 'none'
+		const hasDoubleTapAction =
+			this._config.secondary_double_tap_action &&
+			this._config.secondary_double_tap_action.action !== 'none';
+
+		return hasTapAction || hasHoldAction || hasDoubleTapAction;
+	}
+
 	// The render() function of a LitElement returns the HTML of your card, and any time one or the
 	// properties defined above are updated, the correct parts of the rendered html are magically
 	// replaced with the new values.  Check https://lit.dev for more info.
@@ -270,17 +313,21 @@ class RoomCard extends LitElement {
 			? this._getValueRawOrTemplate(text_color)
 			: secondaryColor;
 
+		const isClickable = this._isCardClickable();
+		const isSecondaryClickable = this._isSecondaryClickable();
+
 		return html`
 			<ha-card
-				@click=${(e) => this._handleCardClick(e)}
-				@mousedown=${(e) => this._handleCardMouseDown(e)}
-				@mouseup=${(e) => this._handleCardMouseUp(e)}
-				@mouseleave=${(e) => this._handleCardMouseLeave(e)}
-				@touchstart=${(e) => this._handleCardTouchStart(e)}
-				@touchend=${(e) => this._handleCardTouchEnd(e)}
-				@contextmenu=${(e) => this._handleCardContextMenu(e)}
+				@click=${isClickable ? (e) => this._handleCardClick(e) : null}
+				@mousedown=${isClickable ? (e) => this._handleCardMouseDown(e) : null}
+				@mouseup=${isClickable ? (e) => this._handleCardMouseUp(e) : null}
+				@mouseleave=${isClickable ? (e) => this._handleCardMouseLeave(e) : null}
+				@touchstart=${isClickable ? (e) => this._handleCardTouchStart(e) : null}
+				@touchend=${isClickable ? (e) => this._handleCardTouchEnd(e) : null}
+				@contextmenu=${isClickable ? (e) => this._handleCardContextMenu(e) : null}
 				.config=${this._config}
-				tabindex="0"
+				class="${isClickable ? 'clickable' : 'non-clickable'}"
+				tabindex="${isClickable ? '0' : '-1'}"
 			>
 				<div class="container">
 					<div class="content-main">
@@ -289,9 +336,65 @@ class RoomCard extends LitElement {
 								>${this._config.name}</span
 							>
 							${secondary
-								? html`<span class="secondary" style="color: ${finalSecondaryColor}"
-										>${secondary}</span
-									>`
+								? this._config.secondary_allow_html
+									? html`<span
+											class="secondary ${isSecondaryClickable
+												? 'clickable'
+												: ''}"
+											style="color: ${finalSecondaryColor}"
+											@click=${isSecondaryClickable
+												? (e) => this._handleSecondaryClick(e)
+												: null}
+											@mousedown=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseDown(e)
+												: null}
+											@mouseup=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseUp(e)
+												: null}
+											@mouseleave=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseLeave(e)
+												: null}
+											@touchstart=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchStart(e)
+												: null}
+											@touchend=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchEnd(e)
+												: null}
+											@contextmenu=${isSecondaryClickable
+												? (e) => this._handleSecondaryContextMenu(e)
+												: null}
+											tabindex="${isSecondaryClickable ? '0' : '-1'}"
+											>${unsafeHTML(secondary)}</span
+										>`
+									: html`<span
+											class="secondary ${isSecondaryClickable
+												? 'clickable'
+												: ''}"
+											style="color: ${finalSecondaryColor}"
+											@click=${isSecondaryClickable
+												? (e) => this._handleSecondaryClick(e)
+												: null}
+											@mousedown=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseDown(e)
+												: null}
+											@mouseup=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseUp(e)
+												: null}
+											@mouseleave=${isSecondaryClickable
+												? (e) => this._handleSecondaryMouseLeave(e)
+												: null}
+											@touchstart=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchStart(e)
+												: null}
+											@touchend=${isSecondaryClickable
+												? (e) => this._handleSecondaryTouchEnd(e)
+												: null}
+											@contextmenu=${isSecondaryClickable
+												? (e) => this._handleSecondaryContextMenu(e)
+												: null}
+											tabindex="${isSecondaryClickable ? '0' : '-1'}"
+											>${secondary}</span
+										>`
 								: ''}
 						</div>
 
@@ -447,6 +550,81 @@ class RoomCard extends LitElement {
 		this._fireHassAction(this._config, 'hold');
 	}
 
+	// Handle secondary text click
+	_handleSecondaryClick(e) {
+		if (this._holdFired) {
+			this._holdFired = false;
+			return;
+		}
+		e.stopPropagation();
+		this._fireHassAction(
+			{
+				entity: this._config.secondary_entity,
+				tap_action: this._config.secondary_tap_action,
+				hold_action: this._config.secondary_hold_action,
+				double_tap_action: this._config.secondary_double_tap_action,
+			},
+			'tap'
+		);
+	}
+
+	_handleSecondaryMouseDown(e) {
+		if (e.button !== 0) return;
+		e.stopPropagation();
+		this._startHoldTimer(() =>
+			this._fireHassAction(
+				{
+					entity: this._config.secondary_entity,
+					tap_action: this._config.secondary_tap_action,
+					hold_action: this._config.secondary_hold_action,
+					double_tap_action: this._config.secondary_double_tap_action,
+				},
+				'hold'
+			)
+		);
+	}
+
+	_handleSecondaryMouseUp() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryMouseLeave() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryTouchStart(e) {
+		e.stopPropagation();
+		this._startHoldTimer(() =>
+			this._fireHassAction(
+				{
+					entity: this._config.secondary_entity,
+					tap_action: this._config.secondary_tap_action,
+					hold_action: this._config.secondary_hold_action,
+					double_tap_action: this._config.secondary_double_tap_action,
+				},
+				'hold'
+			)
+		);
+	}
+
+	_handleSecondaryTouchEnd() {
+		this._clearHoldTimer();
+	}
+
+	_handleSecondaryContextMenu(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		this._fireHassAction(
+			{
+				entity: this._config.secondary_entity,
+				tap_action: this._config.secondary_tap_action,
+				hold_action: this._config.secondary_hold_action,
+				double_tap_action: this._config.secondary_double_tap_action,
+			},
+			'hold'
+		);
+	}
+
 	_handleItemClick(e, item) {
 		if (this._holdFired) {
 			this._holdFired = false;
@@ -546,6 +724,35 @@ class RoomCard extends LitElement {
 		return { action: 'more-info' };
 	}
 
+	// Check if an entity item should be clickable
+	_isItemClickable(item) {
+		if (!item) return false;
+
+		// Check if tap_action is defined and not 'none'
+		const hasTapAction = item.tap_action && item.tap_action.action !== 'none';
+
+		// Check if hold_action is defined and not 'none'
+		const hasHoldAction = item.hold_action && item.hold_action.action !== 'none';
+
+		// Check if double_tap_action is defined and not 'none'
+		const hasDoubleTapAction =
+			item.double_tap_action && item.double_tap_action.action !== 'none';
+
+		// If any explicit action is set, use that
+		if (hasTapAction || hasHoldAction || hasDoubleTapAction) {
+			return true;
+		}
+
+		// Otherwise check if there's a default action (for entities)
+		if (item.type === 'entity' && item.entity) {
+			const defaultAction = this._getDefaultAction(item);
+			return defaultAction && defaultAction.action !== 'none';
+		}
+
+		// Template items without explicit action are not clickable
+		return false;
+	}
+
 	// Get the state icon for an item
 	_getItemHTML(item) {
 		let stateValue = '';
@@ -608,18 +815,20 @@ class RoomCard extends LitElement {
 		}
 		const iconClass = !stateIsOn ? 'off' : 'on';
 
+		const isItemClickable = this._isItemClickable(item);
+
 		return html`
 			<ha-card
-				@click=${(e) => this._handleItemClick(e, item)}
-				@mousedown=${(e) => this._handleItemMouseDown(e, item)}
-				@mouseup=${(e) => this._handleItemMouseUp(e, item)}
-				@mouseleave=${(e) => this._handleItemMouseLeave(e, item)}
-				@touchstart=${(e) => this._handleItemTouchStart(e, item)}
-				@touchend=${(e) => this._handleItemTouchEnd(e, item)}
-				@contextmenu=${(e) => this._handleItemContextMenu(e, item)}
+				@click=${isItemClickable ? (e) => this._handleItemClick(e, item) : null}
+				@mousedown=${isItemClickable ? (e) => this._handleItemMouseDown(e, item) : null}
+				@mouseup=${isItemClickable ? (e) => this._handleItemMouseUp(e, item) : null}
+				@mouseleave=${isItemClickable ? (e) => this._handleItemMouseLeave(e, item) : null}
+				@touchstart=${isItemClickable ? (e) => this._handleItemTouchStart(e, item) : null}
+				@touchend=${isItemClickable ? (e) => this._handleItemTouchEnd(e, item) : null}
+				@contextmenu=${isItemClickable ? (e) => this._handleItemContextMenu(e, item) : null}
 				.config=${item}
-				tabindex="0"
-				class="state-item"
+				tabindex="${isItemClickable ? '0' : '-1'}"
+				class="state-item ${isItemClickable ? 'clickable' : 'non-clickable'}"
 				style="background-color: ${finalBackgroundColor}"
 			>
 				<ha-icon
@@ -820,7 +1029,7 @@ class RoomCard extends LitElement {
 				display: block;
 				height: 236px;
 			}
-			:host:hover {
+			:host(:has(.clickable)):hover {
 				box-shadow: var(--material-shadow-elevation-4);
 			}
 
@@ -836,8 +1045,12 @@ class RoomCard extends LitElement {
 				box-shadow: none;
 			}
 
-			ha-card:hover {
+			ha-card.clickable:hover {
 				cursor: pointer;
+			}
+
+			ha-card.non-clickable {
+				cursor: default;
 			}
 
 			.container {
@@ -950,6 +1163,15 @@ class RoomCard extends LitElement {
 				white-space: nowrap;
 			}
 
+			.secondary.clickable {
+				cursor: pointer;
+				transition: opacity 0.2s ease;
+			}
+
+			.secondary.clickable:hover {
+				opacity: 0.8;
+			}
+
 			.content-right {
 				display: flex;
 				align-items: center;
@@ -985,7 +1207,15 @@ class RoomCard extends LitElement {
 				border: none;
 			}
 
-			.state-item:hover {
+			.state-item.clickable {
+				cursor: pointer;
+			}
+
+			.state-item.non-clickable {
+				cursor: default;
+			}
+
+			.state-item.clickable:hover {
 				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 			}
 

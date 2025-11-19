@@ -815,6 +815,48 @@ class RoomCardEditor extends LitElement {
 						selector: { boolean: {} },
 					},
 					{
+						name: 'secondary_allow_html',
+						label: localize(
+							this.hass,
+							'secondary_allow_html',
+							'Allow HTML in secondary info'
+						),
+						selector: { boolean: {} },
+					},
+					{
+						name: 'secondary_entity',
+						label: localize(
+							this.hass,
+							'secondary_entity',
+							'Secondary Info Entity (for actions)'
+						),
+						selector: { entity: {} },
+					},
+					{
+						type: 'grid',
+						name: '',
+						schema: [
+							{
+								name: 'secondary_tap_action',
+								label: `${localize(this.hass, 'secondary', 'Secondary')} ${
+									this.hass?.localize?.(
+										'ui.panel.lovelace.editor.card.generic.tap_action'
+									) || 'Tap Action'
+								}`,
+								selector: { 'ui-action': {} },
+							},
+							{
+								name: 'secondary_hold_action',
+								label: `${localize(this.hass, 'secondary', 'Secondary')} ${
+									this.hass?.localize?.(
+										'ui.panel.lovelace.editor.card.generic.hold_action'
+									) || 'Hold Action'
+								}`,
+								selector: { 'ui-action': {} },
+							},
+						],
+					},
+					{
 						name: 'background_type',
 						label: localize(this.hass, 'background_type', 'Background Type'),
 						selector: {

@@ -30,6 +30,7 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
+          target-branch: ${{ github.ref_name }}
           # Use a different config when running on 'next' so release-please will create a prerelease.
           config-file: ${{ github.ref == 'refs/heads/next' && 'release-please-config-next.json' || 'release-please-config.json' }}
           manifest-file: .release-please-manifest.json

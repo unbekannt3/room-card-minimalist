@@ -1,45 +1,58 @@
 name: Release
 
 on:
-    push:
-        branches:
-            - main
-            - next
+  push:
+    branches:
+      - main
+      - next
 
 permissions:
-    contents: write
-    issues: write
-    pull-requests: write
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-    release:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Generate token
-              id: generate_token
-              uses: actions/create-github-app-token@v1
-              with:
-                  app-id: ${{ secrets.UNBKBOT_APPID }}
-                  private-key: ${{ secrets.UNBKBOT_KEY }}
+  release:
+    runs-on: ubuntu-latest
+    env:
+      SSH_SIGNING_KEY: ${{ secrets.SSH_SIGNING_KEY }}
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.UNBKBOT_APPID }}
+          private-key: ${{ secrets.UNBKBOT_KEY }}
 
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  token: ${{ steps.generate_token.outputs.token }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate_token.outputs.token }}
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Build
-              run: npm run build
+      - name: Build
+        run: npm run build
 
-            - name: Release
-              env:
-                  GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-              run: npx semantic-release
+      - name: Setup SSH Signing
+        if: env.SSH_SIGNING_KEY != ''
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_SIGNING_KEY" > ~/.ssh/signing_key
+          chmod 600 ~/.ssh/signing_key
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/signing_key
+          git config --global commit.gpgsign true
+          git config --global tag.gpgsign true
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: npx semantic-release

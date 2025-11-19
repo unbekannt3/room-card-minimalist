@@ -1,3 +1,8 @@
+## <small>1.2.1 (2025-11-19)</small>
+
+* Merge pull request #23 from unbekannt3/dependabot/npm_and_yarn/multi-289c097fca ([c631e2e](https://github.com/unbekannt3/room-card-minimalist/commit/c631e2e)), closes [#23](https://github.com/unbekannt3/room-card-minimalist/issues/23)
+* chore(deps): bump glob and semantic-release ([5e52da6](https://github.com/unbekannt3/room-card-minimalist/commit/5e52da6))
+
 ## 1.2.0 (2025-11-19)
 
 * ci: fix github actions for i18n implementation ([50d2f19](https://github.com/unbekannt3/room-card-minimalist/commit/50d2f19))

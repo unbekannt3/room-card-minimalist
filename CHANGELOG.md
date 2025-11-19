@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.2.0-beta.0...v1.2.0-beta.1) (2025-11-19)
+
+
+### Features
+
+* secondary info actions ([801003d](https://github.com/unbekannt3/room-card-minimalist/commit/801003df7c32630e1a5629a00b3118a3f5b78894))
+
+
+### Other
+
+* release 1.2.0-beta.1 ([1849004](https://github.com/unbekannt3/room-card-minimalist/commit/1849004a52fcb8d9136b958f92341b04ff5d1032))
+
 ## [1.2.0-beta.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.1.1-beta.2...v1.2.0-beta.0) (2025-11-16)
 
 

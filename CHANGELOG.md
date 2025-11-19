@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.2.0-beta.1...v1.3.0-beta.1) (2025-11-19)
+
+
+### Features
+
+* add interactive secondary info and HTML support ([1dcce36](https://github.com/unbekannt3/room-card-minimalist/commit/1dcce365ca3e0b3560d0bfabffaf3f45564a658e))
+
 ## [1.2.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.2.0-beta.0...v1.2.0-beta.1) (2025-11-19)
 
 

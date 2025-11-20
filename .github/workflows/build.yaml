@@ -6,7 +6,7 @@ on:
     branches-ignore:
       - main
       - next
-      - 'release-please--*'
+      - "release-please--*"
 
 permissions:
   contents: read

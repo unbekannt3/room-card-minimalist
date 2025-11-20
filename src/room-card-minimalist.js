@@ -257,39 +257,32 @@ class RoomCard extends LitElement {
 		if (!this._config) return false;
 
 		// Check if tap_action is defined and not 'none'
-		const hasTapAction = this._config.tap_action && this._config.tap_action.action !== 'none';
+		const hasTapAction =
+			this._config.tap_action?.action && this._config.tap_action.action !== 'none';
 
 		// Check if hold_action is defined and not 'none'
 		const hasHoldAction =
-			this._config.hold_action && this._config.hold_action.action !== 'none';
+			this._config.hold_action?.action && this._config.hold_action.action !== 'none';
 
-		// Check if double_tap_action is defined and not 'none'
-		const hasDoubleTapAction =
-			this._config.double_tap_action && this._config.double_tap_action.action !== 'none';
-
-		return hasTapAction || hasHoldAction || hasDoubleTapAction;
+		return hasTapAction || hasHoldAction;
 	}
 
 	// Check if the secondary text should be clickable
 	_isSecondaryClickable() {
-		if (!this._config || !this._config.secondary) return false;
+		if (!this._config || !this._config.secondary || !this._config.secondary_entity)
+			return false;
 
 		// Check if secondary_tap_action is defined and not 'none'
 		const hasTapAction =
-			this._config.secondary_tap_action &&
+			this._config.secondary_tap_action?.action &&
 			this._config.secondary_tap_action.action !== 'none';
 
 		// Check if secondary_hold_action is defined and not 'none'
 		const hasHoldAction =
-			this._config.secondary_hold_action &&
+			this._config.secondary_hold_action?.action &&
 			this._config.secondary_hold_action.action !== 'none';
 
-		// Check if secondary_double_tap_action is defined and not 'none'
-		const hasDoubleTapAction =
-			this._config.secondary_double_tap_action &&
-			this._config.secondary_double_tap_action.action !== 'none';
-
-		return hasTapAction || hasHoldAction || hasDoubleTapAction;
+		return hasTapAction || hasHoldAction;
 	}
 
 	// The render() function of a LitElement returns the HTML of your card, and any time one or the

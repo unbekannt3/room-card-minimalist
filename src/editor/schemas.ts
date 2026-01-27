@@ -222,7 +222,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 				]
 			: [
 					{
-						type: 'grid',
+						type: 'grid' as const,
 						name: '',
 						schema: [
 							{
@@ -246,7 +246,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 			? []
 			: ([
 					{
-						type: 'grid',
+						type: 'grid' as const,
 						name: '',
 						schema: [
 							{
@@ -262,7 +262,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						],
 					},
 					{
-						type: 'grid',
+						type: 'grid' as const,
 						name: '',
 						schema: [
 							{
@@ -294,7 +294,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						],
 					},
 					{
-						type: 'grid',
+						type: 'grid' as const,
 						name: '',
 						schema: [
 							{
@@ -319,7 +319,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 					},
 				] as SchemaItem[])),
 		{
-			type: 'grid',
+			type: 'grid' as const,
 			name: '',
 			schema: [
 				{

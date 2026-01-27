@@ -23,7 +23,7 @@
 	"tertiary_entity": "Tertiärinfo-Entität (für Aktionen)",
 	"tertiary_allow_html": "HTML in Tertiärinfo erlauben",
 	"use_template_color_for_tertiary": "Vorlagenfarbe für Tertiärinfo verwenden",
-	"entities_reverse_order": "Zustände von unten nach oben anzeigen",
+	"entities_reverse_order": "Zustände nach unten ausrichten",
 	"secondary": "Zusatzinfo",
 	"secondary_color": "Zusatzinfo-Farbe",
 	"secondary_entity": "Zusatzinfo-Entität (für Aktionen)",

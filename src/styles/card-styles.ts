@@ -177,7 +177,7 @@ export const cardStyles = css`
 
 	.tertiary {
 		font-weight: var(--card-secondary-font-weight);
-		font-size: var(--card-tertiary-font-size, 12px);
+		font-size: var(--card-secondary-font-size);
 		line-height: var(--card-secondary-line-height);
 		color: var(--secondary-text-color);
 		text-overflow: ellipsis;

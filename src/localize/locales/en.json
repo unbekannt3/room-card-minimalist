@@ -23,7 +23,7 @@
 	"tertiary_entity": "Tertiary Info Entity (for actions)",
 	"tertiary_allow_html": "Allow HTML in Tertiary Info",
 	"use_template_color_for_tertiary": "Use Preset Color for Tertiary",
-	"entities_reverse_order": "Reverse Entity Order",
+	"entities_reverse_order": "Align Entities from Bottom-Up",
 	"secondary": "Secondary Info",
 	"secondary_color": "Secondary Info Color",
 	"secondary_entity": "Secondary Info Entity (for actions)",

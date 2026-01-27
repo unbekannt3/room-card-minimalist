@@ -46,6 +46,7 @@ npm run format:check     # Check formatting without changes
 **Template Detection**: Values containing `{` are treated as Jinja2 templates and subscribed via `render_template` WebSocket messages to Home Assistant.
 
 **Entity Types**: State indicators support two types:
+
 - `entity` - Monitors a HA entity state, compares against `on_state`
 - `template` - Evaluates a condition template, non-empty = on
 

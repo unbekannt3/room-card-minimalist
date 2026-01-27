@@ -32,6 +32,7 @@
 	"condition": "Condition",
 	"icon_on": "Icon (On)",
 	"icon_off": "Icon (Off)",
+	"icon_fallback": "Icon (Fallback)",
 	"on_state": "On State (typical \"on\")",
 	"template_on": "Template (On)",
 	"template_off": "Template (Off)",

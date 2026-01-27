@@ -32,6 +32,7 @@
 	"condition": "Bedingung",
 	"icon_on": "Symbol (An)",
 	"icon_off": "Symbol (Aus)",
+	"icon_fallback": "Symbol (Fallback)",
 	"on_state": "Zustand für An (meistens \"on\")",
 	"template_on": "Vorlagenfarbe (An)",
 	"template_off": "Vorlagenfarbe (Aus)",

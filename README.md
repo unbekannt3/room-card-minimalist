@@ -26,6 +26,7 @@ Based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/has
   - [Secondary & Tertiary Info](#secondary--tertiary-info)
   - [Icon & Background](#icon--background)
   - [Entity States](#entity-states)
+  - [Multi-State Entities](#multi-state-entities)
   - [Climate Entities](#climate-entities)
   - [Color Templates](#color-templates)
 - [Examples](#examples)
@@ -222,6 +223,39 @@ entities:
         | selectattr('state','eq','on') | list | count %}
       {% if count > 0 %}{{ count }}{% endif %}
     template_on: yellow
+```
+
+### Multi-State Entities
+
+For entities with multiple states beyond on/off (e.g., vacuum robots, media players), enable multi-state mode to configure each state individually.
+
+| Name              | Type    | Default | Description                                      |
+| :---------------- | :------ | :------ | :----------------------------------------------- |
+| `use_multi_state` | boolean | `false` | Enable multi-state mode                          |
+| `custom_states`   | string  | —       | Comma-separated list of states (e.g., `idle, cleaning, paused`) |
+| `icon_[state]`    | string  | —       | Icon for specific state                          |
+| `color_[state]`   | string  | —       | Icon color for specific state                    |
+| `background_color_[state]` | string | — | Background color for specific state             |
+| `template_[state]`| string  | —       | Color preset for specific state                  |
+
+**Example: Vacuum Robot**
+
+```yaml
+entities:
+  - type: entity
+    entity: vacuum.robot
+    icon: mdi:robot-vacuum  # Fallback icon
+    use_multi_state: true
+    custom_states: "idle, cleaning, paused, returning, error"
+    icon_cleaning: mdi:robot-vacuum
+    icon_idle: mdi:robot-vacuum-off
+    icon_error: mdi:robot-vacuum-alert
+    template_cleaning: green
+    template_idle: grey
+    template_paused: yellow
+    template_error: red
+    tap_action:
+      action: more-info
 ```
 
 ### Climate Entities

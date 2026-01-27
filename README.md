@@ -11,357 +11,382 @@
 ![Card - Dark Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-dark.png?raw=true)
 ![Card - Light Theme](https://github.com/unbekannt3/hass-room-card-minimalist/blob/main/docs/images/cards-light.png?raw=true)
 
-## What is Room Card Minimalist
+A minimalist room card for Home Assistant inspired by [UI Lovelace Minimalist](https://ui-lovelace-minimalist.github.io/UI/usage/cards/card_room/). Features a room name, styled icon, optional secondary/tertiary info lines, and up to 4 entity state indicators.
 
-Room Card Minimalist is based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/hass-room-card) but extensively redesigned with added functionality in the style of the [room-card from UI Lovelace Minimalist](https://ui-lovelace-minimalist.github.io/UI/usage/cards/card_room/) which I've used in the past and missed ever since for "normal" Lovelace setups.
+Based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/hass-room-card).
 
-It provides a fixed size card with a room name, styled icon, and optional secondary info. You can configure up to 4 entities or templates to be displayed as buttons with icons that change based on the entity/template state.
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+  - [Basic Settings](#basic-settings)
+  - [Secondary & Tertiary Info](#secondary--tertiary-info)
+  - [Icon & Background](#icon--background)
+  - [Entity States](#entity-states)
+  - [Climate Entities](#climate-entities)
+  - [Color Templates](#color-templates)
+- [Examples](#examples)
+- [Layout & Theming](#layout--theming)
+- [Internationalization](#internationalization)
+- [Development](#development)
+
+---
 
 ## Installation
 
 ### HACS (Recommended)
 
-Room Card is available in [HACS][hacs] (Home Assistant Community Store):
-
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=unbekannt3&repository=room-card-minimalist)
 
-or search for "room-card-minimalist" in HACS.
+Or search for "room-card-minimalist" in [HACS][hacs].
 
 ### Manual
 
-1. Download `room-card-minimalist.js` file from the [latest release][release-url].
-2. Put `room-card-minimalist.js` file into your `config/www` folder.
-3. Add reference to `room-card-minimalist.js` in your Dashboard. There's two ways to do that:
-   - **Using UI:** _Settings_ → _Dashboards_ → _More Options icon_ → _Resources_ → _Add Resource_ → Set _Url_ as `/local/room-card-minimalist.js` → Set _Resource type_ as `JavaScript Module`.
-     **Note:** If you do not see the Resources menu, you will need to enable _Advanced Mode_ in your _User Profile_
-   - **Using YAML:** Add following code to `lovelace` section.
+1. Download `room-card-minimalist.js` from the [latest release][release-url]
+2. Place it in your `config/www` folder
+3. Add the resource:
+   - **UI:** _Settings_ → _Dashboards_ → _Resources_ → _Add Resource_
+     - URL: `/local/room-card-minimalist.js`
+     - Type: `JavaScript Module`
+   - **YAML:**
      ```yaml
-     resources:
-       - url: /local/room-card-minimalist.js
-         type: module
+     lovelace:
+       resources:
+         - url: /local/room-card-minimalist.js
+           type: module
      ```
 
-## Configuration variables
+---
 
-The editor is supported, but if you want to use `yaml`, here are the properties:
-
-### Card Configuration
-
-| Name                               | Type    | Default  | Description                                                                                                                                                                        |
-| :--------------------------------- | :------ | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                             | string  | Required | Name of the room to render.                                                                                                                                                        |
-| `icon`                             | string  | Required | Icon to render.                                                                                                                                                                    |
-| `icon_color`                       | string  | Optional | The color of the room icon. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                 |
-| `secondary`                        | string  | Optional | Secondary info to render. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                   |
-| `secondary_color`                  | string  | Optional | Color of the secondary text. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).                                                                |
-| `secondary_allow_html`             | boolean | `false`  | Allow HTML in secondary text for custom styling (font-size, colors, etc.). **Security warning:** Only enable if you trust the template source.                                     |
-| `secondary_entity`                 | string  | Optional | Entity ID for secondary text actions (e.g., `sensor.temperature`). Used for `more-info` dialog and other actions.                                                                  |
-| `secondary_tap_action`             | object  | Optional | Action to perform when tapping the secondary text. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                |
-| `secondary_hold_action`            | object  | Optional | Action to perform when holding the secondary text. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                |
-| `card_template`                    | string  | Optional | Color template for the card. See [Available Color Templates](#available-color-templates) for options.                                                                              |
-| `background_type`                  | enum    | `color`  | Background type behind the icon: `none`, `color`, `image`, or `person`.                                                                                                            |
-| `background_circle_color`          | string  | Optional | Color of the background circle when `background_type` is `color`. Empty for template color. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
-| `background_image`                 | string  | Optional | Image URL or /local/ path when `background_type` is `image`.                                                                                                                       |
-| `background_person`                | string  | Optional | Person entity ID when `background_type` is `person` (e.g., `person.john`). Uses the person's profile picture.                                                                      |
-| `background_image_square`          | boolean | Optional | Makes background image square when `background_type` is `image` or `person`.                                                                                                       |
-| `tap_action`                       | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                                         |
-| `hold_action`                      | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                                                                        |
-| `entities_reverse_order`           | boolean | `false`  | Display entities from bottom to top instead of top to bottom.                                                                                                                      |
-| `use_template_color_for_title`     | boolean | `false`  | Use the card template color for the room title text.                                                                                                                               |
-| `use_template_color_for_secondary` | boolean | `false`  | Use the card template color for the secondary text/template.                                                                                                                       |
-| `entities`                         | list    | Optional | List of entities to display as buttons (max 4).                                                                                                                                    |
-
-### Background Type Options
-
-The card supports different background types behind the room icon:
-
-| Background Type | Description                                          | Configuration Fields                           |
-| :-------------- | :--------------------------------------------------- | :--------------------------------------------- |
-| `none`          | No background circle or image behind the icon        | None                                           |
-| `color`         | Traditional colored circle behind the icon (default) | `background_circle_color`                      |
-| `image`         | Custom image as background behind the icon           | `background_image`, `background_image_square`  |
-| `person`        | Profile picture from a Home Assistant person entity  | `background_person`, `background_image_square` |
-
-**Example configurations:**
-
-```yaml
-# Color background (default)
-background_type: color
-background_circle_color: "#FF5722"  # or leave empty for template color
-
-# Image background
-background_type: image
-background_image: "/local/images/bedroom.jpg"
-
-# Person profile picture
-background_type: person
-background_person: person.john
-background_image_square: true # OPTIONAL: square image instead of circle
-
-# No background
-background_type: none
-```
-
-### HTML in Secondary Info
-
-You can enable HTML in the secondary info text to apply custom styling like font-size, colors, bold text, etc.
-
-**⚠️ Security Warning:** Only enable `secondary_allow_html` if you trust the source of your templates. HTML content is rendered without sanitization when enabled.
-
-**Basic example:**
-
-```yaml
-type: custom:room-card-minimalist
-name: Living Room
-icon: mdi:sofa
-secondary: '<span style="font-size: 16px; font-weight: bold; color: #FF5722;">22.5°C</span>'
-secondary_allow_html: true
-```
-
-**Template example with conditional styling:**
-
-```yaml
-secondary_allow_html: true
-secondary: >
-  {% set temp = states('sensor.living_room_temperature') | float %}
-  {% if temp > 25 %}
-    <span style="color: #F54436; font-size: 14px; font-weight: bold;">🔥 {{ temp }}°C</span>
-  {% elif temp < 18 %}
-    <span style="color: #03A9F4; font-size: 14px;">❄️ {{ temp }}°C</span>
-  {% else %}
-    <span style="font-size: 12px;">{{ temp }}°C</span>
-  {% endif %}
-```
-
-**Multiple lines example:**
-
-```yaml
-secondary_allow_html: true
-secondary: >
-  <div style="line-height: 1.4;">
-    <span style="font-size: 14px; font-weight: bold;">{{ states('sensor.bedroom_temperature') }}°C</span><br>
-    <span style="font-size: 11px; opacity: 0.8;">{{ states('sensor.bedroom_humidity') }}% humidity</span>
-  </div>
-```
-
-### Secondary Info Actions
-
-You can make the secondary info text clickable to perform actions like opening the history dialog or navigating to a dashboard.
-
-**Example - Show history dialog for temperature sensor:**
-
-```yaml
-type: custom:room-card-minimalist
-name: Living Room
-icon: mdi:sofa
-secondary: '{{states("sensor.living_room_temperature")}} °C'
-secondary_entity: sensor.living_room_temperature
-secondary_tap_action:
-  action: more-info
-```
-
-**Example - Navigate to climate dashboard:**
-
-```yaml
-type: custom:room-card-minimalist
-name: Living Room
-icon: mdi:sofa
-secondary: '{{states("sensor.living_room_temperature")}} °C'
-secondary_tap_action:
-  action: navigate
-  navigation_path: /lovelace/climate
-secondary_hold_action:
-  action: more-info
-  entity: sensor.living_room_temperature
-```
-
-**Note:** When secondary actions are configured, the secondary text will show a pointer cursor on hover and become clickable.
-
-### Entity Configuration
-
-| Name                   | Type    | Default  | Description                                                                                                                  |
-| :--------------------- | :------ | :------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| `type`                 | enum    | Required | Use `entity` or `template`.                                                                                                  |
-| `icon`                 | string  | Required | Icon to render.                                                                                                              |
-| `icon_off`             | string  | Optional | Icon to render when state is off. If not set, the icon will not change.                                                      |
-| `entity`               | string  | Required | Required if type is `entity`. The entity ID to monitor.                                                                      |
-| `on_state`             | string  | Required | Required if type is `entity` and not a climate entity. The state value that will be considered as "on".                      |
-| `condition`            | string  | Required | Required if type is `template`. Template that returns any value for "on" state, empty for "off".                             |
-| `color_on`             | string  | Optional | Color for entity icon when on. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).        |
-| `color_off`            | string  | Optional | Color for entity icon when off. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).       |
-| `background_color_on`  | string  | Optional | Background color for entity when on. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).  |
-| `background_color_off` | string  | Optional | Background color for entity when off. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
-| `template_on`          | string  | Optional | Color template to apply when entity is on (e.g., `blue`).                                                                    |
-| `template_off`         | string  | Optional | Color template to apply when entity is off (e.g., `red`).                                                                    |
-| `use_light_color`      | boolean | `false`  | For light entities: use the actual light color as the active state color.                                                    |
-| `tap_action`           | object  | Optional | Action to perform on tap. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                   |
-| `hold_action`          | object  | Optional | Action to perform on hold. See [Home Assistant actions](https://www.home-assistant.io/dashboards/actions/).                  |
-
-### Climate Entity Configuration
-
-For climate entities (entities starting with `climate.`), the card automatically detects the available HVAC modes and provides mode-specific configuration options instead of the generic `on_state`, `color_on/off`, `template_on/off`, and `background_color_on/off` fields.
-
-| Name                      | Type   | Default  | Description                                                                                                                                    |
-| :------------------------ | :----- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| `color_[mode]`            | string | Optional | Color for entity icon when in specific HVAC mode. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/).       |
-| `background_color_[mode]` | string | Optional | Background color for entity when in specific HVAC mode. May contain [templates](https://www.home-assistant.io/docs/configuration/templating/). |
-| `template_[mode]`         | string | Optional | Color template to apply when entity is in specific HVAC mode (e.g., `blue`, `red`).                                                            |
-
-**Available HVAC modes:** `off`, `heat`, `cool`, `heat_cool`, `auto`, `dry`, `fan_only`
-
-**Note:** The actual available modes depend on your specific climate entity. The card will automatically show configuration options only for the modes your climate entity supports.
-
-### Available Color Templates
-
-The following color templates are available for `card_template`, `template_on`, and `template_off`:
-
-| Template Name | Color                                                           | Description                         |
-| :------------ | :-------------------------------------------------------------- | :---------------------------------- |
-| `blue`        | ![#3D5AFE](https://dummyimage.com/15/3d5afe/3d5afe) Blue        | Default blue color scheme `#3D5AFE` |
-| `lightblue`   | ![#03A9F4](https://dummyimage.com/15/03a9f4/03a9f4) Light Blue  | Light blue color scheme `#03A9F4`   |
-| `red`         | ![#F54436](https://dummyimage.com/15/f54436/f54436) Red         | Red color scheme `#F54436`          |
-| `green`       | ![#01C852](https://dummyimage.com/15/01c852/01c852) Green       | Green color scheme `#01C852`        |
-| `lightgreen`  | ![#8BC34A](https://dummyimage.com/15/8bc34a/8bc34a) Light Green | Light green color scheme `#8BC34A`  |
-| `yellow`      | ![#FF9101](https://dummyimage.com/15/ff9101/ff9101) Yellow      | Yellow/amber color scheme `#FF9101` |
-| `purple`      | ![#661FFF](https://dummyimage.com/15/661fff/661fff) Purple      | Purple color scheme `#661FFF`       |
-| `orange`      | ![#FF5722](https://dummyimage.com/15/ff5722/ff5722) Orange      | Orange color scheme `#FF5722`       |
-| `pink`        | ![#E91E63](https://dummyimage.com/15/e91e63/e91e63) Pink        | Pink color scheme `#E91E63`         |
-| `grey`        | ![#9E9E9E](https://dummyimage.com/15/9e9e9e/9e9e9e) Grey        | Grey/neutral color scheme `#9E9E9E` |
-| `teal`        | ![#009688](https://dummyimage.com/15/009688/009688) Teal        | Teal color scheme `#009688`         |
-| `indigo`      | ![#3F51B5](https://dummyimage.com/15/3f51b5/3f51b5) Indigo      | Indigo color scheme `#3F51B5`       |
-
-These templates use CSS variables that can be customized in your Home Assistant theme. If UI Lovelace Minimalist or another theme is installed which provides the `--color-*` variables, the templates will use these colors. Otherwise, fallback colors are provided (see [src/room-card-minimalist.js](https://github.com/unbekannt3/room-card-minimalist/blob/main/src/room-card-minimalist.js) => const COLOR_TEMPLATES for details).
-
-### YAML Example
+## Quick Start
 
 ```yaml
 type: custom:room-card-minimalist
 name: Living Room
 icon: mdi:sofa
 card_template: blue
-background_type: image
-background_image: '/local/images/living-room.jpg'
-use_template_color_for_title: true
-use_template_color_for_secondary: true
-entities_reverse_order: false
-secondary: '{{states("sensor.living_room_temperature")}} °C'
-# Optional: Make secondary text clickable to show history
-secondary_entity: sensor.living_room_temperature
+secondary: "{{ states('sensor.living_room_temperature') }}°C"
+tertiary: "{{ states('sensor.living_room_humidity') }}%"
+```
+
+---
+
+## Configuration
+
+The visual editor is fully supported. Below is the YAML reference.
+
+### Basic Settings
+
+| Name                           | Type    | Default    | Description                                                                        |
+| :----------------------------- | :------ | :--------- | :--------------------------------------------------------------------------------- |
+| `name`                         | string  | _Required_ | Room name                                                                          |
+| `icon`                         | string  | _Required_ | Room icon (e.g., `mdi:sofa`)                                                       |
+| `card_template`                | string  | —          | Color preset. See [Color Templates](#color-templates)                              |
+| `tap_action`                   | object  | —          | Action on tap. See [HA actions](https://www.home-assistant.io/dashboards/actions/) |
+| `hold_action`                  | object  | —          | Action on hold                                                                     |
+| `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                     |
+| `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                  |
+| `entities`                     | list    | —          | Entity state indicators (max 4). See [Entity States](#entity-states)               |
+
+### Secondary & Tertiary Info
+
+Display one or two additional info lines below the room name. Both support [Jinja2 templates](https://www.home-assistant.io/docs/configuration/templating/).
+
+#### Secondary Info
+
+| Name                               | Type    | Default | Description                             |
+| :--------------------------------- | :------ | :------ | :-------------------------------------- |
+| `secondary`                        | string  | —       | Text or template                        |
+| `secondary_color`                  | string  | —       | Text color (supports templates)         |
+| `use_template_color_for_secondary` | boolean | `false` | Use preset color instead                |
+| `secondary_allow_html`             | boolean | `false` | Allow HTML (security risk if untrusted) |
+| `secondary_entity`                 | string  | —       | Entity for actions (e.g., `more-info`)  |
+| `secondary_tap_action`             | object  | —       | Action on tap                           |
+| `secondary_hold_action`            | object  | —       | Action on hold                          |
+
+#### Tertiary Info
+
+| Name                              | Type    | Default | Description                             |
+| :-------------------------------- | :------ | :------ | :-------------------------------------- |
+| `tertiary`                        | string  | —       | Text or template                        |
+| `tertiary_color`                  | string  | —       | Text color (supports templates)         |
+| `use_template_color_for_tertiary` | boolean | `false` | Use preset color instead                |
+| `tertiary_allow_html`             | boolean | `false` | Allow HTML (security risk if untrusted) |
+| `tertiary_entity`                 | string  | —       | Entity for actions                      |
+| `tertiary_tap_action`             | object  | —       | Action on tap                           |
+| `tertiary_hold_action`            | object  | —       | Action on hold                          |
+
+**Example: Temperature & Humidity**
+
+```yaml
+secondary: "{{ states('sensor.temperature') }}°C"
+tertiary: "{{ states('sensor.humidity') }}%"
+tertiary_color: 'var(--info-color)'
+```
+
+**Example: Clickable secondary with history**
+
+```yaml
+secondary: "{{ states('sensor.temperature') }}°C"
+secondary_entity: sensor.temperature
 secondary_tap_action:
   action: more-info
-# Optional: Enable HTML in secondary for custom styling
-# secondary_allow_html: true
-# secondary: '<span style="font-size: 14px; font-weight: bold;">{{states("sensor.living_room_temperature")}} °C</span>'
-tap_action:
-  action: navigate
-  navigation_path: /lovelace/living-room
-hold_action:
-  action: more-info
+```
+
+### Icon & Background
+
+Configure the room icon and its background circle/image.
+
+| Name                       | Type    | Default | Description                                                |
+| :------------------------- | :------ | :------ | :--------------------------------------------------------- |
+| `icon_color`               | string  | —       | Icon color (supports templates). Empty = use preset color  |
+| `background_type`          | enum    | `color` | `none`, `color`, `image`, or `person`                      |
+| `background_circle_color`  | string  | —       | Circle color when `background_type: color`. Empty = preset |
+| `background_image`         | string  | —       | Image URL/path when `background_type: image`               |
+| `background_person_entity` | string  | —       | Person entity when `background_type: person`               |
+| `background_image_square`  | boolean | `false` | Square image instead of circle                             |
+
+**Background Type Options:**
+
+| Type     | Description              | Fields                                                |
+| :------- | :----------------------- | :---------------------------------------------------- |
+| `none`   | No background            | —                                                     |
+| `color`  | Colored circle (default) | `icon_color`, `background_circle_color`               |
+| `image`  | Custom image             | `background_image`, `background_image_square`         |
+| `person` | Person profile picture   | `background_person_entity`, `background_image_square` |
+
+```yaml
+# Color circle (default)
+background_type: color
+background_circle_color: "#FF5722"
+
+# Person profile picture
+background_type: person
+background_person_entity: person.john
+background_image_square: true
+
+# Custom image
+background_type: image
+background_image: "/local/images/room.jpg"
+```
+
+### Entity States
+
+Up to 4 entity indicators on the right side of the card. Each can be an `entity` or `template` type.
+
+| Name                   | Type    | Default    | Description                                            |
+| :--------------------- | :------ | :--------- | :----------------------------------------------------- |
+| `type`                 | enum    | _Required_ | `entity` or `template`                                 |
+| `icon`                 | string  | _Required_ | Icon when on/active                                    |
+| `icon_off`             | string  | —          | Icon when off (defaults to `icon`)                     |
+| `entity`               | string  | —          | Entity ID (required for `type: entity`)                |
+| `on_state`             | string  | —          | State value considered "on" (required for non-climate) |
+| `condition`            | string  | —          | Template condition (required for `type: template`)     |
+| `color_on`             | string  | —          | Icon color when on                                     |
+| `color_off`            | string  | —          | Icon color when off                                    |
+| `background_color_on`  | string  | —          | Background when on                                     |
+| `background_color_off` | string  | —          | Background when off                                    |
+| `template_on`          | string  | —          | Color preset when on                                   |
+| `template_off`         | string  | —          | Color preset when off                                  |
+| `use_light_color`      | boolean | `false`    | Use actual light color (for `light.*` entities)        |
+| `tap_action`           | object  | —          | Action on tap                                          |
+| `hold_action`          | object  | —          | Action on hold                                         |
+
+**Entity example:**
+
+```yaml
 entities:
   - type: entity
-    entity: light.living_room_ceiling
+    entity: light.ceiling
     icon: mdi:ceiling-light
     icon_off: mdi:ceiling-light-outline
     on_state: 'on'
     use_light_color: true
-    color_off: grey
     tap_action:
       action: toggle
-    hold_action:
-      action: more-info
+```
+
+**Template example:**
+
+```yaml
+entities:
   - type: template
     icon: mdi:lightbulb-group
     icon_off: mdi:lightbulb-group-outline
-    condition: >-
-      {% set lights_on = expand(area_entities('Living Room')) |
-      selectattr('domain','eq','light') | selectattr('state','eq','on') | list |
-      count %}{% if lights_on > 0 %}{{ lights_on }} lights on{% endif %}
-    color_on: yellow
-  - type: entity
-    entity: binary_sensor.living_room_motion
-    on_state: 'on'
-    icon: mdi:motion-sensor
-    icon_off: mdi:motion-sensor-off
-    color_on: green
+    condition: >
+      {% set count = expand(area_entities('Living Room'))
+        | selectattr('domain','eq','light')
+        | selectattr('state','eq','on') | list | count %}
+      {% if count > 0 %}{{ count }}{% endif %}
+    template_on: yellow
+```
+
+### Climate Entities
+
+Climate entities (`climate.*`) automatically use HVAC mode-specific styling instead of on/off states.
+
+| Name                      | Type   | Description                    |
+| :------------------------ | :----- | :----------------------------- |
+| `color_[mode]`            | string | Icon color for HVAC mode       |
+| `background_color_[mode]` | string | Background color for HVAC mode |
+| `template_[mode]`         | string | Color preset for HVAC mode     |
+
+**Available modes:** `off`, `heat`, `cool`, `heat_cool`, `auto`, `dry`, `fan_only`
+
+```yaml
+entities:
   - type: entity
     entity: climate.living_room
     icon: mdi:thermostat
-    icon_off: mdi:thermostat-off
-    # Climate entities use mode-specific configuration:
-    color_off: grey
     template_off: grey
     template_heat: red
     template_cool: lightblue
-    template_auto: green
 ```
 
-## Layout Considerations
+### Color Templates
 
-**Note:** Due to the fixed size of this card, it won't align perfectly with Home Assistant's automatic grid sizes in some layouts, which can result in padding/spacing below the cards.
+Available presets for `card_template`, `template_on`, `template_off`, and mode-specific templates:
 
-**Workaround:** To achieve better layout control and eliminate unwanted spacing:
+| Name         | Preview                                                         | Hex       |
+| :----------- | :-------------------------------------------------------------- | :-------- |
+| `blue`       | ![#3D5AFE](https://dummyimage.com/15/3d5afe/3d5afe) Blue        | `#3D5AFE` |
+| `lightblue`  | ![#03A9F4](https://dummyimage.com/15/03a9f4/03a9f4) Light Blue  | `#03A9F4` |
+| `red`        | ![#F54436](https://dummyimage.com/15/f54436/f54436) Red         | `#F54436` |
+| `green`      | ![#01C852](https://dummyimage.com/15/01c852/01c852) Green       | `#01C852` |
+| `lightgreen` | ![#8BC34A](https://dummyimage.com/15/8bc34a/8bc34a) Light Green | `#8BC34A` |
+| `yellow`     | ![#FF9101](https://dummyimage.com/15/ff9101/ff9101) Yellow      | `#FF9101` |
+| `purple`     | ![#661FFF](https://dummyimage.com/15/661fff/661fff) Purple      | `#661FFF` |
+| `orange`     | ![#FF5722](https://dummyimage.com/15/ff5722/ff5722) Orange      | `#FF5722` |
+| `pink`       | ![#E91E63](https://dummyimage.com/15/e91e63/e91e63) Pink        | `#E91E63` |
+| `grey`       | ![#9E9E9E](https://dummyimage.com/15/9e9e9e/9e9e9e) Grey        | `#9E9E9E` |
+| `teal`       | ![#009688](https://dummyimage.com/15/009688/009688) Teal        | `#009688` |
+| `indigo`     | ![#3F51B5](https://dummyimage.com/15/3f51b5/3f51b5) Indigo      | `#3F51B5` |
 
-- Use `horizontal-stack` when you want multiple cards side by side
-- Use `vertical-stack` when you want multiple cards stacked vertically
+Templates use CSS variables (`--color-*`) which can be customized by themes like UI Lovelace Minimalist.
 
-### Theme customization
+---
 
-Room Card Minimalist works without a theme installed however, I personally use the awesome [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) from Nerwyn in combination with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).
+## Examples
+
+### Full Configuration
+
+```yaml
+type: custom:room-card-minimalist
+name: Living Room
+icon: mdi:sofa
+card_template: blue
+use_template_color_for_title: true
+
+# Text info
+secondary: "{{ states('sensor.temperature') }}°C"
+secondary_entity: sensor.temperature
+secondary_tap_action:
+  action: more-info
+tertiary: "{{ states('sensor.humidity') }}%"
+
+# Background
+background_type: color
+
+# Card actions
+tap_action:
+  action: navigate
+  navigation_path: /lovelace/living-room
+
+# Entity indicators
+entities:
+  - type: entity
+    entity: light.ceiling
+    icon: mdi:ceiling-light
+    icon_off: mdi:ceiling-light-outline
+    on_state: 'on'
+    use_light_color: true
+    tap_action:
+      action: toggle
+
+  - type: entity
+    entity: binary_sensor.motion
+    icon: mdi:motion-sensor
+    icon_off: mdi:motion-sensor-off
+    on_state: 'on'
+    template_on: green
+
+  - type: entity
+    entity: climate.thermostat
+    icon: mdi:thermostat
+    template_off: grey
+    template_heat: red
+    template_cool: lightblue
+```
+
+### HTML in Secondary/Tertiary
+
+**⚠️ Security Warning:** Only enable `*_allow_html` if you trust the template source.
+
+```yaml
+secondary_allow_html: true
+secondary: >
+  {% set temp = states('sensor.temperature') | float %}
+  {% if temp > 25 %}
+    <span style="color: #F54436;">{{ temp }}°C</span>
+  {% else %}
+    <span>{{ temp }}°C</span>
+  {% endif %}
+```
+
+---
+
+## Layout & Theming
+
+### Layout Tips
+
+Due to the fixed card size, use stacks for better alignment:
+
+```yaml
+type: horizontal-stack
+cards:
+  - type: custom:room-card-minimalist
+    # ...
+  - type: custom:room-card-minimalist
+    # ...
+```
+
+### Theme Compatibility
+
+Should work with any theme. Recommended as personally used: [Material Design 3 Theme](https://github.com/Nerwyn/material-you-theme) with [Material You Utilities](https://github.com/Nerwyn/material-you-utilities).
+
+---
 
 ## Internationalization
 
-Room Card Minimalist supports multiple languages and automatically adapts to your Home Assistant language setting.
+The editor automatically adapts to your Home Assistant language.
 
-### Supported Languages
+**Supported languages:**
 
 - 🇺🇸 English
 - 🇩🇪 German
 
-More languages can be easily added by contributing JSON translation files.
-For detailed instructions, see our [Internationalization Guide](docs/Internationalization.md).
+Contributions welcome! See [Internationalization Guide](docs/Internationalization.md).
 
-## Development Setup
+---
 
-For local development make sure to have at least Node 22 installed (earlier version might work but untested).
+## Development
 
-1. **Install Packages:**
+Requires Node.js 22+.
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install           # Install dependencies
+npm run watch         # Dev server on localhost:8080
+npm run docker:start  # Start local HA on localhost:8123
+npm run docker:stop   # Stop local HA
+npm run build         # Production build
+```
 
-2. **Enable live build:**
+Add the dev resource in HA: `http://localhost:8080/room-card-minimalist.js` (JavaScript Module)
 
-   ```bash
-   npm run watch
-   ```
-
-   This will create a webpack dev server on localhost:8080 which will serve the live built room-card-minimalist.js file.
-
-3. **Start the local Home Assistant dev instance:**
-
-   ```bash
-   npm run docker:start
-   ```
-
-   This will start a local Home Assistant instance in a Docker container on [localhost:8123](http://localhost:8123).
-
-4. **Add the card to your Lovelace dashboard:**
-   - Go to Settings → Dashboards → Resources → Add Resource
-   - URL:
-
-   ```bash
-   http://localhost:8080/room-card-minimalist.js
-   ```
-
-   - Type: JavaScript Module
-
-   You can then use the card as described above.
-
-5. **Stop the Home Assistant dev instance:**
-   ```bash
-   npm run docker:stop
-   ```
+---
 
 <!-- Badges -->
 
@@ -377,7 +402,6 @@ For local development make sure to have at least Node 22 installed (earlier vers
 <!-- References -->
 
 [home-assistant]: https://www.home-assistant.io/
-[home-assitant-theme-docs]: https://www.home-assistant.io/integrations/frontend/#defining-themes
 [hacs]: https://hacs.xyz
 [release-url]: https://github.com/unbekannt3/room-card-minimalist/releases
 [license-url]: https://github.com/unbekannt3/room-card-minimalist/blob/main/LICENSE

@@ -1,4 +1,8 @@
 {
+	"use_multi_state": "Multi-State Mode",
+	"use_multi_state_description": "Enable Multi-State Mode for custom state colors",
+	"custom_states": "States (comma separated)",
+	"custom_states_hint": "Enter states like: idle, cleaning, paused",
 	"card_template": "Card Color Preset",
 	"card_template_none": "None",
 	"background_type": "Background Type",

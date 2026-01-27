@@ -447,7 +447,28 @@ class RoomCard extends LitElement {
 		return entity && entity.startsWith('climate.');
 	}
 
-	_applyTemplates(item, state, currentHvacMode = null) {
+	// Check if item uses custom multi-state mode
+	_isMultiStateItem(item) {
+		return (
+			item &&
+			item.use_multi_state === true &&
+			item.custom_states &&
+			item.custom_states.trim() !== '' &&
+			!this._isClimateEntity(item.entity)
+		);
+	}
+
+	// Get parsed custom states from item
+	_getCustomStates(item) {
+		if (!item.custom_states) return [];
+		return item.custom_states
+			.split(',')
+			.map((s) => s.trim())
+			.filter((s) => s !== '');
+	}
+
+	_applyTemplates(item, state, currentHvacMode = null, currentEntityState = null) {
+		// Handle climate entities with HVAC modes
 		if (this._isClimateEntity(item.entity) && currentHvacMode) {
 			const modeTemplate = item[`template_${currentHvacMode}`];
 			const modeColor = item[`color_${currentHvacMode}`];
@@ -465,6 +486,28 @@ class RoomCard extends LitElement {
 
 			if (modeColor) result.icon_color = modeColor;
 			if (modeBackgroundColor) result.background_color = modeBackgroundColor;
+
+			return result;
+		}
+
+		// Handle custom multi-state entities
+		if (this._isMultiStateItem(item) && currentEntityState) {
+			const stateTemplate = item[`template_${currentEntityState}`];
+			const stateColor = item[`color_${currentEntityState}`];
+			const stateBackgroundColor = item[`background_color_${currentEntityState}`];
+
+			let result = {
+				icon_color: 'var(--primary-text-color)',
+				background_color: 'var(--secondary-background-color)',
+				text_color: 'var(--primary-text-color)',
+			};
+
+			if (stateTemplate && COLOR_TEMPLATES[stateTemplate]) {
+				result = { ...result, ...COLOR_TEMPLATES[stateTemplate] };
+			}
+
+			if (stateColor) result.icon_color = stateColor;
+			if (stateBackgroundColor) result.background_color = stateBackgroundColor;
 
 			return result;
 		}
@@ -751,6 +794,7 @@ class RoomCard extends LitElement {
 		let stateValue = '';
 		let stateIsOn = false;
 		let currentHvacMode = null;
+		let currentEntityState = null;
 
 		if (item.type === 'entity') {
 			stateValue = this._getValue(item.entity);
@@ -762,6 +806,15 @@ class RoomCard extends LitElement {
 					currentHvacMode = entityState.state;
 					// For climate entities, consider it "on" if not in "off" mode
 					stateIsOn = currentHvacMode !== 'off';
+				}
+			} else if (this._isMultiStateItem(item)) {
+				// Multi-state entity handling
+				const entityState = this.hass.states[item.entity];
+				if (entityState && entityState.state) {
+					currentEntityState = entityState.state;
+					// For multi-state entities, consider it "on" if not in "off" or "unavailable"
+					stateIsOn =
+						currentEntityState !== 'off' && currentEntityState !== 'unavailable';
 				}
 			} else {
 				// Regular entity logic
@@ -777,7 +830,8 @@ class RoomCard extends LitElement {
 		const { icon_color, background_color } = this._applyTemplates(
 			item,
 			stateIsOn ? 'on' : 'off',
-			currentHvacMode
+			currentHvacMode,
+			currentEntityState
 		);
 
 		// Get actual color from light entity if use_light_color is enabled
@@ -800,6 +854,18 @@ class RoomCard extends LitElement {
 			if (currentHvacMode === 'off' && item.icon_off) {
 				icon = item.icon_off;
 			} else {
+				icon = item.icon;
+			}
+		} else if (this._isMultiStateItem(item) && currentEntityState) {
+			// For multi-state entities, check for state-specific icon first
+			const stateIcon = item[`icon_${currentEntityState}`];
+			if (stateIcon) {
+				icon = stateIcon;
+			} else if ((currentEntityState === 'off' || currentEntityState === 'unavailable') && item.icon_off) {
+				// Fallback to icon_off for off/unavailable states
+				icon = item.icon_off;
+			} else {
+				// Fallback to main icon
 				icon = item.icon;
 			}
 		} else {

@@ -1,6 +1,26 @@
 import { LitElement, html, css } from 'lit-element';
 import { localize, getColorTemplateOptions } from './localize/localize.js';
 
+// Multi-state presets for common domains
+const MULTI_STATE_PRESETS = {
+	vacuum: ['idle', 'cleaning', 'paused', 'returning', 'docked', 'error'],
+	alarm_control_panel: [
+		'disarmed',
+		'armed_home',
+		'armed_away',
+		'armed_night',
+		'triggered',
+		'pending',
+		'arming',
+	],
+	media_player: ['off', 'idle', 'playing', 'paused', 'buffering'],
+	lock: ['locked', 'unlocked', 'locking', 'unlocking', 'jammed'],
+	cover: ['open', 'closed', 'opening', 'closing'],
+	fan: ['off', 'on', 'low', 'medium', 'high'],
+	humidifier: ['off', 'on', 'humidifying', 'drying'],
+	water_heater: ['off', 'eco', 'electric', 'gas', 'heat_pump', 'performance'],
+};
+
 class RoomCardEditor extends LitElement {
 	constructor() {
 		super();
@@ -279,7 +299,7 @@ class RoomCardEditor extends LitElement {
 		document.body.style.cursor = 'grabbing';
 	}
 
-	_handleDragEnd(ev) {
+	_handleDragEnd() {
 		// Remove all drag classes and reset cursor
 		this.shadowRoot.querySelectorAll('.box').forEach((box) => {
 			box.classList.remove('dragging', 'drag-over');
@@ -436,7 +456,22 @@ class RoomCardEditor extends LitElement {
 		}
 
 		const entities = [...this._config.entities];
-		entities[entity] = ev.detail.value;
+		const oldValue = entities[entity];
+		const newValue = ev.detail.value;
+
+		// Auto-fill custom_states when use_multi_state is enabled and custom_states is empty
+		if (
+			newValue.use_multi_state &&
+			!oldValue?.use_multi_state &&
+			(!newValue.custom_states || newValue.custom_states.trim() === '')
+		) {
+			const preset = this._getMultiStatePreset(newValue.entity);
+			if (preset.length > 0) {
+				newValue.custom_states = preset.join(', ');
+			}
+		}
+
+		entities[entity] = newValue;
 
 		this._config = { ...this._config, entities };
 
@@ -448,7 +483,92 @@ class RoomCardEditor extends LitElement {
 		this.dispatchEvent(event);
 	}
 
+	// Get multi-state preset for a given entity ID
+	_getMultiStatePreset(entityId) {
+		if (!entityId) return [];
+		const domain = entityId.split('.')[0];
+		return MULTI_STATE_PRESETS[domain] || [];
+	}
+
+	// Check if entity uses multi-state mode (not climate, as climate has built-in HVAC support)
+	_isMultiStateEntity(entityConfig) {
+		if (!entityConfig || !entityConfig.entity) {
+			return false;
+		}
+		return entityConfig.use_multi_state === true && !this._isClimateEntity(entityConfig);
+	}
+
+	// Get custom multi-state schema for entity
+	_getCustomMultiStateSchema(item) {
+		if (!item.custom_states || item.custom_states.trim() === '') {
+			return [];
+		}
+
+		const states = item.custom_states
+			.split(',')
+			.map((s) => s.trim())
+			.filter((s) => s !== '');
+
+		if (states.length === 0) {
+			return [];
+		}
+
+		const schema = [];
+
+		states.forEach((state) => {
+			const stateLabel = state.charAt(0).toUpperCase() + state.slice(1).replace(/_/g, ' ');
+
+			schema.push({
+				type: 'expandable',
+				expanded: false,
+				name: '',
+				title: `${stateLabel}`,
+				schema: [
+					{
+						name: `icon_${state}`,
+						label: `Icon`,
+						selector: { icon: {} },
+						context: { icon_entity: 'entity' },
+					},
+					{
+						name: `template_${state}`,
+						label: localize(this.hass, 'card_template', 'Template'),
+						selector: {
+							select: {
+								multiple: false,
+								mode: 'dropdown',
+								options: getColorTemplateOptions(this.hass),
+							},
+						},
+					},
+					{
+						type: 'grid',
+						name: '',
+						schema: [
+							{
+								name: `color_${state}`,
+								label: localize(this.hass, 'icon_color', 'Color'),
+								selector: { text: {} },
+							},
+							{
+								name: `background_color_${state}`,
+								label: localize(this.hass, 'background_circle_color', 'Background'),
+								selector: { text: {} },
+							},
+						],
+					},
+				],
+			});
+		});
+
+		return schema;
+	}
+
 	_getEntitySchema(item) {
+		// Determine if we should show standard on/off fields or multi-state fields
+		const isMultiState = this._isMultiStateEntity(item);
+		const isClimate = item.type === 'entity' && this._isClimateEntity(item);
+
 		let baseSchema = [
 			{
 				name: 'type',
@@ -489,8 +609,8 @@ class RoomCardEditor extends LitElement {
 					},
 				],
 			},
-			// Only show color/template fields for non-climate entities
-			...(item.type === 'entity' && this._isClimateEntity(item)
+			// Only show color/template fields for non-climate and non-multi-state entities
+			...(isClimate || isMultiState
 				? []
 				: [
 						{
@@ -620,7 +740,22 @@ class RoomCardEditor extends LitElement {
 				required: true,
 				selector: { entity: {} },
 			},
+			// Multi-state toggle (only show for non-climate entities)
 			...(this._isClimateEntity(item)
+				? []
+				: [
+						{
+							name: 'use_multi_state',
+							label: localize(
+								this.hass,
+								'use_multi_state_description',
+								'Enable Multi-State Mode for custom state colors'
+							),
+							selector: { boolean: {} },
+						},
+					]),
+			// Show on_state only for non-climate and non-multi-state entities
+			...(this._isClimateEntity(item) || isMultiState
 				? []
 				: [
 						{
@@ -630,7 +765,24 @@ class RoomCardEditor extends LitElement {
 							selector: { text: {} },
 						},
 					]),
+			// Multi-state custom states field
+			...(isMultiState
+				? [
+						{
+							name: 'custom_states',
+							label: localize(
+								this.hass,
+								'custom_states_hint',
+								'Enter states like: idle, cleaning, paused'
+							),
+							selector: { text: {} },
+						},
+					]
+				: []),
+			// Climate entity schema (built-in HVAC mode support)
 			...(this._isClimateEntity(item) ? this._getClimateEntitySchema(item) : []),
+			// Custom multi-state schema (dynamic fields for each state)
+			...(isMultiState ? this._getCustomMultiStateSchema(item) : []),
 		];
 
 		if (item.type === 'template') {
@@ -641,13 +793,12 @@ class RoomCardEditor extends LitElement {
 			baseSchema.push(...entitySchema);
 		}
 
-		const shouldExpand =
-			(item.type == 'template' && item.condition == undefined) ||
-			(item.type == 'entity' && item.entity == undefined);
+		// Only expand if completely new/empty (no icon set yet)
+		const isNew = !item.icon;
 		return [
 			{
 				type: 'expandable',
-				expanded: shouldExpand,
+				expanded: isNew,
 				name: '',
 				title: `${localize(this.hass, 'state_label', 'State')}: ${localize(this.hass, `entity_type_${item.type}`, item.type)}`,
 				schema: baseSchema,

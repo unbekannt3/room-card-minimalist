@@ -223,6 +223,14 @@ export class RoomCard extends LitElement {
 		if (this._config.secondary_color) {
 			this._templateService.subscribe(this._config.secondary_color);
 		}
+		// Subscribe to tertiary template
+		if (this._config.tertiary) {
+			this._templateService.subscribe(this._config.tertiary);
+		}
+		// Subscribe to tertiary_color template
+		if (this._config.tertiary_color) {
+			this._templateService.subscribe(this._config.tertiary_color);
+		}
 		// Subscribe to background_image template
 		if (this._config.background_image) {
 			this._templateService.subscribe(this._config.background_image);
@@ -251,6 +259,8 @@ export class RoomCard extends LitElement {
 
 		const secondary = this._getValueRawOrTemplate(this._config.secondary);
 		const secondaryColor = this._getValueRawOrTemplate(this._config.secondary_color);
+		const tertiary = this._getValueRawOrTemplate(this._config.tertiary);
+		const tertiaryColor = this._getValueRawOrTemplate(this._config.tertiary_color);
 		let entitiesToShow = this._config.entities.slice(0, MAX_ENTITIES);
 
 		if (this._config.entities_reverse_order) {
@@ -269,16 +279,25 @@ export class RoomCard extends LitElement {
 		const finalSecondaryColor = this._config.use_template_color_for_secondary
 			? this._getValueRawOrTemplate(cardColors.text_color)
 			: secondaryColor;
+		const finalTertiaryColor = this._config.use_template_color_for_tertiary
+			? this._getValueRawOrTemplate(cardColors.text_color)
+			: tertiaryColor;
 
 		const isCardClickable = isClickable(this._config);
 		const isSecondaryClickable = this._isSecondaryClickable();
+		const isTertiaryClickable = this._isTertiaryClickable();
 
-		// Create handlers for card and secondary
+		// Create handlers for card, secondary, and tertiary
 		const cardHandlers = isCardClickable
 			? this._actionController.createHandlers(this._config, { ignoreSelector: '.state-item' })
 			: null;
 		const secondaryHandlers = isSecondaryClickable
 			? this._actionController.createHandlers(this._getSecondaryConfig(), {
+					stopPropagation: true,
+				})
+			: null;
+		const tertiaryHandlers = isTertiaryClickable
+			? this._actionController.createHandlers(this._getTertiaryConfig(), {
 					stopPropagation: true,
 				})
 			: null;
@@ -307,6 +326,12 @@ export class RoomCard extends LitElement {
 								finalSecondaryColor,
 								isSecondaryClickable,
 								secondaryHandlers
+							)}
+							${this._renderTertiary(
+								tertiary,
+								finalTertiaryColor,
+								isTertiaryClickable,
+								tertiaryHandlers
 							)}
 						</div>
 						${this._renderIconContainer(cardColors)}
@@ -341,6 +366,36 @@ export class RoomCard extends LitElement {
 		return html`
 			<span
 				class="secondary ${isClickable ? 'clickable' : ''}"
+				style="color: ${color}"
+				@click=${handlers?.onClick}
+				@mousedown=${handlers?.onMouseDown}
+				@mouseup=${handlers?.onMouseUp}
+				@mouseleave=${handlers?.onMouseLeave}
+				@touchstart=${handlers?.onTouchStart}
+				@touchend=${handlers?.onTouchEnd}
+				@contextmenu=${handlers?.onContextMenu}
+				tabindex="${isClickable ? '0' : '-1'}"
+				>${content}</span
+			>
+		`;
+	}
+
+	/**
+	 * Render tertiary text element
+	 */
+	private _renderTertiary(
+		tertiary: string | undefined,
+		color: string | undefined,
+		isClickable: boolean,
+		handlers: ReturnType<ActionController['createHandlers']> | null
+	): TemplateResult | string {
+		if (!tertiary) return '';
+
+		const content = this._config?.tertiary_allow_html ? unsafeHTML(tertiary) : tertiary;
+
+		return html`
+			<span
+				class="tertiary ${isClickable ? 'clickable' : ''}"
 				style="color: ${color}"
 				@click=${handlers?.onClick}
 				@mousedown=${handlers?.onMouseDown}
@@ -455,6 +510,31 @@ export class RoomCard extends LitElement {
 			tap_action: this._config?.secondary_tap_action,
 			hold_action: this._config?.secondary_hold_action,
 			double_tap_action: this._config?.secondary_double_tap_action,
+		};
+	}
+
+	/**
+	 * Check if tertiary text should be clickable
+	 */
+	private _isTertiaryClickable(): boolean {
+		if (!this._config?.tertiary || !this._config.tertiary_entity) return false;
+		return isClickable({
+			entity: this._config.tertiary_entity,
+			tap_action: this._config.tertiary_tap_action,
+			hold_action: this._config.tertiary_hold_action,
+			double_tap_action: this._config.tertiary_double_tap_action,
+		});
+	}
+
+	/**
+	 * Get tertiary action config
+	 */
+	private _getTertiaryConfig(): ActionsConfig {
+		return {
+			entity: this._config?.tertiary_entity,
+			tap_action: this._config?.tertiary_tap_action,
+			hold_action: this._config?.tertiary_hold_action,
+			double_tap_action: this._config?.tertiary_double_tap_action,
 		};
 	}
 

@@ -462,12 +462,20 @@ export function getBackgroundSchema(ctx: SchemaContext): SchemaItem[] {
 		}
 	}
 
+	// Icon color field - shown for 'none' and 'color' background types
+	const iconColorField: SchemaItem = {
+		name: 'icon_color',
+		label: localize(ctx.hass, 'icon_color', 'Icon Color'),
+		selector: { template: {} },
+	};
+
 	switch (backgroundType) {
 		case 'none':
-			return [];
+			return [iconColorField];
 
 		case 'color':
 			return [
+				iconColorField,
 				{
 					name: 'background_circle_color',
 					label: localize(
@@ -511,6 +519,7 @@ export function getBackgroundSchema(ctx: SchemaContext): SchemaItem[] {
 		default:
 			// Fallback to old color circle schema
 			return [
+				iconColorField,
 				{
 					name: 'background_circle_color',
 					label: localize(
@@ -528,6 +537,10 @@ export function getBackgroundSchema(ctx: SchemaContext): SchemaItem[] {
  * Get the main card configuration schema
  */
 export function getMainSchema(ctx: SchemaContext): Schema {
+	// Expand secondary/tertiary sections if they have values configured
+	const hasSecondary = !!ctx.config?.secondary;
+	const hasTertiary = !!ctx.config?.tertiary;
+
 	return [
 		{
 			name: 'name',
@@ -568,21 +581,6 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			selector: { 'ui-action': {} },
 		},
 		{
-			name: 'icon_color',
-			label: localize(ctx.hass, 'icon_color', 'Icon Color'),
-			selector: { template: {} },
-		},
-		{
-			name: 'secondary',
-			label: localize(ctx.hass, 'secondary', 'Secondary Info'),
-			selector: { template: {} },
-		},
-		{
-			name: 'secondary_color',
-			label: localize(ctx.hass, 'secondary_color', 'Secondary Info Color'),
-			selector: { template: {} },
-		},
-		{
 			name: 'use_template_color_for_title',
 			label: localize(
 				ctx.hass,
@@ -591,80 +589,200 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			),
 			selector: { boolean: {} },
 		},
+		// Secondary Info - Expandable Section
 		{
-			name: 'use_template_color_for_secondary',
-			label: localize(
-				ctx.hass,
-				'use_template_color_for_secondary',
-				'Use template color for secondary info'
-			),
-			selector: { boolean: {} },
-		},
-		{
-			name: 'secondary_allow_html',
-			label: localize(ctx.hass, 'secondary_allow_html', 'Allow HTML in secondary info'),
-			selector: { boolean: {} },
-		},
-		{
-			name: 'secondary_entity',
-			label: localize(ctx.hass, 'secondary_entity', 'Secondary Info Entity (for actions)'),
-			selector: { entity: {} },
-		},
-		{
-			type: 'grid',
+			type: 'expandable',
+			expanded: hasSecondary,
 			name: '',
+			title: localize(ctx.hass, 'secondary', 'Secondary Info'),
 			schema: [
 				{
-					name: 'secondary_tap_action',
-					label: `${localize(ctx.hass, 'secondary', 'Secondary')} ${
-						ctx.hass?.localize?.('ui.panel.lovelace.editor.card.generic.tap_action') ||
-						'Tap Action'
-					}`,
-					selector: { 'ui-action': {} },
+					name: 'secondary',
+					label: localize(ctx.hass, 'secondary', 'Secondary Info'),
+					selector: { template: {} },
 				},
 				{
-					name: 'secondary_hold_action',
-					label: `${localize(ctx.hass, 'secondary', 'Secondary')} ${
-						ctx.hass?.localize?.('ui.panel.lovelace.editor.card.generic.hold_action') ||
-						'Hold Action'
-					}`,
-					selector: { 'ui-action': {} },
+					name: 'secondary_color',
+					label: localize(ctx.hass, 'secondary_color', 'Secondary Info Color'),
+					selector: { template: {} },
 				},
-			],
-		},
-		{
-			name: 'background_type',
-			label: localize(ctx.hass, 'background_type', 'Background Type'),
-			selector: {
-				select: {
-					multiple: false,
-					mode: 'dropdown',
-					options: [
+				{
+					name: 'use_template_color_for_secondary',
+					label: localize(
+						ctx.hass,
+						'use_template_color_for_secondary',
+						'Use template color for secondary info'
+					),
+					selector: { boolean: {} },
+				},
+				{
+					name: 'secondary_allow_html',
+					label: localize(
+						ctx.hass,
+						'secondary_allow_html',
+						'Allow HTML in secondary info'
+					),
+					selector: { boolean: {} },
+				},
+				{
+					name: 'secondary_entity',
+					label: localize(
+						ctx.hass,
+						'secondary_entity',
+						'Secondary Info Entity (for actions)'
+					),
+					selector: { entity: {} },
+				},
+				{
+					type: 'grid',
+					name: '',
+					schema: [
 						{
-							value: 'none',
-							label: localize(ctx.hass, 'background_type_none', 'No Background'),
+							name: 'secondary_tap_action',
+							label: `${localize(ctx.hass, 'secondary', 'Secondary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.tap_action'
+								) || 'Tap Action'
+							}`,
+							selector: { 'ui-action': {} },
 						},
 						{
-							value: 'color',
-							label: localize(ctx.hass, 'background_type_color', 'Color Circle'),
-						},
-						{
-							value: 'image',
-							label: localize(ctx.hass, 'background_type_image', 'Custom Image'),
-						},
-						{
-							value: 'person',
-							label: localize(
-								ctx.hass,
-								'background_type_person',
-								'Person Profile Picture'
-							),
+							name: 'secondary_hold_action',
+							label: `${localize(ctx.hass, 'secondary', 'Secondary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.hold_action'
+								) || 'Hold Action'
+							}`,
+							selector: { 'ui-action': {} },
 						},
 					],
 				},
-			},
+			],
 		},
-		...getBackgroundSchema(ctx),
+		// Tertiary Info - Expandable Section
+		{
+			type: 'expandable',
+			expanded: hasTertiary,
+			name: '',
+			title: localize(ctx.hass, 'tertiary', 'Tertiary Info'),
+			schema: [
+				{
+					name: 'tertiary',
+					label: localize(ctx.hass, 'tertiary', 'Tertiary Info'),
+					selector: { template: {} },
+				},
+				{
+					name: 'tertiary_color',
+					label: localize(ctx.hass, 'tertiary_color', 'Tertiary Info Color'),
+					selector: { template: {} },
+				},
+				{
+					name: 'use_template_color_for_tertiary',
+					label: localize(
+						ctx.hass,
+						'use_template_color_for_tertiary',
+						'Use template color for tertiary info'
+					),
+					selector: { boolean: {} },
+				},
+				{
+					name: 'tertiary_allow_html',
+					label: localize(
+						ctx.hass,
+						'tertiary_allow_html',
+						'Allow HTML in tertiary info'
+					),
+					selector: { boolean: {} },
+				},
+				{
+					name: 'tertiary_entity',
+					label: localize(
+						ctx.hass,
+						'tertiary_entity',
+						'Tertiary Info Entity (for actions)'
+					),
+					selector: { entity: {} },
+				},
+				{
+					type: 'grid',
+					name: '',
+					schema: [
+						{
+							name: 'tertiary_tap_action',
+							label: `${localize(ctx.hass, 'tertiary', 'Tertiary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.tap_action'
+								) || 'Tap Action'
+							}`,
+							selector: { 'ui-action': {} },
+						},
+						{
+							name: 'tertiary_hold_action',
+							label: `${localize(ctx.hass, 'tertiary', 'Tertiary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.hold_action'
+								) || 'Hold Action'
+							}`,
+							selector: { 'ui-action': {} },
+						},
+					],
+				},
+			],
+		},
+		// Background - Expandable Section
+		{
+			type: 'expandable',
+			expanded: false,
+			name: '',
+			title: localize(ctx.hass, 'card_icon_image', 'Card Icon/Image'),
+			schema: [
+				{
+					name: 'background_type',
+					label: localize(ctx.hass, 'background_type', 'Background Type'),
+					selector: {
+						select: {
+							multiple: false,
+							mode: 'dropdown',
+							options: [
+								{
+									value: 'none',
+									label: localize(
+										ctx.hass,
+										'background_type_none',
+										'No Background'
+									),
+								},
+								{
+									value: 'color',
+									label: localize(
+										ctx.hass,
+										'background_type_color',
+										'Color Circle'
+									),
+								},
+								{
+									value: 'image',
+									label: localize(
+										ctx.hass,
+										'background_type_image',
+										'Custom Image'
+									),
+								},
+								{
+									value: 'person',
+									label: localize(
+										ctx.hass,
+										'background_type_person',
+										'Person Profile Picture'
+									),
+								},
+							],
+						},
+					},
+				},
+				...getBackgroundSchema(ctx),
+			],
+		},
 		{
 			name: 'entities_reverse_order',
 			label: localize(ctx.hass, 'entities_reverse_order', 'Reverse Entity Order'),

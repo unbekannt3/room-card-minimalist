@@ -175,6 +175,25 @@ export const cardStyles = css`
 		opacity: 0.8;
 	}
 
+	.tertiary {
+		font-weight: var(--card-secondary-font-weight);
+		font-size: var(--card-tertiary-font-size, 12px);
+		line-height: var(--card-secondary-line-height);
+		color: var(--secondary-text-color);
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.tertiary.clickable {
+		cursor: pointer;
+		transition: opacity 0.2s ease;
+	}
+
+	.tertiary.clickable:hover {
+		opacity: 0.8;
+	}
+
 	.content-right {
 		display: flex;
 		align-items: center;

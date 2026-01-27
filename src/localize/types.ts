@@ -30,6 +30,7 @@ export interface Translations {
 	custom_states_hint: string;
 	card_template: string;
 	card_template_none: string;
+	card_icon_image: string;
 	background_type: string;
 	background_type_none: string;
 	background_type_color: string;
@@ -41,7 +42,12 @@ export interface Translations {
 	background_person_entity: string;
 	use_template_color_for_title: string;
 	use_template_color_for_secondary: string;
+	use_template_color_for_tertiary: string;
 	secondary_allow_html: string;
+	tertiary: string;
+	tertiary_color: string;
+	tertiary_entity: string;
+	tertiary_allow_html: string;
 	entities_reverse_order: string;
 	secondary: string;
 	secondary_color: string;

@@ -38,6 +38,14 @@ export interface RoomCardConfig extends ActionsConfig {
 	secondary_hold_action?: ActionConfig;
 	secondary_double_tap_action?: ActionConfig;
 	secondary_allow_html?: boolean;
+	// Tertiary info
+	tertiary?: string;
+	tertiary_color?: string;
+	tertiary_entity?: string;
+	tertiary_tap_action?: ActionConfig;
+	tertiary_hold_action?: ActionConfig;
+	tertiary_double_tap_action?: ActionConfig;
+	tertiary_allow_html?: boolean;
 	// Background settings
 	background_type?: BackgroundType;
 	background_image?: string;
@@ -49,6 +57,7 @@ export interface RoomCardConfig extends ActionsConfig {
 	// Color options
 	use_template_color_for_title?: boolean;
 	use_template_color_for_secondary?: boolean;
+	use_template_color_for_tertiary?: boolean;
 	// Card actions
 	tap_action?: ActionConfig;
 	hold_action?: ActionConfig;
@@ -63,6 +72,9 @@ export interface RoomCardInternalConfig extends RoomCardConfig {
 	secondary: string;
 	secondary_color: string;
 	secondary_entity: string;
+	tertiary: string;
+	tertiary_color: string;
+	tertiary_entity: string;
 	entities: EntityConfig[];
 	background_type: BackgroundType;
 	background_image: string;
@@ -71,7 +83,9 @@ export interface RoomCardInternalConfig extends RoomCardConfig {
 	entities_reverse_order: boolean;
 	use_template_color_for_title: boolean;
 	use_template_color_for_secondary: boolean;
+	use_template_color_for_tertiary: boolean;
 	secondary_allow_html: boolean;
+	tertiary_allow_html: boolean;
 }
 
 // Default card config values
@@ -79,6 +93,9 @@ export const DEFAULT_CARD_CONFIG: Omit<RoomCardInternalConfig, 'type' | 'name' |
 	secondary: '',
 	secondary_color: 'var(--secondary-text-color)',
 	secondary_entity: '',
+	tertiary: '',
+	tertiary_color: 'var(--secondary-text-color)',
+	tertiary_entity: '',
 	entities: [],
 	background_type: 'color',
 	background_image: '',
@@ -87,7 +104,9 @@ export const DEFAULT_CARD_CONFIG: Omit<RoomCardInternalConfig, 'type' | 'name' |
 	entities_reverse_order: false,
 	use_template_color_for_title: false,
 	use_template_color_for_secondary: false,
+	use_template_color_for_tertiary: false,
 	secondary_allow_html: false,
+	tertiary_allow_html: false,
 };
 
 // Type guard to check if config needs migration

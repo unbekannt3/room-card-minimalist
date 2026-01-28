@@ -1,3 +1,7 @@
+## 1.3.0-beta.2 (2026-01-28)
+
+* fix: multi-states switch shown for simple entities ([684cd9e](https://github.com/unbekannt3/room-card-minimalist/commit/684cd9e))
+
 ## 1.3.0-beta.1 (2026-01-28)
 
 * ci: check node ([932fa5f](https://github.com/unbekannt3/room-card-minimalist/commit/932fa5f))

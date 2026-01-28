@@ -57,5 +57,4 @@ jobs:
         timeout-minutes: 5
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          DEBUG: semantic-release:*
         run: npx semantic-release

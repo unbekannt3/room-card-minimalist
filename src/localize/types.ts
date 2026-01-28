@@ -24,6 +24,8 @@ export interface ColorTranslations {
 
 // All available translation keys
 export interface Translations {
+	show_value: string;
+	value_template: string;
 	use_multi_state: string;
 	use_multi_state_description: string;
 	custom_states: string;

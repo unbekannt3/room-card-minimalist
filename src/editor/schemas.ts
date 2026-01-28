@@ -318,6 +318,21 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						],
 					},
 				] as SchemaItem[])),
+		// Show Value fields
+		{
+			name: 'show_value',
+			label: localize(ctx.hass, 'show_value', 'Show Value'),
+			selector: { boolean: {} },
+		},
+		...(item.show_value
+			? ([
+					{
+						name: 'value_template',
+						label: localize(ctx.hass, 'value_template', 'Value Template'),
+						selector: { template: {} },
+					},
+				] as SchemaItem[])
+			: []),
 		{
 			type: 'grid' as const,
 			name: '',
@@ -687,11 +702,7 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 				},
 				{
 					name: 'tertiary_allow_html',
-					label: localize(
-						ctx.hass,
-						'tertiary_allow_html',
-						'Allow HTML in tertiary info'
-					),
+					label: localize(ctx.hass, 'tertiary_allow_html', 'Allow HTML in tertiary info'),
 					selector: { boolean: {} },
 				},
 				{

@@ -255,6 +255,26 @@ export const cardStyles = css`
 		color: var(--secondary-text-color);
 	}
 
+	.state-item.has-value {
+		position: relative;
+		overflow: visible;
+	}
+
+	.state-value {
+		position: absolute;
+		bottom: -2px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: 10px;
+		font-weight: 600;
+		white-space: nowrap;
+		text-align: center;
+		line-height: 1;
+		background: var(--card-background-color, var(--ha-card-background, #fff));
+		padding: 1px 4px;
+		border-radius: 4px;
+	}
+
 	.invalid-entity {
 		color: var(--error-color);
 		font-size: 10px;
@@ -295,6 +315,11 @@ export const cardStyles = css`
 
 		.states-reverse {
 			padding-bottom: 0;
+		}
+
+		.state-value {
+			font-size: 9px;
+			padding: 1px 3px;
 		}
 
 		.icon-background-square {

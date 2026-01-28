@@ -28,6 +28,8 @@ export interface StandardEntityConfig extends BaseEntityConfig {
 	use_light_color?: boolean;
 	use_multi_state?: boolean;
 	custom_states?: string;
+	show_value?: boolean;
+	value_template?: string;
 	template_on?: ColorTemplateName;
 	template_off?: ColorTemplateName;
 	color_on?: string;
@@ -45,6 +47,8 @@ export interface StandardEntityConfig extends BaseEntityConfig {
 export interface TemplateEntityConfig extends BaseEntityConfig {
 	type: 'template';
 	condition: string;
+	show_value?: boolean;
+	value_template?: string;
 	template_on?: ColorTemplateName;
 	template_off?: ColorTemplateName;
 	color_on?: string;

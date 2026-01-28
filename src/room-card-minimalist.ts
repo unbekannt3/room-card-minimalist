@@ -14,6 +14,7 @@ import type {
 	RoomCardConfig,
 	RoomCardInternalConfig,
 	EntityConfig,
+	StandardEntityConfig,
 	ColorTemplateName,
 	ActionsConfig,
 } from './types';
@@ -234,6 +235,12 @@ export class RoomCard extends LitElement {
 		// Subscribe to background_image template
 		if (this._config.background_image) {
 			this._templateService.subscribe(this._config.background_image);
+		}
+		// Subscribe to entity value templates
+		for (const entity of this._config.entities) {
+			if (entity.show_value && entity.value_template) {
+				this._templateService.subscribe(entity.value_template);
+			}
 		}
 	}
 
@@ -465,7 +472,7 @@ export class RoomCard extends LitElement {
 		}
 
 		const stateResult = getEntityStateResult(item, this.hass, (i) => this._getValue(i));
-		const { isOn, currentHvacMode, currentEntityState } = stateResult;
+		const { isOn, currentHvacMode, currentEntityState, stateValue } = stateResult;
 
 		const baseColors = applyEntityTemplates(
 			item,
@@ -477,13 +484,38 @@ export class RoomCard extends LitElement {
 		const { iconColor, backgroundColor } = getFinalColors(item, isOn, baseColors, this.hass);
 		const icon = getEntityIcon(item, isOn, currentHvacMode, currentEntityState);
 
+		// Get display value if show_value is enabled
+		let displayValue: string | undefined;
+		if (item.show_value) {
+			if (item.value_template) {
+				// Use value_template if provided
+				displayValue = this._getValueRawOrTemplate(item.value_template);
+			} else if (item.type === 'entity') {
+				// Use entity state directly for entity type
+				const entityItem = item as StandardEntityConfig;
+				const entityState = this.hass?.states[entityItem.entity];
+				displayValue = entityState?.state;
+			} else if (item.type === 'template') {
+				// Use stateValue (template result) for template type
+				displayValue = stateValue;
+			}
+		}
+
 		const handlers = isEntityItemClickable(item)
 			? this._actionController.createHandlers(item as ActionsConfig, {
 					stopPropagation: true,
 				})
 			: null;
 
-		return renderEntityItem(item, handlers, iconColor, backgroundColor, icon, isOn);
+		return renderEntityItem(
+			item,
+			handlers,
+			iconColor,
+			backgroundColor,
+			icon,
+			isOn,
+			displayValue
+		);
 	}
 
 	// ==================== Helper Methods ====================

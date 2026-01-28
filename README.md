@@ -53,6 +53,7 @@ Or search for "room-card-minimalist" in [HACS][hacs].
      - URL: `/local/room-card-minimalist.js`
      - Type: `JavaScript Module`
    - **YAML:**
+
      ```yaml
      lovelace:
        resources:
@@ -186,6 +187,8 @@ Up to 4 entity indicators on the right side of the card. Each can be an `entity`
 | `entity`               | string  | —          | Entity ID (required for `type: entity`)                |
 | `on_state`             | string  | —          | State value considered "on" (required for non-climate) |
 | `condition`            | string  | —          | Template condition (required for `type: template`)     |
+| `show_value`           | boolean | `false`    | Display custom state value as label on the circle      |
+| `value_template`       | string  | —          | Template for the value to be displayed as label        |
 | `color_on`             | string  | —          | Icon color when on                                     |
 | `color_off`            | string  | —          | Icon color when off                                    |
 | `background_color_on`  | string  | —          | Background when on                                     |
@@ -210,6 +213,19 @@ entities:
       action: toggle
 ```
 
+**Entity with value display:**
+
+```yaml
+entities:
+  - type: entity
+    entity: sensor.temperature
+    icon: mdi:thermometer
+    on_state: 'on'
+    show_value: true
+    value_template: "{{ states('sensor.temperature') }}°C" # Label below state icon
+    template_on: orange
+```
+
 **Template example:**
 
 ```yaml
@@ -229,14 +245,14 @@ entities:
 
 For entities with multiple states beyond on/off (e.g., vacuum robots, media players), enable multi-state mode to configure each state individually.
 
-| Name              | Type    | Default | Description                                      |
-| :---------------- | :------ | :------ | :----------------------------------------------- |
-| `use_multi_state` | boolean | `false` | Enable multi-state mode                          |
-| `custom_states`   | string  | —       | Comma-separated list of states (e.g., `idle, cleaning, paused`) |
-| `icon_[state]`    | string  | —       | Icon for specific state                          |
-| `color_[state]`   | string  | —       | Icon color for specific state                    |
-| `background_color_[state]` | string | — | Background color for specific state             |
-| `template_[state]`| string  | —       | Color preset for specific state                  |
+| Name                       | Type    | Default | Description                                                     |
+| :------------------------- | :------ | :------ | :-------------------------------------------------------------- |
+| `use_multi_state`          | boolean | `false` | Enable multi-state mode                                         |
+| `custom_states`            | string  | —       | Comma-separated list of states (e.g., `idle, cleaning, paused`) |
+| `icon_[state]`             | string  | —       | Icon for specific state                                         |
+| `color_[state]`            | string  | —       | Icon color for specific state                                   |
+| `background_color_[state]` | string  | —       | Background color for specific state                             |
+| `template_[state]`         | string  | —       | Color preset for specific state                                 |
 
 **Example: Vacuum Robot**
 
@@ -244,9 +260,9 @@ For entities with multiple states beyond on/off (e.g., vacuum robots, media play
 entities:
   - type: entity
     entity: vacuum.robot
-    icon: mdi:robot-vacuum  # Fallback icon
+    icon: mdi:robot-vacuum # Fallback icon
     use_multi_state: true
-    custom_states: "idle, cleaning, paused, returning, error"
+    custom_states: 'idle, cleaning, paused, returning, error'
     icon_cleaning: mdi:robot-vacuum
     icon_idle: mdi:robot-vacuum-off
     icon_error: mdi:robot-vacuum-alert

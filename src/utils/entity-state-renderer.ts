@@ -3,7 +3,7 @@
  * Handles rendering of entity state items in the room card
  */
 
-import { html, TemplateResult } from 'lit';
+import { html, nothing, TemplateResult } from 'lit';
 import type {
 	HomeAssistant,
 	HassEntity,
@@ -13,7 +13,6 @@ import type {
 	TemplateEntityConfig,
 	AppliedColorTemplate,
 	ColorTemplateName,
-	ActionsConfig,
 } from '../types';
 import { COLOR_TEMPLATES } from '../constants';
 import { isClimateEntityId, getEntityState } from './entity-helpers';
@@ -248,13 +247,15 @@ export function renderEntityItem(
 	iconColor: string,
 	backgroundColor: string,
 	icon: string,
-	isOn: boolean
+	isOn: boolean,
+	displayValue?: string
 ): TemplateResult {
 	const isClickable = isEntityItemClickable(item);
 	const iconClass = !isOn ? 'off' : 'on';
+	const hasValue = displayValue !== undefined && displayValue !== '';
 
 	return html`
-		<ha-card
+		<div
 			@click=${isClickable ? handlers?.onClick : null}
 			@mousedown=${isClickable ? handlers?.onMouseDown : null}
 			@mouseup=${isClickable ? handlers?.onMouseUp : null}
@@ -262,13 +263,17 @@ export function renderEntityItem(
 			@touchstart=${isClickable ? handlers?.onTouchStart : null}
 			@touchend=${isClickable ? handlers?.onTouchEnd : null}
 			@contextmenu=${isClickable ? handlers?.onContextMenu : null}
-			.config=${item as ActionsConfig}
 			tabindex="${isClickable ? '0' : '-1'}"
-			class="state-item ${isClickable ? 'clickable' : 'non-clickable'}"
+			class="state-item ${isClickable ? 'clickable' : 'non-clickable'} ${hasValue
+				? 'has-value'
+				: ''}"
 			style="background-color: ${backgroundColor}"
 		>
-			<ha-icon class="state-icon ${iconClass}" .icon=${icon} style="color: ${iconColor}" />
-		</ha-card>
+			<ha-icon class="state-icon ${iconClass}" .icon=${icon} style="color: ${iconColor}"></ha-icon>
+			${hasValue
+				? html`<span class="state-value" style="color: ${iconColor}">${displayValue}</span>`
+				: nothing}
+		</div>
 	`;
 }
 

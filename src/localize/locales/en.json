@@ -1,4 +1,6 @@
 {
+	"show_value": "Display State in Circle below Icon",
+	"value_template": "Template (e.g. {{ states('sensor.xxx') }}%)",
 	"use_multi_state": "Multi-State Mode",
 	"use_multi_state_description": "Enable Multi-State Mode for custom state colors",
 	"custom_states": "States (comma separated)",

@@ -1,4 +1,6 @@
 {
+	"show_value": "Status im Kreis unterm Symbol anzeigen",
+	"value_template": "Template (z.B. {{ states('sensor.xxx') }}%)",
 	"use_multi_state": "Multi-State Modus",
 	"use_multi_state_description": "Multi-State Modus für benutzerdefinierte Zustandsfarben aktivieren",
 	"custom_states": "Zustände (kommasepariert)",

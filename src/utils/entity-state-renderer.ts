@@ -269,7 +269,11 @@ export function renderEntityItem(
 				: ''}"
 			style="background-color: ${backgroundColor}"
 		>
-			<ha-icon class="state-icon ${iconClass}" .icon=${icon} style="color: ${iconColor}"></ha-icon>
+			<ha-icon
+				class="state-icon ${iconClass}"
+				.icon=${icon}
+				style="color: ${iconColor}"
+			></ha-icon>
 			${hasValue
 				? html`<span class="state-value" style="color: ${iconColor}">${displayValue}</span>`
 				: nothing}

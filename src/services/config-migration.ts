@@ -8,8 +8,16 @@ import type {
 	RoomCardConfigWithLegacy,
 	RoomCardInternalConfig,
 	BackgroundType,
+	EntityConfig,
+	StandardEntityConfig,
 } from '../types';
 import { DEFAULT_CARD_CONFIG, validateConfig } from '../types';
+import { isClimateEntityId } from '../utils/entity-helpers';
+
+/**
+ * Known HVAC modes for climate entity migration
+ */
+const HVAC_MODES = ['off', 'heat', 'cool', 'heat_cool', 'auto', 'dry', 'fan_only'] as const;
 
 /**
  * Migrate legacy background settings to new background_type system
@@ -37,6 +45,74 @@ function migrateBackgroundType(config: RoomCardConfigWithLegacy): BackgroundType
 }
 
 /**
+ * Migrate legacy climate entity to unified multi-state system
+ * Detects HVAC mode properties and converts to use_multi_state with custom_states
+ */
+function migrateClimateEntity(entity: StandardEntityConfig): StandardEntityConfig {
+	// Only migrate climate entities
+	if (!isClimateEntityId(entity.entity)) {
+		return entity;
+	}
+
+	// Already using multi-state system
+	if (entity.use_multi_state) {
+		return entity;
+	}
+
+	// Check for any legacy HVAC mode properties
+	const foundModes: string[] = [];
+	for (const mode of HVAC_MODES) {
+		const hasTemplate = entity[`template_${mode}`] !== undefined;
+		const hasColor = entity[`color_${mode}`] !== undefined;
+		const hasBackgroundColor = entity[`background_color_${mode}`] !== undefined;
+
+		if (hasTemplate || hasColor || hasBackgroundColor) {
+			foundModes.push(mode);
+		}
+	}
+
+	// If no legacy properties found, nothing to migrate
+	if (foundModes.length === 0) {
+		return entity;
+	}
+
+	// Convert to multi-state format
+	return {
+		...entity,
+		use_multi_state: true,
+		custom_states: foundModes.join(', '),
+	};
+}
+
+/**
+ * Check if any entity in config needs climate migration
+ */
+function needsClimateMigration(config: RoomCardConfigWithLegacy): boolean {
+	if (!config.entities) return false;
+
+	return config.entities.some((entity) => {
+		if (entity.type !== 'entity') return false;
+		const stdEntity = entity as StandardEntityConfig;
+
+		// Check if it's a climate entity with legacy HVAC mode properties
+		if (!isClimateEntityId(stdEntity.entity)) return false;
+		if (stdEntity.use_multi_state) return false;
+
+		// Check for any HVAC mode properties
+		for (const mode of HVAC_MODES) {
+			if (
+				stdEntity[`template_${mode}`] !== undefined ||
+				stdEntity[`color_${mode}`] !== undefined ||
+				stdEntity[`background_color_${mode}`] !== undefined
+			) {
+				return true;
+			}
+		}
+		return false;
+	});
+}
+
+/**
  * Check if config needs migration
  */
 export function needsMigration(config: RoomCardConfigWithLegacy): boolean {
@@ -44,7 +120,8 @@ export function needsMigration(config: RoomCardConfigWithLegacy): boolean {
 		config.use_background_image !== undefined ||
 		config.show_background_circle !== undefined ||
 		config.background_settings !== undefined ||
-		!config.background_type
+		!config.background_type ||
+		needsClimateMigration(config)
 	);
 }
 
@@ -58,9 +135,18 @@ export function migrateConfig(config: RoomCardConfigWithLegacy): RoomCardConfig 
 	const { use_background_image, show_background_circle, background_settings, ...restConfig } =
 		config;
 
+	// Migrate climate entities to unified multi-state system
+	const migratedEntities = restConfig.entities?.map((entity) => {
+		if (entity.type === 'entity') {
+			return migrateClimateEntity(entity as StandardEntityConfig);
+		}
+		return entity;
+	});
+
 	return {
 		...restConfig,
 		background_type: migratedBackgroundType,
+		entities: migratedEntities as EntityConfig[],
 	};
 }
 

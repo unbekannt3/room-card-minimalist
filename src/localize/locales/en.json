@@ -5,6 +5,7 @@
 	"use_multi_state_description": "Enable Multi-State Mode for custom state colors",
 	"custom_states": "States (comma separated)",
 	"custom_states_hint": "Enter states like: idle, cleaning, paused",
+	"custom_states_helper": "Select states used for Multi-State Mode, others use fallback icon",
 	"card_template": "Card Color Preset",
 	"card_template_none": "None",
 	"card_icon_image": "Card Icon/Image",

@@ -17,7 +17,10 @@ import type {
 } from './types';
 
 // Constants
-import { getMultiStatePreset } from './constants';
+import { getMultiStatePreset, getDomainIcon } from './constants';
+
+// Utils
+import { getClimateHvacModes, isClimateEntityId } from './utils/entity-helpers';
 
 // Localize
 import { localize } from './localize/localize';
@@ -187,6 +190,29 @@ export class RoomCardEditor extends LitElement {
 	}
 
 	/**
+	 * Transform entity data for ha-form (convert custom_states string to array)
+	 */
+	private _getEntityFormData(entity: EntityConfig): Record<string, unknown> {
+		if (entity.type !== 'entity' || !entity.custom_states) {
+			return entity as unknown as Record<string, unknown>;
+		}
+
+		// Convert comma-separated string to array for multi-select
+		const customStatesArray =
+			typeof entity.custom_states === 'string'
+				? entity.custom_states
+						.split(',')
+						.map((s) => s.trim())
+						.filter((s) => s !== '')
+				: entity.custom_states;
+
+		return {
+			...(entity as unknown as Record<string, unknown>),
+			custom_states: customStatesArray,
+		};
+	}
+
+	/**
 	 * Get the icon for an entity configuration
 	 */
 	private _getEntityIcon(entity: EntityConfig): string {
@@ -208,25 +234,9 @@ export class RoomCardEditor extends LitElement {
 					return entityObj.attributes.icon;
 				}
 
-				// Fallback icons based on domain
+				// Fallback icons based on domain (using centralized DOMAIN_ICONS)
 				const domain = entity.entity.split('.')[0];
-				const domainIcons: Record<string, string> = {
-					light: 'mdi:lightbulb',
-					switch: 'mdi:toggle-switch',
-					fan: 'mdi:fan',
-					climate: 'mdi:thermostat',
-					cover: 'mdi:window-shutter',
-					lock: 'mdi:lock',
-					sensor: 'mdi:gauge',
-					binary_sensor: 'mdi:checkbox-marked-circle',
-					camera: 'mdi:camera',
-					media_player: 'mdi:speaker',
-					automation: 'mdi:robot',
-					script: 'mdi:script-text',
-					scene: 'mdi:palette',
-				};
-
-				return domainIcons[domain] || 'mdi:help-circle';
+				return getDomainIcon(domain);
 			}
 		}
 
@@ -298,23 +308,42 @@ export class RoomCardEditor extends LitElement {
 
 		const entities = [...(this._config.entities || [])];
 		const oldValue = entities[entityIndex];
-		const newValue = ev.detail.value as EntityConfig;
+		const newValue = ev.detail.value as EntityConfig & { custom_states?: string | string[] };
+
+		// Convert custom_states array back to comma-separated string
+		if (newValue.custom_states && Array.isArray(newValue.custom_states)) {
+			(newValue as EntityConfig & { custom_states: string }).custom_states =
+				newValue.custom_states.join(', ');
+		}
 
 		// Auto-fill custom_states when use_multi_state is enabled and custom_states is empty
+		const customStatesEmpty =
+			!newValue.custom_states ||
+			(typeof newValue.custom_states === 'string' && newValue.custom_states.trim() === '');
+
 		if (
 			newValue.type === 'entity' &&
 			newValue.use_multi_state &&
 			(!oldValue || oldValue.type !== 'entity' || !oldValue.use_multi_state) &&
-			(!newValue.custom_states || newValue.custom_states.trim() === '')
+			customStatesEmpty
 		) {
-			const preset = getMultiStatePreset(newValue.entity);
-			if (preset.length > 0) {
+			let states: string[] = [];
+
+			// For climate entities, get HVAC modes from entity attributes
+			if (isClimateEntityId(newValue.entity)) {
+				states = getClimateHvacModes(this.hass, newValue.entity);
+			} else {
+				// For other entities, get preset states
+				states = getMultiStatePreset(newValue.entity);
+			}
+
+			if (states.length > 0) {
 				(newValue as EntityConfig & { custom_states: string }).custom_states =
-					preset.join(', ');
+					states.join(', ');
 			}
 		}
 
-		entities[entityIndex] = newValue;
+		entities[entityIndex] = newValue as EntityConfig;
 
 		this._config = { ...this._config, entities };
 
@@ -513,7 +542,7 @@ export class RoomCardEditor extends LitElement {
 						<ha-form
 							.hass=${this.hass}
 							.schema=${getEntitySchema(this._getSchemaContext(), entity)}
-							.data=${entity}
+							.data=${this._getEntityFormData(entity)}
 							.computeLabel=${(s: SchemaItem) =>
 								(s as { label?: string }).label ?? s.name}
 							@value-changed=${(ev: CustomEvent) =>

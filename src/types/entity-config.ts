@@ -111,8 +111,7 @@ export function isMultiStateEntityConfig(config: EntityConfig): config is MultiS
 	return (
 		config.type === 'entity' &&
 		(config as StandardEntityConfig).use_multi_state === true &&
-		Boolean((config as StandardEntityConfig).custom_states?.trim()) &&
-		!config.entity?.startsWith('climate.')
+		Boolean((config as StandardEntityConfig).custom_states?.trim())
 	);
 }
 

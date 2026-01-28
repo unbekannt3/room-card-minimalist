@@ -5,6 +5,7 @@
 	"use_multi_state_description": "Multi-State Modus für benutzerdefinierte Zustandsfarben aktivieren",
 	"custom_states": "Zustände (kommasepariert)",
 	"custom_states_hint": "Zustände eingeben, z.B.: idle, cleaning, paused",
+	"custom_states_helper": "Wähle Zustände für Multi-State Mode, andere nutzen Fallback-Icon",
 	"card_template": "Vorlage für Kartenfarbe",
 	"card_template_none": "Keine",
 	"card_icon_image": "Karten-Icon/Bild",

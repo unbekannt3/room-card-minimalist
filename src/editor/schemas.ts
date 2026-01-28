@@ -19,10 +19,11 @@ import { localize, getColorTemplateOptions } from '../localize/localize';
 import {
 	isLightEntityConfig,
 	isClimateEntityConfig,
-	isMultiStateEntityConfig,
 	getClimateHvacModes,
 	parseCustomStates,
 } from '../utils/entity-helpers';
+
+import { hasMultiStatePreset, getMultiStatePreset } from '../constants/multi-state-presets';
 
 /**
  * Context for schema generation functions
@@ -30,6 +31,32 @@ import {
 export interface SchemaContext {
 	hass: HomeAssistant | undefined;
 	config?: RoomCardConfig;
+}
+
+/**
+ * Get available state options for multi-state selector
+ * Returns options from HVAC modes (for climate) or presets (for other entities)
+ */
+function getAvailableStateOptions(
+	ctx: SchemaContext,
+	entityId: string | undefined,
+	isClimate: boolean
+): SelectOption[] {
+	let states: string[] = [];
+
+	if (isClimate && entityId) {
+		// Get HVAC modes from entity attributes
+		states = getClimateHvacModes(ctx.hass, entityId);
+	} else if (entityId) {
+		// Get preset states for the entity domain
+		states = getMultiStatePreset(entityId);
+	}
+
+	// Convert to SelectOption format with nice labels
+	return states.map((state) => ({
+		value: state,
+		label: state.charAt(0).toUpperCase() + state.slice(1).replace(/_/g, ' '),
+	}));
 }
 
 /**
@@ -184,8 +211,11 @@ export function getClimateEntitySchema(ctx: SchemaContext, item: EntityConfig): 
  * Builds the complete schema for a single entity configuration
  */
 export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema {
-	// Determine if we should show standard on/off fields or multi-state fields
-	const isMultiState = isMultiStateEntityConfig(item);
+	// For the editor UI, show multi-state fields when toggle is enabled (even if custom_states is empty)
+	// This differs from isMultiStateEntityConfig which requires non-empty custom_states for runtime
+	const isMultiStateEnabled =
+		item.type === 'entity' &&
+		(item as EntityConfig & { use_multi_state?: boolean }).use_multi_state === true;
 	const isClimate = isClimateEntityConfig(item);
 
 	let baseSchema: SchemaItem[] = [
@@ -210,7 +240,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 			},
 		},
 		// Icon fields - different layout for multi-state vs regular entities
-		...(isMultiState
+		...(isMultiStateEnabled
 			? [
 					{
 						name: 'icon',
@@ -242,7 +272,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 					},
 				]),
 		// Only show color/template fields for non-climate and non-multi-state entities
-		...(isClimate || isMultiState
+		...(isClimate || isMultiStateEnabled
 			? []
 			: ([
 					{
@@ -383,6 +413,11 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 		},
 	];
 
+	// Check if entity domain supports multi-state (including climate)
+	const entityId = item.type === 'entity' ? (item as EntityConfig & { entity?: string }).entity : undefined;
+	const entityDomain = entityId ? entityId.split('.')[0] : '';
+	const supportsMultiState = isClimate || hasMultiStatePreset(entityDomain);
+
 	const entitySchema: SchemaItem[] = [
 		{
 			name: 'entity',
@@ -390,10 +425,9 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 			required: true,
 			selector: { entity: {} },
 		},
-		// Multi-state toggle (only show for non-climate entities)
-		...(isClimate
-			? []
-			: ([
+		// Multi-state toggle (show for climate and entities with multi-state presets)
+		...(supportsMultiState
+			? ([
 					{
 						name: 'use_multi_state',
 						label: localize(
@@ -403,9 +437,10 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						),
 						selector: { boolean: {} },
 					},
-				] as SchemaItem[])),
+				] as SchemaItem[])
+			: []),
 		// Show on_state only for non-climate and non-multi-state entities
-		...(isClimate || isMultiState
+		...(isClimate || isMultiStateEnabled
 			? []
 			: ([
 					{
@@ -415,24 +450,32 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						selector: { text: {} },
 					},
 				] as SchemaItem[])),
-		// Multi-state custom states field
-		...(isMultiState
+		// Multi-state custom states field (shown when multi-state is enabled)
+		...(isMultiStateEnabled
 			? ([
 					{
 						name: 'custom_states',
-						label: localize(
+						label: localize(ctx.hass, 'add_state', 'Add State'),
+						helper: localize(
 							ctx.hass,
-							'custom_states_hint',
-							'Enter states like: idle, cleaning, paused'
+							'custom_states_helper',
+							'Select states to configure individual colors and icons'
 						),
-						selector: { text: {} },
+						selector: {
+							select: {
+								multiple: true,
+								custom_value: true,
+								mode: 'list',
+								options: getAvailableStateOptions(ctx, entityId, isClimate),
+							},
+						},
 					},
 				] as SchemaItem[])
 			: []),
-		// Climate entity schema (built-in HVAC mode support)
-		...(isClimate ? getClimateEntitySchema(ctx, item) : []),
-		// Custom multi-state schema (dynamic fields for each state)
-		...(isMultiState ? getCustomMultiStateSchema(ctx, item) : []),
+		// Legacy climate entity schema (only when multi-state is NOT enabled)
+		...(isClimate && !isMultiStateEnabled ? getClimateEntitySchema(ctx, item) : []),
+		// Multi-state schema (dynamic fields for each state - unified for all entity types)
+		...(isMultiStateEnabled ? getCustomMultiStateSchema(ctx, item) : []),
 	];
 
 	if (item.type === 'template') {

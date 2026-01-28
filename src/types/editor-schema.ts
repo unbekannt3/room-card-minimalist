@@ -97,6 +97,7 @@ export type Selector =
 export interface BaseSchemaItem {
 	name: string;
 	label?: string;
+	helper?: string;
 	required?: boolean;
 	disabled?: boolean;
 	context?: Record<string, string>;

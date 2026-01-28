@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      # Vulnerability in bundled npm inside @semantic-release/npm
+      # This is an upstream issue - we can't fix it from here
+      # https://github.com/semantic-release/npm/issues
+      - dependency-name: tar
+        update-types:
+          - version-update:semver-patch
+          - version-update:semver-minor
+      - dependency-name: npm
+        update-types:
+          - version-update:semver-patch
+          - version-update:semver-minor

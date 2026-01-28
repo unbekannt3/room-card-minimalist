@@ -32,14 +32,14 @@ export interface EntityStateResult {
 
 /**
  * Check if item uses custom multi-state mode
+ * Now includes climate entities when use_multi_state is enabled
  */
 export function isMultiStateItem(item: EntityConfig): boolean {
 	if (item.type !== 'entity') return false;
 	const entityItem = item as StandardEntityConfig;
 	return (
 		entityItem.use_multi_state === true &&
-		Boolean(entityItem.custom_states?.trim()) &&
-		!isClimateEntityId(entityItem.entity)
+		Boolean(entityItem.custom_states?.trim())
 	);
 }
 
@@ -60,19 +60,19 @@ export function getEntityStateResult(
 		const entityItem = item as StandardEntityConfig;
 		stateValue = getValue(entityItem.entity);
 
-		// Special handling for climate entities
-		if (isClimateEntityId(entityItem.entity)) {
-			const entityState = getEntityState(hass, entityItem.entity);
-			if (entityState?.state) {
-				currentHvacMode = entityState.state;
-				isOn = currentHvacMode !== 'off';
-			}
-		} else if (isMultiStateItem(item)) {
-			// Multi-state entity handling
+		// Multi-state handling (unified for all entity types including climate)
+		if (isMultiStateItem(item)) {
 			const entityState = getEntityState(hass, entityItem.entity);
 			if (entityState?.state) {
 				currentEntityState = entityState.state;
 				isOn = currentEntityState !== 'off' && currentEntityState !== 'unavailable';
+			}
+		} else if (isClimateEntityId(entityItem.entity)) {
+			// Legacy climate handling (when multi-state is not enabled)
+			const entityState = getEntityState(hass, entityItem.entity);
+			if (entityState?.state) {
+				currentHvacMode = entityState.state;
+				isOn = currentHvacMode !== 'off';
 			}
 		} else {
 			// Regular entity logic
@@ -103,23 +103,7 @@ export function applyEntityTemplates(
 ): AppliedColorTemplate {
 	const standardItem = item as StandardEntityConfig;
 
-	// Handle climate entities with HVAC modes
-	if (isClimateEntityId(standardItem.entity) && currentHvacMode) {
-		const modeTemplate = standardItem[`template_${currentHvacMode}`] as
-			| ColorTemplateName
-			| undefined;
-		const modeColor = standardItem[`color_${currentHvacMode}`] as string | undefined;
-		const modeBackgroundColor = standardItem[`background_color_${currentHvacMode}`] as
-			| string
-			| undefined;
-
-		return applyColorTemplate(modeTemplate, {
-			icon_color: modeColor,
-			background_color: modeBackgroundColor,
-		});
-	}
-
-	// Handle custom multi-state entities
+	// Handle multi-state entities (unified for all types including climate)
 	if (isMultiStateItem(item) && currentEntityState) {
 		const stateTemplate = standardItem[`template_${currentEntityState}`] as
 			| ColorTemplateName
@@ -132,6 +116,22 @@ export function applyEntityTemplates(
 		return applyColorTemplate(stateTemplate, {
 			icon_color: stateColor,
 			background_color: stateBackgroundColor,
+		});
+	}
+
+	// Legacy climate handling (when multi-state is not enabled)
+	if (isClimateEntityId(standardItem.entity) && currentHvacMode) {
+		const modeTemplate = standardItem[`template_${currentHvacMode}`] as
+			| ColorTemplateName
+			| undefined;
+		const modeColor = standardItem[`color_${currentHvacMode}`] as string | undefined;
+		const modeBackgroundColor = standardItem[`background_color_${currentHvacMode}`] as
+			| string
+			| undefined;
+
+		return applyColorTemplate(modeTemplate, {
+			icon_color: modeColor,
+			background_color: modeBackgroundColor,
 		});
 	}
 
@@ -212,21 +212,23 @@ export function getEntityIcon(
 	if (item.type === 'entity') {
 		const entityItem = item as StandardEntityConfig;
 
-		if (isClimateEntityId(entityItem.entity) && currentHvacMode) {
-			// For climate entities, use icon_off when in "off" mode, otherwise use main icon
-			if (currentHvacMode === 'off' && item.icon_off) {
-				return item.icon_off;
-			}
-			return item.icon;
-		}
-
+		// Multi-state entities (unified for all types including climate)
 		if (isMultiStateItem(item) && currentEntityState) {
-			// For multi-state entities, check for state-specific icon first
+			// Check for state-specific icon first
 			const stateIcon = entityItem[`icon_${currentEntityState}`] as string | undefined;
 			if (stateIcon) {
 				return stateIcon;
 			}
 			// Use main icon as fallback for any unknown/unconfigured state
+			return item.icon;
+		}
+
+		// Legacy climate handling (when multi-state is not enabled)
+		if (isClimateEntityId(entityItem.entity) && currentHvacMode) {
+			// For climate entities, use icon_off when in "off" mode, otherwise use main icon
+			if (currentHvacMode === 'off' && item.icon_off) {
+				return item.icon_off;
+			}
 			return item.icon;
 		}
 

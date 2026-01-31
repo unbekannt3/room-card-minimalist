@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.2...v1.3.3) (2026-01-31)
+
+### Other
+
+* fix translation guide ([98fe70b](https://github.com/unbekannt3/room-card-minimalist/commit/98fe70b5dacb658b91f2db1bb1ee131ab44c3965))
+
 ## [1.3.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.1...v1.3.2) (2026-01-31)
 
 ### Other

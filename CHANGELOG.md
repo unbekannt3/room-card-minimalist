@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.1...v1.3.2) (2026-01-31)
+
+### Other
+
+* **deps-dev:** bump @commitlint/config-conventional ([5a10b16](https://github.com/unbekannt3/room-card-minimalist/commit/5a10b16ff5188f75ce0b9a08ffd4dce1abdcaad6))
+* **deps-dev:** bump @types/node from 22.19.7 to 25.1.0 ([d96ec4a](https://github.com/unbekannt3/room-card-minimalist/commit/d96ec4a8d11fa847fa0aae892d3e3f5601c3f626))
+
 ## <small>1.3.1 (2026-01-31)</small>
 
 * Merge pull request #34 from unbekannt3/dependabot/npm_and_yarn/semantic-release-25.0.3 ([4436a0b](https://github.com/unbekannt3/room-card-minimalist/commit/4436a0b)), closes [#34](https://github.com/unbekannt3/room-card-minimalist/issues/34)

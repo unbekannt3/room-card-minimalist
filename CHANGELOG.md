@@ -1,3 +1,8 @@
+## 1.3.0 (2026-01-31)
+
+* feat: merge from next ([6a8be4a](https://github.com/unbekannt3/room-card-minimalist/commit/6a8be4a))
+* Feature Release 1.3.0 (#32) ([9c4acf1](https://github.com/unbekannt3/room-card-minimalist/commit/9c4acf1)), closes [#32](https://github.com/unbekannt3/room-card-minimalist/issues/32) [#30](https://github.com/unbekannt3/room-card-minimalist/issues/30) [#26](https://github.com/unbekannt3/room-card-minimalist/issues/26) [#25](https://github.com/unbekannt3/room-card-minimalist/issues/25)
+
 ## 1.3.0-beta.2 (2026-01-28)
 
 * fix: multi-states switch shown for simple entities ([684cd9e](https://github.com/unbekannt3/room-card-minimalist/commit/684cd9e))

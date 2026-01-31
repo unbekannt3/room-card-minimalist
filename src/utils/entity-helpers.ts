@@ -41,10 +41,7 @@ export function isClimateEntityConfig(config: EntityConfig): boolean {
 export function isMultiStateEntityConfig(config: EntityConfig): boolean {
 	if (config.type !== 'entity') return false;
 	const stdConfig = config as StandardEntityConfig;
-	return (
-		stdConfig.use_multi_state === true &&
-		Boolean(stdConfig.custom_states?.trim())
-	);
+	return stdConfig.use_multi_state === true && Boolean(stdConfig.custom_states?.trim());
 }
 
 /**

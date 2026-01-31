@@ -246,6 +246,7 @@ entities:
 For entities with multiple states beyond on/off (e.g., vacuum robots, media players, climate), enable multi-state mode to configure each state individually.
 
 **Supported entity types with auto-fill presets:**
+
 - `vacuum` - idle, cleaning, paused, returning, docked, error
 - `climate` - auto-filled from entity's available HVAC modes
 - `media_player` - off, idle, playing, paused, buffering
@@ -258,14 +259,14 @@ For entities with multiple states beyond on/off (e.g., vacuum robots, media play
 
 When enabling multi-state mode, `custom_states` is automatically populated. You can remove states you don't need.
 
-| Name                       | Type    | Default | Description                                                     |
-| :------------------------- | :------ | :------ | :-------------------------------------------------------------- |
-| `use_multi_state`          | boolean | `false` | Enable multi-state mode                                         |
-| `custom_states`            | string  | —       | Comma-separated list of states (auto-filled from presets)       |
-| `icon_[state]`             | string  | —       | Icon for specific state                                         |
-| `color_[state]`            | string  | —       | Icon color for specific state                                   |
-| `background_color_[state]` | string  | —       | Background color for specific state                             |
-| `template_[state]`         | string  | —       | Color preset for specific state                                 |
+| Name                       | Type    | Default | Description                                               |
+| :------------------------- | :------ | :------ | :-------------------------------------------------------- |
+| `use_multi_state`          | boolean | `false` | Enable multi-state mode                                   |
+| `custom_states`            | string  | —       | Comma-separated list of states (auto-filled from presets) |
+| `icon_[state]`             | string  | —       | Icon for specific state                                   |
+| `color_[state]`            | string  | —       | Icon color for specific state                             |
+| `background_color_[state]` | string  | —       | Background color for specific state                       |
+| `template_[state]`         | string  | —       | Color preset for specific state                           |
 
 **Example: Vacuum Robot**
 
@@ -291,14 +292,14 @@ entities:
 
 Climate entities (`climate.*`) use the same multi-state system as other entities. When enabling multi-state mode, the HVAC modes are automatically populated from the entity's available modes.
 
-| Name                       | Type    | Default | Description                                         |
-| :------------------------- | :------ | :------ | :-------------------------------------------------- |
-| `use_multi_state`          | boolean | `false` | Enable multi-state mode for HVAC modes              |
-| `custom_states`            | string  | —       | Auto-filled with entity's HVAC modes when enabled   |
-| `icon_[mode]`              | string  | —       | Icon for specific HVAC mode                         |
-| `color_[mode]`             | string  | —       | Icon color for HVAC mode                            |
-| `background_color_[mode]`  | string  | —       | Background color for HVAC mode                      |
-| `template_[mode]`          | string  | —       | Color preset for HVAC mode                          |
+| Name                      | Type    | Default | Description                                       |
+| :------------------------ | :------ | :------ | :------------------------------------------------ |
+| `use_multi_state`         | boolean | `false` | Enable multi-state mode for HVAC modes            |
+| `custom_states`           | string  | —       | Auto-filled with entity's HVAC modes when enabled |
+| `icon_[mode]`             | string  | —       | Icon for specific HVAC mode                       |
+| `color_[mode]`            | string  | —       | Icon color for HVAC mode                          |
+| `background_color_[mode]` | string  | —       | Background color for HVAC mode                    |
+| `template_[mode]`         | string  | —       | Color preset for HVAC mode                        |
 
 **Common HVAC modes:** `off`, `heat`, `cool`, `heat_cool`, `auto`, `dry`, `fan_only`
 
@@ -308,7 +309,7 @@ entities:
     entity: climate.living_room
     icon: mdi:thermostat
     use_multi_state: true
-    custom_states: 'off, heat, cool, auto'  # Auto-filled from entity
+    custom_states: 'off, heat, cool, auto' # Auto-filled from entity
     icon_heat: mdi:fire
     icon_cool: mdi:snowflake
     template_off: grey

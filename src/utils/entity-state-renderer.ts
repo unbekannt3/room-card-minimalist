@@ -37,10 +37,7 @@ export interface EntityStateResult {
 export function isMultiStateItem(item: EntityConfig): boolean {
 	if (item.type !== 'entity') return false;
 	const entityItem = item as StandardEntityConfig;
-	return (
-		entityItem.use_multi_state === true &&
-		Boolean(entityItem.custom_states?.trim())
-	);
+	return entityItem.use_multi_state === true && Boolean(entityItem.custom_states?.trim());
 }
 
 /**

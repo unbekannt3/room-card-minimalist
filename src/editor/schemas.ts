@@ -414,7 +414,8 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 	];
 
 	// Check if entity domain supports multi-state (including climate)
-	const entityId = item.type === 'entity' ? (item as EntityConfig & { entity?: string }).entity : undefined;
+	const entityId =
+		item.type === 'entity' ? (item as EntityConfig & { entity?: string }).entity : undefined;
 	const entityDomain = entityId ? entityId.split('.')[0] : '';
 	const supportsMultiState = isClimate || hasMultiStatePreset(entityDomain);
 

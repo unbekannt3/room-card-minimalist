@@ -37,12 +37,14 @@ To add a new language, simply copy the English template and translate it:
    - Keep all the **keys** (the text before the colons) in English
    - Ensure your JSON syntax is valid by using a JSON validator like [JSONLint](https://jsonlint.com/)
 
-5. **Add the import to localize.js**
-   - The new language needs to be imported in `src/localize/localize.js`
+5. **Add the import to `src/localize/localize.ts`**
+   - The new language needs to be imported in `src/localize/localize.ts`
    - Add the import line and include it in the translations object
    - Example for French:
 
-   ```javascript
+   ```typescript
+   import enTranslations from './locales/en.json';
+   import deTranslations from './locales/de.json';
    import frTranslations from './locales/fr.json';
 
    const translations = {
@@ -84,7 +86,7 @@ cd room-card-minimalist
 git checkout -b translation-fr
 
 # 3. Copy and translate
-cp src/localize/locale/en.json src/localize/locale/fr.json
+cp src/localize/locales/en.json src/localize/locales/fr.json
 # Edit fr.json with your translations
 # Don't forget to edit the README to show your language as supported :)
 

@@ -1,3 +1,13 @@
+## <small>1.3.1 (2026-01-31)</small>
+
+* Merge pull request #34 from unbekannt3/dependabot/npm_and_yarn/semantic-release-25.0.3 ([4436a0b](https://github.com/unbekannt3/room-card-minimalist/commit/4436a0b)), closes [#34](https://github.com/unbekannt3/room-card-minimalist/issues/34)
+* Merge pull request #35 from unbekannt3/dependabot/npm_and_yarn/commitlint/cli-20.4.0 ([24d5da7](https://github.com/unbekannt3/room-card-minimalist/commit/24d5da7)), closes [#35](https://github.com/unbekannt3/room-card-minimalist/issues/35)
+* Merge pull request #36 from unbekannt3/dependabot/npm_and_yarn/semantic-release/github-12.0.3 ([3e7d7e3](https://github.com/unbekannt3/room-card-minimalist/commit/3e7d7e3)), closes [#36](https://github.com/unbekannt3/room-card-minimalist/issues/36)
+* chore: prettier fixes ([1fc2e06](https://github.com/unbekannt3/room-card-minimalist/commit/1fc2e06))
+* chore(deps-dev): bump @commitlint/cli from 20.3.1 to 20.4.0 ([0b3dfd4](https://github.com/unbekannt3/room-card-minimalist/commit/0b3dfd4))
+* chore(deps-dev): bump @semantic-release/github from 12.0.2 to 12.0.3 ([0cdf71e](https://github.com/unbekannt3/room-card-minimalist/commit/0cdf71e))
+* chore(deps-dev): bump semantic-release from 25.0.2 to 25.0.3 ([24c17c3](https://github.com/unbekannt3/room-card-minimalist/commit/24c17c3))
+
 ## 1.3.0 (2026-01-31)
 
 * feat: merge from next ([6a8be4a](https://github.com/unbekannt3/room-card-minimalist/commit/6a8be4a))

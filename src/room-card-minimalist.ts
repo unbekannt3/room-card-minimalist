@@ -41,6 +41,7 @@ import {
 	getEntityIcon,
 	renderEntityItem,
 	renderInvalidEntity,
+	isTemplate,
 } from './utils';
 
 // Styles
@@ -236,10 +237,27 @@ export class RoomCard extends LitElement {
 		if (this._config.background_image) {
 			this._templateService.subscribe(this._config.background_image);
 		}
-		// Subscribe to entity value templates
+		// Subscribe to background_circle_color template
+		if (this._config.background_circle_color) {
+			this._templateService.subscribe(this._config.background_circle_color);
+		}
+		// Subscribe to icon_color template
+		if (this._config.icon_color) {
+			this._templateService.subscribe(this._config.icon_color);
+		}
+		// Subscribe to entity templates (value/template/color/icon/background_color)
 		for (const entity of this._config.entities) {
+			// value template
 			if (entity.show_value && entity.value_template) {
 				this._templateService.subscribe(entity.value_template);
+			}
+
+			// subscribe to any templated color/icon fields on the entity
+			for (const key of Object.keys(entity)) {
+				const val = (entity as any)[key];
+				if (typeof val === 'string' && isTemplate(val)) {
+					this._templateService.subscribe(val);
+				}
 			}
 		}
 	}
@@ -274,10 +292,17 @@ export class RoomCard extends LitElement {
 			entitiesToShow = [...entitiesToShow].reverse();
 		}
 
+		const backgroundCircleColor = this._getValueRawOrTemplate(
+			this._config.background_circle_color
+		);
+
+		// Evaluate icon color (might be a template)
+		const iconColorOverride = this._getValueRawOrTemplate(this._config.icon_color);
+
 		const cardColors = applyCardTemplate(
 			this._config.card_template,
-			this._config.icon_color,
-			this._config.background_circle_color
+			iconColorOverride,
+			backgroundCircleColor
 		);
 
 		const titleColor = this._config.use_template_color_for_title
@@ -474,15 +499,18 @@ export class RoomCard extends LitElement {
 		const stateResult = getEntityStateResult(item, this.hass, (i) => this._getValue(i));
 		const { isOn, currentHvacMode, currentEntityState, stateValue } = stateResult;
 
+		// Resolve any templated color/icon fields on the entity before applying templates
+		const resolvedItem = this._resolveEntityTemplateFields(item);
+
 		const baseColors = applyEntityTemplates(
-			item,
+			resolvedItem,
 			isOn ? 'on' : 'off',
 			currentHvacMode,
 			currentEntityState
 		);
 
-		const { iconColor, backgroundColor } = getFinalColors(item, isOn, baseColors, this.hass);
-		const icon = getEntityIcon(item, isOn, currentHvacMode, currentEntityState);
+		const { iconColor, backgroundColor } = getFinalColors(resolvedItem, isOn, baseColors, this.hass);
+		const icon = getEntityIcon(resolvedItem, isOn, currentHvacMode, currentEntityState);
 
 		// Get display value if show_value is enabled
 		let displayValue: string | undefined;
@@ -520,6 +548,31 @@ export class RoomCard extends LitElement {
 
 	// ==================== Helper Methods ====================
 
+	/**
+	 * Resolve templated fields on an entity (colors/icons) to their evaluated values
+	 */
+	private _resolveEntityTemplateFields(entity: EntityConfig): EntityConfig {
+		const copy: any = { ...entity };
+		for (const key of Object.keys(entity)) {
+			// Only resolve color and icon related keys
+			if (
+				key.startsWith('color_') ||
+				key.startsWith('background_color_') ||
+				key === 'color_on' ||
+				key === 'color_off' ||
+				key === 'background_color_on' ||
+				key === 'background_color_off' ||
+				key.startsWith('icon_')
+			) {
+				const val = (entity as any)[key];
+				if (typeof val === 'string') {
+					const resolved = this._getValueRawOrTemplate(val);
+					if (resolved !== undefined) copy[key] = resolved;
+				}
+			}
+		}
+		return copy as EntityConfig;
+	}
 	/**
 	 * Check if secondary text should be clickable
 	 */

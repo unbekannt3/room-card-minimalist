@@ -1,3 +1,9 @@
+## [1.3.4](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.3...v1.3.4) (2026-02-01)
+
+### Bug Fixes
+
+* template colors missing subscriptions ([#38](https://github.com/unbekannt3/room-card-minimalist/issues/38)) ([15fdf87](https://github.com/unbekannt3/room-card-minimalist/commit/15fdf87ae253c742c5bb8ddaa85df673a542105b))
+
 ## [1.3.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.2...v1.3.3) (2026-01-31)
 
 ### Other

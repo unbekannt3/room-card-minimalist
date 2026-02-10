@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.4...v1.4.0) (2026-02-10)
+
+### Features
+
+* add double tap support ([#44](https://github.com/unbekannt3/room-card-minimalist/issues/44)) ([2906d81](https://github.com/unbekannt3/room-card-minimalist/commit/2906d8120595f93c2f3e6f85259dcce999bb836b))
+
 ## [1.3.4](https://github.com/unbekannt3/room-card-minimalist/compare/v1.3.3...v1.3.4) (2026-02-01)
 
 ### Bug Fixes

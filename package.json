@@ -1,6 +1,6 @@
 {
 	"name": "room-card-minimalist",
-	"version": "1.3.4",
+	"version": "1.4.0",
 	"description": "UI-Lovelace-Minimalist styled room overview card",
 	"main": "src",
 	"scripts": {

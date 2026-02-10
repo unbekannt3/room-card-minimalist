@@ -1,3 +1,13 @@
+## [1.4.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.1...v1.4.2) (2026-02-10)
+
+### Bug Fixes
+
+* possible fix for semantic-release creating releases for dependabot PRs ([ec2b5d4](https://github.com/unbekannt3/room-card-minimalist/commit/ec2b5d45020070819dd38d9e06ff7d6bd01870fe))
+
+### Other
+
+* **deps-dev:** bump @babel/core from 7.28.6 to 7.29.0 ([7e0acfb](https://github.com/unbekannt3/room-card-minimalist/commit/7e0acfbe483dac7315fdb4e07da44b865b32b7c8))
+
 ## [1.4.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.0...v1.4.1) (2026-02-10)
 
 ### Other

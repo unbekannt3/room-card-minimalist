@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
     ignore:
       # Vulnerability in bundled npm inside @semantic-release/npm
       # This is an upstream issue - we can't fix it from here

@@ -381,6 +381,14 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						'Hold Action',
 					selector: { 'ui-action': {} },
 				},
+				{
+					name: 'double_tap_action',
+					label:
+						ctx.hass?.localize?.(
+							'ui.panel.lovelace.editor.card.generic.double_tap_action'
+						) || 'Double Tap Action',
+					selector: { 'ui-action': {} },
+				},
 			],
 		},
 		...(isLightEntityConfig(item)
@@ -640,6 +648,13 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			selector: { 'ui-action': {} },
 		},
 		{
+			name: 'double_tap_action',
+			label:
+				ctx.hass?.localize?.('ui.panel.lovelace.editor.card.generic.double_tap_action') ||
+				'Double Tap Action',
+			selector: { 'ui-action': {} },
+		},
+		{
 			name: 'use_template_color_for_title',
 			label: localize(
 				ctx.hass,
@@ -714,6 +729,15 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 							}`,
 							selector: { 'ui-action': {} },
 						},
+						{
+							name: 'secondary_double_tap_action',
+							label: `${localize(ctx.hass, 'secondary', 'Secondary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.double_tap_action'
+								) || 'Double Tap Action'
+							}`,
+							selector: { 'ui-action': {} },
+						},
 					],
 				},
 			],
@@ -777,6 +801,15 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 								ctx.hass?.localize?.(
 									'ui.panel.lovelace.editor.card.generic.hold_action'
 								) || 'Hold Action'
+							}`,
+							selector: { 'ui-action': {} },
+						},
+						{
+							name: 'tertiary_double_tap_action',
+							label: `${localize(ctx.hass, 'tertiary', 'Tertiary')} ${
+								ctx.hass?.localize?.(
+									'ui.panel.lovelace.editor.card.generic.double_tap_action'
+								) || 'Double Tap Action'
 							}`,
 							selector: { 'ui-action': {} },
 						},

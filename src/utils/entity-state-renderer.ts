@@ -256,6 +256,7 @@ export function renderEntityItem(
 	return html`
 		<div
 			@click=${isClickable ? handlers?.onClick : null}
+			@dblclick=${isClickable ? handlers?.onDblClick : null}
 			@mousedown=${isClickable ? handlers?.onMouseDown : null}
 			@mouseup=${isClickable ? handlers?.onMouseUp : null}
 			@mouseleave=${isClickable ? handlers?.onMouseLeave : null}

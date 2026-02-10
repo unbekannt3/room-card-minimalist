@@ -337,6 +337,7 @@ export class RoomCard extends LitElement {
 		return html`
 			<ha-card
 				@click=${cardHandlers?.onClick}
+				@dblclick=${cardHandlers?.onDblClick}
 				@mousedown=${cardHandlers?.onMouseDown}
 				@mouseup=${cardHandlers?.onMouseUp}
 				@mouseleave=${cardHandlers?.onMouseLeave}
@@ -400,6 +401,7 @@ export class RoomCard extends LitElement {
 				class="secondary ${isClickable ? 'clickable' : ''}"
 				style="color: ${color}"
 				@click=${handlers?.onClick}
+				@dblclick=${handlers?.onDblClick}
 				@mousedown=${handlers?.onMouseDown}
 				@mouseup=${handlers?.onMouseUp}
 				@mouseleave=${handlers?.onMouseLeave}
@@ -430,6 +432,7 @@ export class RoomCard extends LitElement {
 				class="tertiary ${isClickable ? 'clickable' : ''}"
 				style="color: ${color}"
 				@click=${handlers?.onClick}
+				@dblclick=${handlers?.onDblClick}
 				@mousedown=${handlers?.onMouseDown}
 				@mouseup=${handlers?.onMouseUp}
 				@mouseleave=${handlers?.onMouseLeave}
@@ -509,7 +512,12 @@ export class RoomCard extends LitElement {
 			currentEntityState
 		);
 
-		const { iconColor, backgroundColor } = getFinalColors(resolvedItem, isOn, baseColors, this.hass);
+		const { iconColor, backgroundColor } = getFinalColors(
+			resolvedItem,
+			isOn,
+			baseColors,
+			this.hass
+		);
 		const icon = getEntityIcon(resolvedItem, isOn, currentHvacMode, currentEntityState);
 
 		// Get display value if show_value is enabled

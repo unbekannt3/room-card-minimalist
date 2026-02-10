@@ -89,6 +89,7 @@ The visual editor is fully supported. Below is the YAML reference.
 | `card_template`                | string  | —          | Color preset. See [Color Templates](#color-templates)                              |
 | `tap_action`                   | object  | —          | Action on tap. See [HA actions](https://www.home-assistant.io/dashboards/actions/) |
 | `hold_action`                  | object  | —          | Action on hold                                                                     |
+| `double_tap_action`            | object  | `none`     | Action on double-tap                                                               |
 | `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                     |
 | `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                  |
 | `entities`                     | list    | —          | Entity state indicators (max 4). See [Entity States](#entity-states)               |
@@ -108,6 +109,7 @@ Display one or two additional info lines below the room name. Both support [Jinj
 | `secondary_entity`                 | string  | —       | Entity for actions (e.g., `more-info`)  |
 | `secondary_tap_action`             | object  | —       | Action on tap                           |
 | `secondary_hold_action`            | object  | —       | Action on hold                          |
+| `secondary_double_tap_action`      | object  | `none`  | Action on double-tap                    |
 
 #### Tertiary Info
 
@@ -120,6 +122,7 @@ Display one or two additional info lines below the room name. Both support [Jinj
 | `tertiary_entity`                 | string  | —       | Entity for actions                      |
 | `tertiary_tap_action`             | object  | —       | Action on tap                           |
 | `tertiary_hold_action`            | object  | —       | Action on hold                          |
+| `tertiary_double_tap_action`      | object  | `none`  | Action on double-tap                    |
 
 **Example: Temperature & Humidity**
 
@@ -198,6 +201,7 @@ Up to 4 entity indicators on the right side of the card. Each can be an `entity`
 | `use_light_color`      | boolean | `false`    | Use actual light color (for `light.*` entities)        |
 | `tap_action`           | object  | —          | Action on tap                                          |
 | `hold_action`          | object  | —          | Action on hold                                         |
+| `double_tap_action`    | object  | `none`     | Action on double-tap                                   |
 
 **Entity example:**
 

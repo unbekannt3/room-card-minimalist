@@ -29,7 +29,15 @@ export const DEFAULT_ENTITY_OFF_COLORS: AppliedColorTemplate = {
 export const HOLD_TIMEOUT_MS = 500;
 
 /**
- * Maximum number of entities that can be displayed
+ * Double-tap detection window in milliseconds
+ */
+export const DOUBLE_TAP_TIMEOUT_MS = 300;
+
+/** * Default double-tap action (none)
+ */
+export const DEFAULT_DOUBLE_TAP_ACTION = { action: 'none' as const };
+
+/** * Maximum number of entities that can be displayed
  */
 export const MAX_ENTITIES = 4;
 

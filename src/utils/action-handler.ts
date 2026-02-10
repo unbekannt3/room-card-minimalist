@@ -5,7 +5,7 @@
 
 import { LitElement } from 'lit';
 import type { ActionsConfig } from '../types';
-import { HOLD_TIMEOUT_MS } from '../constants';
+import { HOLD_TIMEOUT_MS, DOUBLE_TAP_TIMEOUT_MS } from '../constants';
 import { handleAction } from '../services';
 
 /**
@@ -13,6 +13,7 @@ import { handleAction } from '../services';
  */
 export interface ActionHandlers {
 	onClick: (e: Event) => void;
+	onDblClick: (e: Event) => void;
 	onMouseDown: (e: MouseEvent) => void;
 	onMouseUp: () => void;
 	onMouseLeave: () => void;
@@ -57,6 +58,8 @@ export class ActionController {
 	private _element: LitElement;
 	private _holdTimeout: ReturnType<typeof setTimeout> | null = null;
 	private _holdFired = false;
+	private _dblTapTimeout: ReturnType<typeof setTimeout> | null = null;
+	private _pendingTapConfig: ActionsConfig | null = null;
 
 	constructor(element: LitElement) {
 		this._element = element;
@@ -104,6 +107,9 @@ export class ActionController {
 	createHandlers(config: ActionsConfig, options: ActionHandlerOptions = {}): ActionHandlers {
 		const { stopPropagation = false, ignoreSelector } = options;
 
+		const hasDoubleTap =
+			config.double_tap_action?.action && config.double_tap_action.action !== 'none';
+
 		return {
 			onClick: (e: Event) => {
 				if (this._holdFired) {
@@ -111,7 +117,37 @@ export class ActionController {
 					return;
 				}
 				e.stopPropagation();
-				handleAction(this._element, config, 'tap');
+
+				if (hasDoubleTap) {
+					// If double-tap is configured, delay the tap action
+					if (this._dblTapTimeout) {
+						// Second tap within window → double-tap
+						clearTimeout(this._dblTapTimeout);
+						this._dblTapTimeout = null;
+						this._pendingTapConfig = null;
+						handleAction(this._element, config, 'double_tap');
+					} else {
+						// First tap → start window
+						this._pendingTapConfig = config;
+						this._dblTapTimeout = setTimeout(() => {
+							this._dblTapTimeout = null;
+							if (this._pendingTapConfig) {
+								handleAction(this._element, this._pendingTapConfig, 'tap');
+								this._pendingTapConfig = null;
+							}
+						}, DOUBLE_TAP_TIMEOUT_MS);
+					}
+				} else {
+					handleAction(this._element, config, 'tap');
+				}
+			},
+
+			onDblClick: (e: Event) => {
+				// Prevent native dblclick from triggering default browser behavior
+				if (hasDoubleTap) {
+					e.preventDefault();
+					e.stopPropagation();
+				}
 			},
 
 			onMouseDown: (e: MouseEvent) => {
@@ -177,6 +213,7 @@ export function bindActionHandlers(
 
 	return {
 		'@click': handlers.onClick,
+		'@dblclick': handlers.onDblClick,
 		'@mousedown': handlers.onMouseDown,
 		'@mouseup': handlers.onMouseUp,
 		'@mouseleave': handlers.onMouseLeave,

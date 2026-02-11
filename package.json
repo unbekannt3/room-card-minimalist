@@ -12,7 +12,7 @@
 		"docker:start": "docker compose -f docker/docker-compose.yml up",
 		"docker:stop": "docker compose -f docker/docker-compose.yml down",
 		"prepare": "husky",
-		"format": "prettier --write .",
+		"format": "prettier --write --ignore-path=.prettierignore .",
 		"format:check": "prettier --check .",
 		"format:js": "prettier --write 'src/**/*.js'",
 		"format:ts": "prettier --write 'src/**/*.ts'",

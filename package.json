@@ -1,6 +1,6 @@
 {
 	"name": "room-card-minimalist",
-	"version": "1.4.2",
+	"version": "1.4.3-beta.1",
 	"description": "UI-Lovelace-Minimalist styled room overview card",
 	"main": "src",
 	"scripts": {
@@ -12,7 +12,7 @@
 		"docker:start": "docker compose -f docker/docker-compose.yml up",
 		"docker:stop": "docker compose -f docker/docker-compose.yml down",
 		"prepare": "husky",
-		"format": "prettier --write .",
+		"format": "prettier --write --ignore-path=.prettierignore .",
 		"format:check": "prettier --check .",
 		"format:js": "prettier --write 'src/**/*.js'",
 		"format:ts": "prettier --write 'src/**/*.ts'",
@@ -26,14 +26,14 @@
 	"devDependencies": {
 		"@babel/core": "^7.29.0",
 		"@babel/preset-env": "^7.29.0",
-		"@commitlint/cli": "^20.4.0",
+		"@commitlint/cli": "^20.4.1",
 		"@commitlint/config-conventional": "^20.4.1",
 		"@semantic-release/changelog": "^6.0.3",
 		"@semantic-release/commit-analyzer": "^13.0.1",
 		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/github": "^12.0.3",
+		"@semantic-release/github": "^12.0.5",
 		"@semantic-release/release-notes-generator": "^14.1.0",
-		"@types/node": "^25.2.0",
+		"@types/node": "^25.2.3",
 		"babel-loader": "^10.0.0",
 		"babel-plugin-template-html-minifier": "^4.1.0",
 		"husky": "^9.1.7",
@@ -42,7 +42,7 @@
 		"terser-webpack-plugin": "^5.3.16",
 		"ts-loader": "^9.5.0",
 		"typescript": "^5.8.0",
-		"webpack": "^5.105.0",
+		"webpack": "^5.105.1",
 		"webpack-cli": "^6.0.1",
 		"webpack-dev-server": "^5.2.3"
 	},

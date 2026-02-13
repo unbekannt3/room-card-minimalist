@@ -321,17 +321,15 @@ export class RoomCard extends LitElement {
 
 		// Create handlers for card, secondary, and tertiary
 		const cardHandlers = isCardClickable
-			? this._actionController.createHandlers(this._config, { ignoreSelector: '.state-item' })
+			? this._actionController.createHandlers(this._config, {
+					ignoreSelector: '.state-item, .secondary.clickable, .tertiary.clickable',
+				})
 			: null;
 		const secondaryHandlers = isSecondaryClickable
-			? this._actionController.createHandlers(this._getSecondaryConfig(), {
-					stopPropagation: true,
-				})
+			? this._actionController.createHandlers(this._getSecondaryConfig())
 			: null;
 		const tertiaryHandlers = isTertiaryClickable
-			? this._actionController.createHandlers(this._getTertiaryConfig(), {
-					stopPropagation: true,
-				})
+			? this._actionController.createHandlers(this._getTertiaryConfig())
 			: null;
 
 		return html`
@@ -538,9 +536,7 @@ export class RoomCard extends LitElement {
 		}
 
 		const handlers = isEntityItemClickable(item)
-			? this._actionController.createHandlers(item as ActionsConfig, {
-					stopPropagation: true,
-				})
+			? this._actionController.createHandlers(item as ActionsConfig)
 			: null;
 
 		return renderEntityItem(

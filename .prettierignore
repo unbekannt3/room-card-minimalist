@@ -26,3 +26,6 @@ Thumbs.db
 # Generated files
 dist/room-card-minimalist.js
 CHANGELOG.md
+# Docker & Config directories
+docker/
+config/

@@ -1,3 +1,14 @@
+## [1.4.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.2...v1.4.3) (2026-02-13)
+
+### Bug Fixes
+
+* click action positioning for addons like honeycomb menu ([#49](https://github.com/unbekannt3/room-card-minimalist/issues/49)) ([bbc80a7](https://github.com/unbekannt3/room-card-minimalist/commit/bbc80a778ab1ddf9e1642b5821c2d381522c4234))
+
+### Other
+
+* **deps-dev:** package updates ([b49b2ab](https://github.com/unbekannt3/room-card-minimalist/commit/b49b2abb10495a133712a2a7072e7bc24529a475))
+* **release:** 1.4.3-beta.1 [skip ci] ([7d65442](https://github.com/unbekannt3/room-card-minimalist/commit/7d65442892719768afc54660098591219f54b786))
+
 ## [1.4.3-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.2...v1.4.3-beta.1) (2026-02-11)
 
 ### Bug Fixes

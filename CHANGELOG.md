@@ -1,3 +1,22 @@
+## [1.5.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.3...v1.5.0-beta.1) (2026-03-07)
+
+### Features
+
+* allow more than 4 entities with conditional visibility ([641c7a1](https://github.com/unbekannt3/room-card-minimalist/commit/641c7a18b74374c525c811fafd3f2ade2dec53a5)), closes [#57](https://github.com/unbekannt3/room-card-minimalist/issues/57)
+
+### Other
+
+* **deps-dev:** bump @commitlint/cli from 20.4.1 to 20.4.3 ([c57cb5c](https://github.com/unbekannt3/room-card-minimalist/commit/c57cb5c1af85124af9cad438d97cbf2665ce9b1b))
+* **deps-dev:** bump @commitlint/config-conventional ([218dfe0](https://github.com/unbekannt3/room-card-minimalist/commit/218dfe056cdba35ae5e6cd5413b2c7f3e76894c8))
+* **deps-dev:** bump @semantic-release/github from 12.0.3 to 12.0.5 ([5a97148](https://github.com/unbekannt3/room-card-minimalist/commit/5a971480c2a96c8894f8d2d6e7c634493cadd981))
+* **deps-dev:** bump @types/node from 25.2.3 to 25.3.0 ([560bb5d](https://github.com/unbekannt3/room-card-minimalist/commit/560bb5d27515c93d8c5cd1b5bbc902a505d0b962))
+* **deps-dev:** bump @types/node from 25.3.0 to 25.3.3 ([9dd76f8](https://github.com/unbekannt3/room-card-minimalist/commit/9dd76f81214cb8f4d6c178bb2800f9557d380bad))
+* **deps-dev:** bump qs from 6.14.1 to 6.14.2 ([6724596](https://github.com/unbekannt3/room-card-minimalist/commit/67245965ba1b711227572edc7f26c3fdf641d918))
+* **deps-dev:** bump terser-webpack-plugin from 5.3.16 to 5.3.17 ([fa6640d](https://github.com/unbekannt3/room-card-minimalist/commit/fa6640d990617754188ab8d993128ad5822798e7))
+* **deps-dev:** bump webpack from 5.105.0 to 5.105.1 ([d20cf07](https://github.com/unbekannt3/room-card-minimalist/commit/d20cf07e6d93a6b078973959944fe13b2b31a329))
+* **deps-dev:** bump webpack from 5.105.2 to 5.105.4 ([f1824d4](https://github.com/unbekannt3/room-card-minimalist/commit/f1824d4e02fc6f401e6cd509aebddc21c15da8a9))
+* **deps:** bump tar and npm ([b7da93e](https://github.com/unbekannt3/room-card-minimalist/commit/b7da93ebb61a4abf12c1f41ac888eba5b2f103f6))
+
 ## [1.4.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.2...v1.4.3) (2026-02-13)
 
 ### Bug Fixes

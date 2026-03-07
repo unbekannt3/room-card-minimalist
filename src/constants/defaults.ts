@@ -40,6 +40,7 @@ export const DEFAULT_DOUBLE_TAP_ACTION = { action: 'none' as const };
 /** * Maximum number of entities that can be displayed
  */
 export const MAX_ENTITIES = 4;
+export const MAX_CONFIGURABLE_ENTITIES = 8;
 
 /**
  * Domains that support toggle action by default

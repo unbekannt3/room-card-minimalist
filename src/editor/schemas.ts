@@ -220,6 +220,11 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 
 	let baseSchema: SchemaItem[] = [
 		{
+			name: 'title',
+			label: localize(ctx.hass, 'entity_title', 'Title (optional)'),
+			selector: { text: {} },
+		},
+		{
 			name: 'type',
 			label: localize(ctx.hass, 'state_type', 'State Type'),
 			selector: {
@@ -348,6 +353,12 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 						],
 					},
 				] as SchemaItem[])),
+		// Visibility condition
+		{
+			name: 'visibility_condition',
+			label: localize(ctx.hass, 'visibility_condition', 'Visibility Condition'),
+			selector: { template: {} },
+		},
 		// Show Value fields
 		{
 			name: 'show_value',

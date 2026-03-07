@@ -17,7 +17,7 @@ import type {
 } from './types';
 
 // Constants
-import { getMultiStatePreset, getDomainIcon } from './constants';
+import { getMultiStatePreset, getDomainIcon, MAX_CONFIGURABLE_ENTITIES } from './constants';
 
 // Utils
 import { getClimateHvacModes, isClimateEntityId } from './utils/entity-helpers';
@@ -178,8 +178,7 @@ export class RoomCardEditor extends LitElement {
 	private _addEntityState(): void {
 		if (!this._config) return;
 
-		// Prevent adding more than 4 entities
-		if (this._config.entities && this._config.entities.length >= 4) {
+		if (this._config.entities && this._config.entities.length >= MAX_CONFIGURABLE_ENTITIES) {
 			return;
 		}
 
@@ -247,6 +246,10 @@ export class RoomCardEditor extends LitElement {
 	 * Get display name for an entity configuration
 	 */
 	private _getEntityDisplayName(entity: EntityConfig, index: number): string {
+		if (entity.title) {
+			return entity.title;
+		}
+
 		const baseText =
 			entity.type === 'template'
 				? localize(this.hass, 'entity_type_template', 'Template')
@@ -513,6 +516,13 @@ export class RoomCardEditor extends LitElement {
 								<span class="entity-title">
 									${this._getEntityDisplayName(entity, entity_idx)}
 								</span>
+								${entity.visibility_condition
+									? html`<ha-icon
+											.icon=${'mdi:eye-check-outline'}
+											style="--mdc-icon-size: 16px; color: var(--secondary-text-color); margin-left: 4px;"
+											title="${localize(this.hass, 'has_visibility_condition', 'Has visibility condition')}"
+										></ha-icon>`
+									: ''}
 							</div>
 							<div class="entity-controls">
 								<mwc-icon-button
@@ -573,7 +583,7 @@ export class RoomCardEditor extends LitElement {
 
 			<div style="display: flex;justify-content: space-between; margin-top: 20px;">
 				<p>${localize(this.hass, 'states', 'States')}</p>
-				${this._config.entities && this._config.entities.length >= 4
+				${this._config.entities && this._config.entities.length >= MAX_CONFIGURABLE_ENTITIES
 					? html`<mwc-button
 							style="margin-top: 5px; cursor: not-allowed;"
 							disabled
@@ -600,6 +610,9 @@ export class RoomCardEditor extends LitElement {
 							)}
 						</mwc-button>`}
 			</div>
+			<p style="margin: 0 0 8px; font-size: 12px; color: var(--secondary-text-color);">
+				${localize(this.hass, 'visibility_hint', 'Only the first 4 visible entities are displayed. Use visibility conditions to control which entities are shown.')}
+			</p>
 
 			${this._renderEntities()}
 		`;

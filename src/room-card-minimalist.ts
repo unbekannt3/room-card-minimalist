@@ -286,7 +286,13 @@ export class RoomCard extends LitElement {
 		const secondaryColor = this._getValueRawOrTemplate(this._config.secondary_color);
 		const tertiary = this._getValueRawOrTemplate(this._config.tertiary);
 		const tertiaryColor = this._getValueRawOrTemplate(this._config.tertiary_color);
-		let entitiesToShow = this._config.entities.slice(0, MAX_ENTITIES);
+		let entitiesToShow = this._config.entities
+			.filter((entity) => {
+				if (!entity.visibility_condition) return true;
+				const result = this._getValueRawOrTemplate(entity.visibility_condition);
+				return result && result !== '' && result !== 'False' && result !== 'None';
+			})
+			.slice(0, MAX_ENTITIES);
 
 		if (this._config.entities_reverse_order) {
 			entitiesToShow = [...entitiesToShow].reverse();

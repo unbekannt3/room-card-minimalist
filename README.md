@@ -26,6 +26,7 @@ Based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/has
   - [Secondary & Tertiary Info](#secondary--tertiary-info)
   - [Icon & Background](#icon--background)
   - [Entity States](#entity-states)
+  - [Conditional Visibility](#conditional-visibility)
   - [Multi-State Entities](#multi-state-entities)
   - [Climate Entities](#climate-entities)
   - [Color Templates](#color-templates)
@@ -92,7 +93,7 @@ The visual editor is fully supported. Below is the YAML reference.
 | `double_tap_action`            | object  | `none`     | Action on double-tap                                                               |
 | `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                     |
 | `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                  |
-| `entities`                     | list    | —          | Entity state indicators (max 4). See [Entity States](#entity-states)               |
+| `entities`                     | list    | —          | Entity state indicators. See [Entity States](#entity-states)                       |
 
 ### Secondary & Tertiary Info
 
@@ -180,13 +181,15 @@ background_image: "/local/images/room.jpg"
 
 ### Entity States
 
-Up to 4 entity indicators on the right side of the card. Each can be an `entity` or `template` type.
+You can configure up to 8 entity indicators, but only the first 4 **visible** entities are displayed on the card. Use `visibility_condition` to conditionally show/hide entities at runtime (e.g., hide AC in summer, show presence only when detected). Entities without a condition are always visible. When `entities_reverse_order` is enabled, the visible entities are aligned from bottom to top.
 
 | Name                   | Type    | Default    | Description                                            |
 | :--------------------- | :------ | :--------- | :----------------------------------------------------- |
 | `type`                 | enum    | _Required_ | `entity` or `template`                                 |
+| `title`                | string  | —          | Custom title for the editor (not displayed on card)    |
 | `icon`                 | string  | _Required_ | Icon when on/active                                    |
 | `icon_off`             | string  | —          | Icon when off (defaults to `icon`)                     |
+| `visibility_condition` | string  | —          | Jinja2 template. Non-empty/truthy = visible, empty = always visible |
 | `entity`               | string  | —          | Entity ID (required for `type: entity`)                |
 | `on_state`             | string  | —          | State value considered "on" (required for non-climate) |
 | `condition`            | string  | —          | Template condition (required for `type: template`)     |
@@ -243,6 +246,43 @@ entities:
         | selectattr('state','eq','on') | list | count %}
       {% if count > 0 %}{{ count }}{% endif %}
     template_on: yellow
+```
+
+### Conditional Visibility
+
+```yaml
+entities:
+  # Always visible
+  - type: entity
+    entity: light.ceiling
+    icon: mdi:ceiling-light
+    on_state: 'on'
+
+  # Only visible in winter (Oct-Mar)
+  - type: entity
+    title: "Heating (Winter)"
+    entity: climate.living_room
+    icon: mdi:thermostat
+    use_multi_state: true
+    visibility_condition: >
+      {{ now().month >= 10 or now().month <= 3 }}
+
+  # Only visible in summer (Apr-Sep)
+  - type: entity
+    title: "AC (Summer)"
+    entity: climate.ac
+    icon: mdi:air-conditioner
+    on_state: 'cool'
+    visibility_condition: >
+      {{ now().month >= 4 and now().month <= 9 }}
+
+  # Only visible when someone is home
+  - type: entity
+    entity: binary_sensor.motion
+    icon: mdi:motion-sensor
+    on_state: 'on'
+    visibility_condition: >
+      {{ is_state('person.john', 'home') }}
 ```
 
 ### Multi-State Entities

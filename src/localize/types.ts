@@ -78,6 +78,10 @@ export interface Translations {
 	add_state: string;
 	state_type: string;
 	maximum_states_reached: string;
+	entity_title: string;
+	visibility_condition: string;
+	visibility_hint: string;
+	has_visibility_condition: string;
 	template_condition: string;
 	state_label: string;
 	use_light_color_description: string;

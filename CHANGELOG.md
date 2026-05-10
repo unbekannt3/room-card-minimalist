@@ -1,3 +1,10 @@
+## [1.5.0-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.1...v1.5.0-beta.2) (2026-05-10)
+
+### Features
+
+* allow templates for entity color presets ([3cae846](https://github.com/unbekannt3/room-card-minimalist/commit/3cae846babce7b75eef0feb1798d4dfcd84e2896)), closes [#80](https://github.com/unbekannt3/room-card-minimalist/issues/80)
+* glowing border driven by template condition ([6241a09](https://github.com/unbekannt3/room-card-minimalist/commit/6241a09c799d5c51a143a737d28de1f07c4bc7e1)), closes [#77](https://github.com/unbekannt3/room-card-minimalist/issues/77)
+
 ## [1.5.0-beta.1](https://github.com/unbekannt3/room-card-minimalist/compare/v1.4.3...v1.5.0-beta.1) (2026-03-07)
 
 ### Features

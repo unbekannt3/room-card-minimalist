@@ -245,6 +245,15 @@ export class RoomCard extends LitElement {
 		if (this._config.icon_color) {
 			this._templateService.subscribe(this._config.icon_color);
 		}
+		// Subscribe to glow_condition + glow_color templates
+		if (this._config.show_glow) {
+			if (this._config.glow_condition) {
+				this._templateService.subscribe(this._config.glow_condition);
+			}
+			if (this._config.glow_color) {
+				this._templateService.subscribe(this._config.glow_color);
+			}
+		}
 		// Subscribe to entity templates (value/template/color/icon/background_color)
 		for (const entity of this._config.entities) {
 			// value template
@@ -325,6 +334,25 @@ export class RoomCard extends LitElement {
 		const isSecondaryClickable = this._isSecondaryClickable();
 		const isTertiaryClickable = this._isTertiaryClickable();
 
+		// Determine if card should glow — glow_condition truthy = glow
+		let shouldGlow = false;
+		if (this._config.show_glow && this._config.glow_condition) {
+			const result = this._getValueRawOrTemplate(this._config.glow_condition);
+			shouldGlow =
+				result !== undefined &&
+				result !== '' &&
+				result !== 'False' &&
+				result !== 'false' &&
+				result !== 'None' &&
+				result !== '0';
+		}
+
+		// Glow color: custom override > card template background color
+		const glowColor =
+			(this._config.glow_color
+				? this._getValueRawOrTemplate(this._config.glow_color)
+				: undefined) || this._getValueRawOrTemplate(cardColors.background_color);
+
 		// Create handlers for card, secondary, and tertiary
 		const cardHandlers = isCardClickable
 			? this._actionController.createHandlers(this._config, {
@@ -349,7 +377,10 @@ export class RoomCard extends LitElement {
 				@touchend=${cardHandlers?.onTouchEnd}
 				@contextmenu=${cardHandlers?.onContextMenu}
 				.config=${this._config}
-				class="${isCardClickable ? 'clickable' : 'non-clickable'}"
+				class="${isCardClickable ? 'clickable' : 'non-clickable'}${shouldGlow ? ' glow' : ''}"
+				style=${shouldGlow
+					? `${glowColor ? `--glow-color: ${glowColor};` : ''}--glow-intensity: ${this._config.glow_intensity}`
+					: ''}
 				tabindex="${isCardClickable ? '0' : '-1'}"
 			>
 				<div class="container">

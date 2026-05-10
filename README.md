@@ -94,6 +94,38 @@ The visual editor is fully supported. Below is the YAML reference.
 | `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                     |
 | `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                  |
 | `entities`                     | list    | —          | Entity state indicators. See [Entity States](#entity-states)                       |
+| `show_glow`                    | boolean | `false`    | Enable glowing border. See [Glow](#glow)                                           |
+| `glow_condition`               | string  | —          | Jinja template controlling the glow. Glows when result is truthy                   |
+| `glow_color`                   | string  | —          | Custom glow color (supports templates). Empty = card preset color                  |
+| `glow_intensity`               | number  | `2`        | Glow strength `1`–`5` (blur/spread multiplier)                                     |
+
+### Glow
+
+Pulsing border driven by a Jinja template. The card glows whenever `glow_condition` evaluates to a truthy value (anything other than empty, `False`, `false`, `None`, `0`).
+
+```yaml
+show_glow: true
+glow_condition: "{{ is_state('binary_sensor.living_room_motion', 'on') }}"
+# optional, defaults to card preset color
+glow_color: "{{ 'red' if is_state('alarm_control_panel.home', 'triggered') else 'gold' }}"
+glow_intensity: 3  # 1 (subtle) to 5 (strong), default 2
+```
+
+More examples:
+
+```yaml
+# Glow when any light in the area is on
+glow_condition: >
+  {{ expand(area_entities('Living Room'))
+     | selectattr('domain','eq','light')
+     | selectattr('state','eq','on') | list | count > 0 }}
+
+# Glow when vacuum is cleaning or returning
+glow_condition: "{{ states('vacuum.roomba') in ['cleaning', 'returning'] }}"
+
+# Glow when someone is home
+glow_condition: "{{ is_state('person.alice', 'home') }}"
+```
 
 ### Secondary & Tertiary Info
 

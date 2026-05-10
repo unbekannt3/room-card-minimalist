@@ -54,6 +54,11 @@ export interface Translations {
 	secondary: string;
 	secondary_color: string;
 	secondary_entity: string;
+	glow: string;
+	show_glow_description: string;
+	glow_condition: string;
+	glow_color: string;
+	glow_intensity: string;
 	icon_color: string;
 	add_entity: string;
 	move_up: string;

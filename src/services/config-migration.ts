@@ -176,6 +176,10 @@ export function applyDefaults(config: RoomCardConfig): RoomCardInternalConfig {
 			DEFAULT_CARD_CONFIG.use_template_color_for_secondary,
 		secondary_allow_html:
 			config.secondary_allow_html ?? DEFAULT_CARD_CONFIG.secondary_allow_html,
+		show_glow: config.show_glow ?? DEFAULT_CARD_CONFIG.show_glow,
+		glow_condition: config.glow_condition ?? DEFAULT_CARD_CONFIG.glow_condition,
+		glow_color: config.glow_color ?? DEFAULT_CARD_CONFIG.glow_color,
+		glow_intensity: config.glow_intensity ?? DEFAULT_CARD_CONFIG.glow_intensity,
 	};
 }
 

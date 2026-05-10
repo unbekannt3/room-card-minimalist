@@ -49,6 +49,34 @@ export const cardStyles = css`
 		width: 100%;
 		height: 100%;
 		box-shadow: none;
+		transition: box-shadow 0.3s ease-in-out;
+	}
+
+	ha-card.glow {
+		--glow-intensity: 2;
+		box-shadow:
+			0 0 calc(6px * var(--glow-intensity)) calc(1px * var(--glow-intensity))
+				var(--glow-color, var(--state-active-color, #ffc107)),
+			0 0 calc(2px * var(--glow-intensity)) 0
+				var(--glow-color, var(--state-active-color, #ffc107)) !important;
+		animation: room-card-glow-pulse 2.4s ease-in-out infinite;
+	}
+
+	@keyframes room-card-glow-pulse {
+		0%, 100% {
+			box-shadow:
+				0 0 calc(4px * var(--glow-intensity)) calc(0.5px * var(--glow-intensity))
+					var(--glow-color, var(--state-active-color, #ffc107)),
+				0 0 calc(1.5px * var(--glow-intensity)) 0
+					var(--glow-color, var(--state-active-color, #ffc107)) !important;
+		}
+		50% {
+			box-shadow:
+				0 0 calc(9px * var(--glow-intensity)) calc(1.5px * var(--glow-intensity))
+					var(--glow-color, var(--state-active-color, #ffc107)),
+				0 0 calc(3px * var(--glow-intensity)) calc(0.5px * var(--glow-intensity))
+					var(--glow-color, var(--state-active-color, #ffc107)) !important;
+		}
 	}
 
 	ha-card.clickable:hover {

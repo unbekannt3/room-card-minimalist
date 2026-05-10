@@ -886,6 +886,50 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 				...getBackgroundSchema(ctx),
 			],
 		},
+		// Glow - Expandable Section
+		{
+			type: 'expandable',
+			expanded: false,
+			name: '',
+			title: localize(ctx.hass, 'glow', 'Glow'),
+			schema: [
+				{
+					name: 'show_glow',
+					label: localize(ctx.hass, 'show_glow_description', 'Enable Glowing Border'),
+					selector: { boolean: {} },
+				},
+				{
+					name: 'glow_condition',
+					label: localize(
+						ctx.hass,
+						'glow_condition',
+						'Glow Condition (Jinja template, truthy = glow)'
+					),
+					selector: { template: {} },
+				},
+				{
+					name: 'glow_color',
+					label: localize(
+						ctx.hass,
+						'glow_color',
+						'Glow Color (optional, supports templates)'
+					),
+					selector: { template: {} },
+				},
+				{
+					name: 'glow_intensity',
+					label: localize(ctx.hass, 'glow_intensity', 'Glow Intensity'),
+					selector: {
+						number: {
+							min: 1,
+							max: 5,
+							step: 1,
+							mode: 'slider',
+						},
+					},
+				},
+			],
+		},
 		{
 			name: 'entities_reverse_order',
 			label: localize(ctx.hass, 'entities_reverse_order', 'Reverse Entity Order'),

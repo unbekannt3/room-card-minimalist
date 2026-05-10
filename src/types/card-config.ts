@@ -58,6 +58,11 @@ export interface RoomCardConfig extends ActionsConfig {
 	use_template_color_for_title?: boolean;
 	use_template_color_for_secondary?: boolean;
 	use_template_color_for_tertiary?: boolean;
+	// Glow settings
+	show_glow?: boolean;
+	glow_condition?: string;
+	glow_color?: string;
+	glow_intensity?: number;
 	// Card actions
 	tap_action?: ActionConfig;
 	hold_action?: ActionConfig;
@@ -86,6 +91,10 @@ export interface RoomCardInternalConfig extends RoomCardConfig {
 	use_template_color_for_tertiary: boolean;
 	secondary_allow_html: boolean;
 	tertiary_allow_html: boolean;
+	show_glow: boolean;
+	glow_condition: string;
+	glow_color: string;
+	glow_intensity: number;
 }
 
 // Default card config values
@@ -107,6 +116,10 @@ export const DEFAULT_CARD_CONFIG: Omit<RoomCardInternalConfig, 'type' | 'name' |
 	use_template_color_for_tertiary: false,
 	secondary_allow_html: false,
 	tertiary_allow_html: false,
+	show_glow: false,
+	glow_condition: '',
+	glow_color: '',
+	glow_intensity: 2,
 };
 
 // Type guard to check if config needs migration

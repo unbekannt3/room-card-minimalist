@@ -102,6 +102,7 @@ export function getCustomMultiStateSchema(ctx: SchemaContext, item: EntityConfig
 					selector: {
 						select: {
 							multiple: false,
+							custom_value: true,
 							mode: 'dropdown',
 							options: getColorTemplateOptions(ctx.hass) as SelectOption[],
 						},
@@ -114,12 +115,12 @@ export function getCustomMultiStateSchema(ctx: SchemaContext, item: EntityConfig
 						{
 							name: `color_${state}`,
 							label: localize(ctx.hass, 'icon_color', 'Color'),
-							selector: { text: {} },
+							selector: { template: {} },
 						},
 						{
 							name: `background_color_${state}`,
 							label: localize(ctx.hass, 'background_circle_color', 'Background'),
-							selector: { text: {} },
+							selector: { template: {} },
 						},
 					],
 				},
@@ -173,12 +174,12 @@ export function getClimateEntitySchema(ctx: SchemaContext, item: EntityConfig): 
 						{
 							name: `color_${mode}`,
 							label: `Color for ${modeLabel}`,
-							selector: { text: {} },
+							selector: { template: {} },
 						},
 						{
 							name: `background_color_${mode}`,
 							label: `${localize(ctx.hass, 'background_color_for', 'Background Color for')} ${modeLabel}`,
-							selector: { text: {} },
+							selector: { template: {} },
 						},
 					],
 				},
@@ -192,6 +193,7 @@ export function getClimateEntitySchema(ctx: SchemaContext, item: EntityConfig): 
 							selector: {
 								select: {
 									multiple: false,
+									custom_value: true,
 									mode: 'dropdown',
 									options: getColorTemplateOptions(ctx.hass) as SelectOption[],
 								},
@@ -287,12 +289,12 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 							{
 								name: 'color_on',
 								label: localize(ctx.hass, 'color_on', 'Color (On)'),
-								selector: { text: {} },
+								selector: { template: {} },
 							},
 							{
 								name: 'color_off',
 								label: localize(ctx.hass, 'color_off', 'Color (Off)'),
-								selector: { text: {} },
+								selector: { template: {} },
 							},
 						],
 					},
@@ -306,6 +308,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 								selector: {
 									select: {
 										multiple: false,
+										custom_value: true,
 										mode: 'dropdown',
 										options: getColorTemplateOptions(
 											ctx.hass
@@ -319,6 +322,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 								selector: {
 									select: {
 										multiple: false,
+										custom_value: true,
 										mode: 'dropdown',
 										options: getColorTemplateOptions(
 											ctx.hass
@@ -339,7 +343,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 									'background_color_on',
 									'Background Color (On)'
 								),
-								selector: { text: {} },
+								selector: { template: {} },
 							},
 							{
 								name: 'background_color_off',
@@ -348,7 +352,7 @@ export function getEntitySchema(ctx: SchemaContext, item: EntityConfig): Schema 
 									'background_color_off',
 									'Background Color (Off)'
 								),
-								selector: { text: {} },
+								selector: { template: {} },
 							},
 						],
 					},

@@ -564,7 +564,7 @@ export class RoomCard extends LitElement {
 	private _resolveEntityTemplateFields(entity: EntityConfig): EntityConfig {
 		const copy: any = { ...entity };
 		for (const key of Object.keys(entity)) {
-			// Only resolve color and icon related keys
+			// Only resolve color, icon and template (preset) related keys
 			if (
 				key.startsWith('color_') ||
 				key.startsWith('background_color_') ||
@@ -572,12 +572,15 @@ export class RoomCard extends LitElement {
 				key === 'color_off' ||
 				key === 'background_color_on' ||
 				key === 'background_color_off' ||
-				key.startsWith('icon_')
+				key.startsWith('icon_') ||
+				key.startsWith('template_')
 			) {
 				const val = (entity as any)[key];
 				if (typeof val === 'string') {
 					const resolved = this._getValueRawOrTemplate(val);
-					if (resolved !== undefined) copy[key] = resolved;
+					if (resolved !== undefined) {
+						copy[key] = key.startsWith('template_') ? resolved.trim() : resolved;
+					}
 				}
 			}
 		}

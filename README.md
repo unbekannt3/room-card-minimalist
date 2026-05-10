@@ -195,12 +195,12 @@ You can configure up to 8 entity indicators, but only the first 4 **visible** en
 | `condition`            | string  | —          | Template condition (required for `type: template`)     |
 | `show_value`           | boolean | `false`    | Display custom state value as label on the circle      |
 | `value_template`       | string  | —          | Template for the value to be displayed as label        |
-| `color_on`             | string  | —          | Icon color when on                                     |
-| `color_off`            | string  | —          | Icon color when off                                    |
-| `background_color_on`  | string  | —          | Background when on                                     |
-| `background_color_off` | string  | —          | Background when off                                    |
-| `template_on`          | string  | —          | Color preset when on                                   |
-| `template_off`         | string  | —          | Color preset when off                                  |
+| `color_on`             | string  | —          | Icon color when on (supports templates)                |
+| `color_off`            | string  | —          | Icon color when off (supports templates)               |
+| `background_color_on`  | string  | —          | Background when on (supports templates)                |
+| `background_color_off` | string  | —          | Background when off (supports templates)               |
+| `template_on`          | string  | —          | Color preset when on. Accepts preset name or Jinja template returning a preset name |
+| `template_off`         | string  | —          | Color preset when off. Accepts preset name or Jinja template returning a preset name |
 | `use_light_color`      | boolean | `false`    | Use actual light color (for `light.*` entities)        |
 | `tap_action`           | object  | —          | Action on tap                                          |
 | `hold_action`          | object  | —          | Action on hold                                         |
@@ -246,6 +246,32 @@ entities:
         | selectattr('state','eq','on') | list | count %}
       {% if count > 0 %}{{ count }}{% endif %}
     template_on: yellow
+```
+
+**Templated colors and presets:**
+
+All color fields (`color_on`, `color_off`, `background_color_on`, `background_color_off`) and preset fields (`template_on`, `template_off`, and the multi-state/climate variants like `color_${state}`, `template_${mode}`) accept Jinja2 templates.
+
+> **Note on `_on` vs `_off`:** the `_on` variants only apply when the entity is considered on (`on_state` matches for `type: entity`, or `condition` is truthy for `type: template`). When the entity is off, the `_off` variants are used. If you want the same template applied regardless of state, set it on both.
+
+```yaml
+entities:
+  # Color follows sensor value
+  - type: entity
+    entity: sensor.battery_level
+    icon: mdi:battery
+    on_state: 'on'
+    color_on: >
+      {% set b = states('sensor.battery_level') | int(0) %}
+      {% if b < 20 %}red{% elif b < 50 %}orange{% else %}green{% endif %}
+
+  # Preset name picked by template
+  - type: entity
+    entity: light.ceiling
+    icon: mdi:ceiling-light
+    on_state: 'on'
+    template_on: >
+      {{ 'red' if is_state('alarm_control_panel.home','triggered') else 'yellow' }}
 ```
 
 ### Conditional Visibility

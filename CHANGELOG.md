@@ -1,3 +1,9 @@
+## [1.5.0-beta.4](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.3...v1.5.0-beta.4) (2026-05-14)
+
+### Features
+
+* optional two-column entity layout ([30a417d](https://github.com/unbekannt3/room-card-minimalist/commit/30a417dd25c4db115be32bc3b7daf7b63c52d108)), closes [#57](https://github.com/unbekannt3/room-card-minimalist/issues/57)
+
 ## [1.5.0-beta.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.2...v1.5.0-beta.3) (2026-05-14)
 
 ### Features

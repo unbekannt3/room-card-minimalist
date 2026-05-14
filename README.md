@@ -86,8 +86,8 @@ The visual editor is fully supported. Below is the YAML reference.
 | Name                           | Type    | Default    | Description                                                                        |
 | :----------------------------- | :------ | :--------- | :--------------------------------------------------------------------------------- |
 | `name`                         | string  | _Required_ | Room name                                                                          |
-| `icon`                         | string  | _Required_ | Room icon (e.g., `mdi:sofa`)                                                       |
-| `card_template`                | string  | —          | Color preset. See [Color Templates](#color-templates)                              |
+| `icon`                         | string  | _Required_ | Room icon (e.g., `mdi:sofa`). Accepts Jinja template returning an icon name        |
+| `card_template`                | string  | —          | Color preset. Accepts preset name or Jinja template returning one. See [Color Templates](#color-templates) |
 | `tap_action`                   | object  | —          | Action on tap. See [HA actions](https://www.home-assistant.io/dashboards/actions/) |
 | `hold_action`                  | object  | —          | Action on hold                                                                     |
 | `double_tap_action`            | object  | `none`     | Action on double-tap                                                               |
@@ -98,6 +98,25 @@ The visual editor is fully supported. Below is the YAML reference.
 | `glow_condition`               | string  | —          | Jinja template controlling the glow. Glows when result is truthy                   |
 | `glow_color`                   | string  | —          | Custom glow color (supports templates). Empty = card preset color                  |
 | `glow_intensity`               | number  | `2`        | Glow strength `1`–`5` (blur/spread multiplier)                                     |
+
+### Templated Card Preset & Icon
+
+`card_template` and `icon` both accept Jinja templates resolving to a preset name or icon name respectively.
+
+```yaml
+# Preset based on light state
+card_template: "{{ 'lightgreen' if is_state('light.wohnzimmer','on') else 'red' }}"
+
+# Preset based on numeric value
+card_template: >
+  {% set t = states('sensor.living_room_temperature') | float %}
+  {% if t > 25 %}red{% elif t > 20 %}orange{% else %}lightblue{% endif %}
+
+# Icon swapped by state
+icon: "{{ 'mdi:sofa' if is_state('light.wohnzimmer','on') else 'mdi:sofa-outline' }}"
+```
+
+Resolved output must match an existing preset name (`red`, `lightgreen`, `blue`, …). See [Color Templates](#color-templates).
 
 ### Glow
 

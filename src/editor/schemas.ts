@@ -634,8 +634,7 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			name: 'icon',
 			label: ctx.hass?.localize?.('ui.panel.lovelace.editor.card.generic.icon') || 'Icon',
 			required: true,
-			selector: { icon: {} },
-			context: { icon_entity: 'entity' },
+			selector: { template: {} },
 		},
 		{
 			name: 'card_template',
@@ -643,6 +642,7 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			selector: {
 				select: {
 					multiple: false,
+					custom_value: true,
 					mode: 'dropdown',
 					options: getColorTemplateOptions(ctx.hass) as SelectOption[],
 				},

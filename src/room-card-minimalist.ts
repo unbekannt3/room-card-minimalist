@@ -245,6 +245,14 @@ export class RoomCard extends LitElement {
 		if (this._config.icon_color) {
 			this._templateService.subscribe(this._config.icon_color);
 		}
+		// Subscribe to card_template (preset name or template)
+		if (this._config.card_template) {
+			this._templateService.subscribe(this._config.card_template);
+		}
+		// Subscribe to icon template
+		if (this._config.icon) {
+			this._templateService.subscribe(this._config.icon);
+		}
 		// Subscribe to glow_condition + glow_color templates
 		if (this._config.show_glow) {
 			if (this._config.glow_condition) {
@@ -314,8 +322,9 @@ export class RoomCard extends LitElement {
 		// Evaluate icon color (might be a template)
 		const iconColorOverride = this._getValueRawOrTemplate(this._config.icon_color);
 
+		const cardTemplate = this._getValueRawOrTemplate(this._config.card_template)?.trim();
 		const cardColors = applyCardTemplate(
-			this._config.card_template,
+			cardTemplate,
 			iconColorOverride,
 			backgroundCircleColor
 		);
@@ -518,7 +527,9 @@ export class RoomCard extends LitElement {
 									colors.icon_color
 								)};"
 							>
-								<ha-icon .icon=${this._config?.icon} />
+								<ha-icon
+									.icon=${this._getValueRawOrTemplate(this._config?.icon)}
+								/>
 							</div>
 						`
 					: ''}

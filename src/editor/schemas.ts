@@ -935,5 +935,14 @@ export function getMainSchema(ctx: SchemaContext): Schema {
 			label: localize(ctx.hass, 'entities_reverse_order', 'Reverse Entity Order'),
 			selector: { boolean: {} },
 		},
+		{
+			name: 'entities_two_columns',
+			label: localize(
+				ctx.hass,
+				'entities_two_columns',
+				'Two Columns (Advanced) — up to 8 icons. Warning: the second column takes ~25% of the card width. Little room left for the room name and secondary/tertiary text, long names will be truncated. Layout becomes unpredictable on narrow dashboard columns (e.g. mobile, single-column layouts).'
+			),
+			selector: { boolean: {} },
+		},
 	];
 }

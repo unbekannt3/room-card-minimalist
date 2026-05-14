@@ -161,6 +161,7 @@ export function applyDefaults(config: RoomCardConfig): RoomCardInternalConfig {
 		secondary_color: config.secondary_color ?? DEFAULT_CARD_CONFIG.secondary_color,
 		secondary_entity: config.secondary_entity ?? DEFAULT_CARD_CONFIG.secondary_entity,
 		entities: config.entities ?? DEFAULT_CARD_CONFIG.entities,
+		entities_inner: config.entities_inner ?? DEFAULT_CARD_CONFIG.entities_inner,
 		background_type: config.background_type ?? DEFAULT_CARD_CONFIG.background_type,
 		background_image: config.background_image ?? DEFAULT_CARD_CONFIG.background_image,
 		background_person_entity:
@@ -169,6 +170,8 @@ export function applyDefaults(config: RoomCardConfig): RoomCardInternalConfig {
 			config.background_image_square ?? DEFAULT_CARD_CONFIG.background_image_square,
 		entities_reverse_order:
 			config.entities_reverse_order ?? DEFAULT_CARD_CONFIG.entities_reverse_order,
+		entities_two_columns:
+			config.entities_two_columns ?? DEFAULT_CARD_CONFIG.entities_two_columns,
 		use_template_color_for_title:
 			config.use_template_color_for_title ?? DEFAULT_CARD_CONFIG.use_template_color_for_title,
 		use_template_color_for_secondary:

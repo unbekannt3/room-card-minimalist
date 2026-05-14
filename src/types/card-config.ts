@@ -53,7 +53,9 @@ export interface RoomCardConfig extends ActionsConfig {
 	background_image_square?: boolean;
 	// Entity states (max 4)
 	entities?: EntityConfig[];
+	entities_inner?: EntityConfig[];
 	entities_reverse_order?: boolean;
+	entities_two_columns?: boolean;
 	// Color options
 	use_template_color_for_title?: boolean;
 	use_template_color_for_secondary?: boolean;
@@ -81,11 +83,13 @@ export interface RoomCardInternalConfig extends RoomCardConfig {
 	tertiary_color: string;
 	tertiary_entity: string;
 	entities: EntityConfig[];
+	entities_inner: EntityConfig[];
 	background_type: BackgroundType;
 	background_image: string;
 	background_person_entity: string;
 	background_image_square: boolean;
 	entities_reverse_order: boolean;
+	entities_two_columns: boolean;
 	use_template_color_for_title: boolean;
 	use_template_color_for_secondary: boolean;
 	use_template_color_for_tertiary: boolean;
@@ -106,11 +110,13 @@ export const DEFAULT_CARD_CONFIG: Omit<RoomCardInternalConfig, 'type' | 'name' |
 	tertiary_color: 'var(--secondary-text-color)',
 	tertiary_entity: '',
 	entities: [],
+	entities_inner: [],
 	background_type: 'color',
 	background_image: '',
 	background_person_entity: '',
 	background_image_square: false,
 	entities_reverse_order: false,
+	entities_two_columns: false,
 	use_template_color_for_title: false,
 	use_template_color_for_secondary: false,
 	use_template_color_for_tertiary: false,

@@ -17,7 +17,13 @@ import type {
 } from './types';
 
 // Constants
-import { getMultiStatePreset, getDomainIcon, MAX_CONFIGURABLE_ENTITIES } from './constants';
+import {
+	getMultiStatePreset,
+	getDomainIcon,
+	MAX_CONFIGURABLE_ENTITIES,
+} from './constants';
+
+type EntityGroup = 'outer' | 'inner';
 
 // Utils
 import { getClimateHvacModes, isClimateEntityId } from './utils/entity-helpers';
@@ -149,43 +155,53 @@ export class RoomCardEditor extends LitElement {
 	}
 
 	/**
-	 * Delete a state entity at the given index
+	 * Helpers for column-aware entity manipulation
 	 */
-	private _deleteStateEntity(idx: number): void {
-		if (!this._config) return;
-
-		const entities = [...(this._config.entities || [])];
-		entities.splice(idx, 1);
-
-		this._dispatchConfigChanged({ ...this._config, entities });
+	private _getGroupList(group: EntityGroup): EntityConfig[] {
+		if (!this._config) return [];
+		return group === 'inner'
+			? [...(this._config.entities_inner || [])]
+			: [...(this._config.entities || [])];
 	}
 
-	/**
-	 * Move a state entity up or down
-	 */
-	private _moveStateEntity(idx: number, pos: number): void {
+	private _dispatchGroupChange(group: EntityGroup, list: EntityConfig[]): void {
 		if (!this._config) return;
-
-		const entities = [...(this._config.entities || [])];
-		[entities[idx], entities[idx + pos]] = [entities[idx + pos], entities[idx]];
-
-		this._dispatchConfigChanged({ ...this._config, entities });
-	}
-
-	/**
-	 * Add a new state entity (template type by default)
-	 */
-	private _addEntityState(): void {
-		if (!this._config) return;
-
-		if (this._config.entities && this._config.entities.length >= MAX_CONFIGURABLE_ENTITIES) {
-			return;
+		if (group === 'inner') {
+			this._dispatchConfigChanged({ ...this._config, entities_inner: list });
+		} else {
+			this._dispatchConfigChanged({ ...this._config, entities: list });
 		}
+	}
 
-		const entities = [...(this._config.entities || [])];
-		entities.push({ type: 'template' } as EntityConfig);
+	/**
+	 * Delete an entity from the given column at the given index
+	 */
+	private _deleteStateEntity(group: EntityGroup, idx: number): void {
+		const list = this._getGroupList(group);
+		list.splice(idx, 1);
+		this._dispatchGroupChange(group, list);
+	}
 
-		this._dispatchConfigChanged({ ...this._config, entities });
+	/**
+	 * Move an entity up or down within its column
+	 */
+	private _moveStateEntity(group: EntityGroup, idx: number, pos: number): void {
+		const list = this._getGroupList(group);
+		const target = idx + pos;
+		if (target < 0 || target >= list.length) return;
+		[list[idx], list[target]] = [list[target], list[idx]];
+		this._dispatchGroupChange(group, list);
+	}
+
+	/**
+	 * Add a new entity to the given column (template type by default)
+	 */
+	private _addEntityState(group: EntityGroup = 'outer'): void {
+		if (!this._config) return;
+		const list = this._getGroupList(group);
+		if (list.length >= MAX_CONFIGURABLE_ENTITIES) return;
+		list.push({ type: 'template' } as EntityConfig);
+		this._dispatchGroupChange(group, list);
 	}
 
 	/**
@@ -304,13 +320,17 @@ export class RoomCardEditor extends LitElement {
 	/**
 	 * Handle entity form value changes
 	 */
-	private _valueChangedEntity(entityIndex: number, ev: CustomEvent): void {
+	private _valueChangedEntity(
+		group: EntityGroup,
+		entityIndex: number,
+		ev: CustomEvent
+	): void {
 		if (!this._config || !this.hass) {
 			return;
 		}
 
-		const entities = [...(this._config.entities || [])];
-		const oldValue = entities[entityIndex];
+		const list = this._getGroupList(group);
+		const oldValue = list[entityIndex];
 		const newValue = ev.detail.value as EntityConfig & { custom_states?: string | string[] };
 
 		// Convert custom_states array back to comma-separated string
@@ -346,9 +366,13 @@ export class RoomCardEditor extends LitElement {
 			}
 		}
 
-		entities[entityIndex] = newValue as EntityConfig;
+		list[entityIndex] = newValue as EntityConfig;
 
-		this._config = { ...this._config, entities };
+		if (group === 'inner') {
+			this._config = { ...this._config, entities_inner: list };
+		} else {
+			this._config = { ...this._config, entities: list };
+		}
 
 		const event = new CustomEvent('config-changed', {
 			detail: { config: this._config },
@@ -375,13 +399,14 @@ export class RoomCardEditor extends LitElement {
 
 	private _dragState: {
 		isDragging: boolean;
+		dragGroup: EntityGroup;
 		dragIndex: number;
 		startY: number;
 	} | null = null;
 
 	// ==================== Mouse-based Drag and Drop Handlers ====================
 
-	private _handleMouseDown(ev: MouseEvent, index: number): void {
+	private _handleMouseDown(ev: MouseEvent, group: EntityGroup, index: number): void {
 		// Only handle left mouse button
 		if (ev.button !== 0) return;
 
@@ -390,6 +415,7 @@ export class RoomCardEditor extends LitElement {
 
 		this._dragState = {
 			isDragging: true,
+			dragGroup: group,
 			dragIndex: index,
 			startY: ev.clientY,
 		};
@@ -414,16 +440,22 @@ export class RoomCardEditor extends LitElement {
 
 		ev.preventDefault();
 
-		// Find box under cursor
-		const boxes = this.shadowRoot?.querySelectorAll('.box');
+		const boxes = this.shadowRoot?.querySelectorAll<HTMLElement>('.box');
 		if (!boxes) return;
 
-		boxes.forEach((box, idx) => {
+		boxes.forEach((box) => {
 			const rect = box.getBoundingClientRect();
+			const boxGroup = (box.dataset.group as EntityGroup) || 'outer';
+			const boxIndex = Number(box.dataset.index ?? -1);
+			const isSelf =
+				boxGroup === this._dragState?.dragGroup &&
+				boxIndex === this._dragState?.dragIndex;
 			if (
+				!isSelf &&
 				ev.clientY >= rect.top &&
 				ev.clientY <= rect.bottom &&
-				idx !== this._dragState?.dragIndex
+				ev.clientX >= rect.left &&
+				ev.clientX <= rect.right
 			) {
 				box.classList.add('drag-over');
 			} else {
@@ -440,32 +472,57 @@ export class RoomCardEditor extends LitElement {
 
 		ev.preventDefault();
 
-		// Find drop target
-		const boxes = this.shadowRoot?.querySelectorAll('.box');
+		const boxes = this.shadowRoot?.querySelectorAll<HTMLElement>('.box');
+		let dropGroup: EntityGroup | null = null;
 		let dropIndex = -1;
 
-		boxes?.forEach((box, idx) => {
+		boxes?.forEach((box) => {
 			const rect = box.getBoundingClientRect();
-			if (ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-				dropIndex = idx;
+			if (
+				ev.clientY >= rect.top &&
+				ev.clientY <= rect.bottom &&
+				ev.clientX >= rect.left &&
+				ev.clientX <= rect.right
+			) {
+				dropGroup = (box.dataset.group as EntityGroup) || 'outer';
+				dropIndex = Number(box.dataset.index ?? -1);
 			}
 		});
 
-		const dragIndex = this._dragState.dragIndex;
-
-		// Clean up before state change
+		const { dragGroup, dragIndex } = this._dragState;
 		this._cleanupDrag();
 
-		// Perform reorder if valid
-		if (dropIndex !== -1 && dropIndex !== dragIndex) {
-			const entities = [...(this._config.entities || [])];
-			const draggedEntity = entities[dragIndex];
+		if (dropGroup === null || dropIndex < 0) return;
+		if (dropGroup === dragGroup && dropIndex === dragIndex) return;
 
-			entities.splice(dragIndex, 1);
-			entities.splice(dropIndex, 0, draggedEntity);
+		const srcList = this._getGroupList(dragGroup);
+		const dragged = srcList[dragIndex];
+		if (!dragged) return;
 
-			this._dispatchConfigChanged({ ...this._config, entities });
+		if (dropGroup === dragGroup) {
+			srcList.splice(dragIndex, 1);
+			srcList.splice(dropIndex, 0, dragged);
+			this._dispatchGroupChange(dragGroup, srcList);
+			return;
 		}
+
+		// Cross-group move
+		const dstList = this._getGroupList(dropGroup);
+		if (dstList.length >= MAX_CONFIGURABLE_ENTITIES) return;
+		srcList.splice(dragIndex, 1);
+		dstList.splice(dropIndex, 0, dragged);
+
+		if (!this._config) return;
+		const updated: RoomCardConfig = {
+			...this._config,
+			...(dragGroup === 'inner'
+				? { entities_inner: srcList }
+				: { entities: srcList }),
+			...(dropGroup === 'inner'
+				? { entities_inner: dstList }
+				: { entities: dstList }),
+		};
+		this._dispatchConfigChanged(updated);
 	};
 
 	private _cleanupDrag(): void {
@@ -487,80 +544,170 @@ export class RoomCardEditor extends LitElement {
 	}
 
 	/**
-	 * Render the entities section
+	 * Render a single entity box. entity_idx is the index within the given
+	 * group; reorder/delete/drag handlers operate on that group's array.
+	 */
+	private _renderEntityBox(
+		entity: EntityConfig,
+		group: EntityGroup,
+		entity_idx: number
+	): TemplateResult {
+		const list =
+			group === 'inner'
+				? this._config?.entities_inner || []
+				: this._config?.entities || [];
+		const total = list.length;
+		return html`
+			<div class="box" data-group=${group} data-index=${entity_idx}>
+				<div class="entity-header">
+					<div class="entity-info">
+						<div
+							class="drag-handle"
+							@mousedown=${(ev: MouseEvent) =>
+								this._handleMouseDown(ev, group, entity_idx)}
+						>
+							<ha-icon .icon=${'mdi:drag'}></ha-icon>
+						</div>
+						<ha-icon
+							.icon=${this._getEntityIcon(entity)}
+							class="entity-icon"
+						></ha-icon>
+						<span class="entity-title">
+							${this._getEntityDisplayName(entity, entity_idx)}
+						</span>
+						${entity.visibility_condition
+							? html`<ha-icon
+									.icon=${'mdi:eye-check-outline'}
+									style="--mdc-icon-size: 16px; color: var(--secondary-text-color); margin-left: 4px;"
+									title="${localize(this.hass, 'has_visibility_condition', 'Has visibility condition')}"
+								></ha-icon>`
+							: ''}
+					</div>
+					<div class="entity-controls">
+						<mwc-icon-button
+							.disabled=${entity_idx === 0}
+							@click=${() => this._moveStateEntity(group, entity_idx, -1)}
+							title="${localize(this.hass, 'move_up', 'Move Up')}"
+						>
+							<ha-icon .icon=${'mdi:arrow-up'}></ha-icon>
+						</mwc-icon-button>
+						<mwc-icon-button
+							.disabled=${entity_idx === total - 1}
+							@click=${() => this._moveStateEntity(group, entity_idx, 1)}
+							title="${localize(this.hass, 'move_down', 'Move Down')}"
+						>
+							<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
+						</mwc-icon-button>
+						<mwc-icon-button
+							@click=${() => this._deleteStateEntity(group, entity_idx)}
+							title="${localize(this.hass, 'delete', 'Delete')}"
+						>
+							<ha-icon .icon=${'mdi:close'}></ha-icon>
+						</mwc-icon-button>
+					</div>
+				</div>
+
+				<ha-form
+					.hass=${this.hass}
+					.schema=${getEntitySchema(this._getSchemaContext(), entity)}
+					.data=${this._getEntityFormData(entity)}
+					.computeLabel=${(s: SchemaItem) => (s as { label?: string }).label ?? s.name}
+					@value-changed=${(ev: CustomEvent) =>
+						this._valueChangedEntity(group, entity_idx, ev)}
+				></ha-form>
+			</div>
+		`;
+	}
+
+	/**
+	 * Render the entities section. In two-column mode the outer column maps
+	 * to `entities`, the inner column to `entities_inner`. Entities can be
+	 * dragged between columns.
 	 */
 	private _renderEntities(): TemplateResult {
 		if (!this._config) {
 			return html``;
 		}
 
-		const entities = this._config.entities || [];
+		const outer = this._config.entities || [];
+
+		if (!this._config.entities_two_columns) {
+			return html`${outer.map((e, i) => this._renderEntityBox(e, 'outer', i))}`;
+		}
+
+		const inner = this._config.entities_inner || [];
+		const outerFull = outer.length >= MAX_CONFIGURABLE_ENTITIES;
+		const innerFull = inner.length >= MAX_CONFIGURABLE_ENTITIES;
 
 		return html`
-			${entities.map(
-				(entity, entity_idx) => html`
-					<div class="box">
-						<div class="entity-header">
-							<div class="entity-info">
-								<div
-									class="drag-handle"
-									@mousedown=${(ev: MouseEvent) =>
-										this._handleMouseDown(ev, entity_idx)}
-								>
-									<ha-icon .icon=${'mdi:drag'}></ha-icon>
-								</div>
-								<ha-icon
-									.icon=${this._getEntityIcon(entity)}
-									class="entity-icon"
-								></ha-icon>
-								<span class="entity-title">
-									${this._getEntityDisplayName(entity, entity_idx)}
-								</span>
-								${entity.visibility_condition
-									? html`<ha-icon
-											.icon=${'mdi:eye-check-outline'}
-											style="--mdc-icon-size: 16px; color: var(--secondary-text-color); margin-left: 4px;"
-											title="${localize(this.hass, 'has_visibility_condition', 'Has visibility condition')}"
-										></ha-icon>`
-									: ''}
-							</div>
-							<div class="entity-controls">
-								<mwc-icon-button
-									.disabled=${entity_idx === 0}
-									@click=${() => this._moveStateEntity(entity_idx, -1)}
-									title="${localize(this.hass, 'move_up', 'Move Up')}"
-								>
-									<ha-icon .icon=${'mdi:arrow-up'}></ha-icon>
-								</mwc-icon-button>
-								<mwc-icon-button
-									.disabled=${entity_idx ===
-									(this._config?.entities?.length || 0) - 1}
-									@click=${() => this._moveStateEntity(entity_idx, 1)}
-									title="${localize(this.hass, 'move_down', 'Move Down')}"
-								>
-									<ha-icon .icon=${'mdi:arrow-down'}></ha-icon>
-								</mwc-icon-button>
-								<mwc-icon-button
-									@click=${() => this._deleteStateEntity(entity_idx)}
-									title="${localize(this.hass, 'delete', 'Delete')}"
-								>
-									<ha-icon .icon=${'mdi:close'}></ha-icon>
-								</mwc-icon-button>
-							</div>
-						</div>
-
-						<ha-form
-							.hass=${this.hass}
-							.schema=${getEntitySchema(this._getSchemaContext(), entity)}
-							.data=${this._getEntityFormData(entity)}
-							.computeLabel=${(s: SchemaItem) =>
-								(s as { label?: string }).label ?? s.name}
-							@value-changed=${(ev: CustomEvent) =>
-								this._valueChangedEntity(entity_idx, ev)}
-						></ha-form>
-					</div>
-				`
-			)}
+			<div class="column-group">
+				<div class="column-group-header">
+					<p class="column-group-title">
+						${localize(
+							this.hass,
+							'outer_column',
+							'Outer Column (up to 8 candidates, 4 visible)'
+						)}
+					</p>
+					${outerFull
+						? html`<mwc-button disabled style="cursor: not-allowed;">
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`
+						: html`<mwc-button @click=${() => this._addEntityState('outer')}>
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`}
+				</div>
+				<p class="column-group-hint">
+					${localize(
+						this.hass,
+						'outer_column_hint',
+						'Rightmost column on the card. First 4 visible entities are shown.'
+					)}
+				</p>
+				${outer.map((e, i) => this._renderEntityBox(e, 'outer', i))}
+			</div>
+			<div class="column-group">
+				<div class="column-group-header">
+					<p class="column-group-title">
+						${localize(
+							this.hass,
+							'inner_column',
+							'Inner Column (up to 8 candidates, 4 visible)'
+						)}
+					</p>
+					${innerFull
+						? html`<mwc-button disabled style="cursor: not-allowed;">
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`
+						: html`<mwc-button @click=${() => this._addEntityState('inner')}>
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`}
+				</div>
+				<p class="column-group-hint">
+					${localize(
+						this.hass,
+						'inner_column_hint',
+						'Second column from the right (closer to the room text). First 4 visible entities are shown.'
+					)}
+				</p>
+				${inner.map((e, i) => this._renderEntityBox(e, 'inner', i))}
+			</div>
 		`;
 	}
 
@@ -583,35 +730,47 @@ export class RoomCardEditor extends LitElement {
 
 			<div style="display: flex;justify-content: space-between; margin-top: 20px;">
 				<p>${localize(this.hass, 'states', 'States')}</p>
-				${this._config.entities && this._config.entities.length >= MAX_CONFIGURABLE_ENTITIES
-					? html`<mwc-button
-							style="margin-top: 5px; cursor: not-allowed;"
-							disabled
-							title="${localize(
-								this.hass,
-								'maximum_states_reached',
-								'Maximum 4 states reached'
-							)}"
-						>
-							<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
-								this.hass,
-								'add_state',
-								'Add State'
-							)}
-						</mwc-button>`
-					: html`<mwc-button
-							style="margin-top: 5px; cursor: pointer;"
-							@click=${this._addEntityState}
-						>
-							<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
-								this.hass,
-								'add_state',
-								'Add State'
-							)}
-						</mwc-button>`}
+				${this._config.entities_two_columns
+					? ''
+					: (this._config.entities?.length || 0) >= MAX_CONFIGURABLE_ENTITIES
+						? html`<mwc-button
+								style="margin-top: 5px; cursor: not-allowed;"
+								disabled
+								title="${localize(
+									this.hass,
+									'maximum_states_reached',
+									'Maximum 4 states reached'
+								)}"
+							>
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`
+						: html`<mwc-button
+								style="margin-top: 5px; cursor: pointer;"
+								@click=${() => this._addEntityState('outer')}
+							>
+								<ha-icon .icon=${'mdi:plus'}></ha-icon>${localize(
+									this.hass,
+									'add_state',
+									'Add State'
+								)}
+							</mwc-button>`}
 			</div>
 			<p style="margin: 0 0 8px; font-size: 12px; color: var(--secondary-text-color);">
-				${localize(this.hass, 'visibility_hint', 'Only the first 4 visible entities are displayed. Use visibility conditions to control which entities are shown.')}
+				${this._config?.entities_two_columns
+					? localize(
+							this.hass,
+							'visibility_hint_two_columns',
+							'Up to 8 candidate entities per column (16 total). The first 4 visible entities of each column are displayed on the card. Use visibility conditions to control which entities are shown.'
+						)
+					: localize(
+							this.hass,
+							'visibility_hint',
+							'Only the first 4 visible entities are displayed. Use visibility conditions to control which entities are shown.'
+						)}
 			</p>
 
 			${this._renderEntities()}

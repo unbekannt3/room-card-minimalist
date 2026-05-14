@@ -51,6 +51,7 @@ export interface Translations {
 	tertiary_entity: string;
 	tertiary_allow_html: string;
 	entities_reverse_order: string;
+	entities_two_columns: string;
 	secondary: string;
 	secondary_color: string;
 	secondary_entity: string;
@@ -86,6 +87,11 @@ export interface Translations {
 	entity_title: string;
 	visibility_condition: string;
 	visibility_hint: string;
+	visibility_hint_two_columns: string;
+	outer_column: string;
+	inner_column: string;
+	outer_column_hint: string;
+	inner_column_hint: string;
 	has_visibility_condition: string;
 	template_condition: string;
 	state_label: string;

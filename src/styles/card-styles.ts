@@ -112,7 +112,8 @@ export const cardStyles = css`
 		flex-direction: column;
 		justify-content: flex-start;
 		min-width: 0;
-		align-self: flex-start;
+		max-width: 100%;
+		align-self: stretch;
 	}
 
 	.icon-container {
@@ -226,6 +227,7 @@ export const cardStyles = css`
 		display: flex;
 		align-items: center;
 		flex-shrink: 0;
+		gap: 8px;
 	}
 
 	.states {
@@ -243,6 +245,7 @@ export const cardStyles = css`
 		padding-top: 0;
 		padding-bottom: 20px;
 	}
+
 
 	.state-item {
 		display: flex;

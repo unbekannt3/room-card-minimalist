@@ -20,7 +20,11 @@ import type {
 } from './types';
 
 // Constants
-import { getRandomColorTemplate, MAX_ENTITIES } from './constants';
+import {
+	getRandomColorTemplate,
+	MAX_ENTITIES,
+	MAX_CONFIGURABLE_ENTITIES,
+} from './constants';
 
 // Services
 import {
@@ -263,7 +267,11 @@ export class RoomCard extends LitElement {
 			}
 		}
 		// Subscribe to entity templates (value/template/color/icon/background_color)
-		for (const entity of this._config.entities) {
+		const allEntities = [
+			...this._config.entities,
+			...(this._config.entities_inner || []),
+		];
+		for (const entity of allEntities) {
 			// value template
 			if (entity.show_value && entity.value_template) {
 				this._templateService.subscribe(entity.value_template);
@@ -303,16 +311,27 @@ export class RoomCard extends LitElement {
 		const secondaryColor = this._getValueRawOrTemplate(this._config.secondary_color);
 		const tertiary = this._getValueRawOrTemplate(this._config.tertiary);
 		const tertiaryColor = this._getValueRawOrTemplate(this._config.tertiary_color);
-		let entitiesToShow = this._config.entities
-			.filter((entity) => {
-				if (!entity.visibility_condition) return true;
-				const result = this._getValueRawOrTemplate(entity.visibility_condition);
-				return result && result !== '' && result !== 'False' && result !== 'None';
-			})
-			.slice(0, MAX_ENTITIES);
+		const isVisible = (entity: EntityConfig): boolean => {
+			if (!entity.visibility_condition) return true;
+			const result = this._getValueRawOrTemplate(entity.visibility_condition);
+			return Boolean(result && result !== '' && result !== 'False' && result !== 'None');
+		};
+
+		const outerPool = this._config.entities.slice(0, MAX_CONFIGURABLE_ENTITIES);
+		let outerEntities = outerPool.filter(isVisible).slice(0, MAX_ENTITIES);
+		let innerEntities: EntityConfig[] = [];
+
+		if (this._config.entities_two_columns) {
+			const innerPool = (this._config.entities_inner || []).slice(
+				0,
+				MAX_CONFIGURABLE_ENTITIES
+			);
+			innerEntities = innerPool.filter(isVisible).slice(0, MAX_ENTITIES);
+		}
 
 		if (this._config.entities_reverse_order) {
-			entitiesToShow = [...entitiesToShow].reverse();
+			outerEntities = [...outerEntities].reverse();
+			innerEntities = [...innerEntities].reverse();
 		}
 
 		const backgroundCircleColor = this._getValueRawOrTemplate(
@@ -414,12 +433,24 @@ export class RoomCard extends LitElement {
 						${this._renderIconContainer(cardColors)}
 					</div>
 					<div class="content-right">
+						${innerEntities.length > 0
+							? html`
+									<div
+										class="states states-inner ${this._config
+											.entities_reverse_order
+											? 'states-reverse'
+											: ''}"
+									>
+										${innerEntities.map((item) => this._renderItem(item))}
+									</div>
+								`
+							: ''}
 						<div
 							class="states ${this._config.entities_reverse_order
 								? 'states-reverse'
 								: ''}"
 						>
-							${entitiesToShow.map((item) => this._renderItem(item))}
+							${outerEntities.map((item) => this._renderItem(item))}
 						</div>
 					</div>
 				</div>

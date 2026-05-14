@@ -83,21 +83,22 @@ The visual editor is fully supported. Below is the YAML reference.
 
 ### Basic Settings
 
-| Name                           | Type    | Default    | Description                                                                        |
-| :----------------------------- | :------ | :--------- | :--------------------------------------------------------------------------------- |
-| `name`                         | string  | _Required_ | Room name                                                                          |
-| `icon`                         | string  | _Required_ | Room icon (e.g., `mdi:sofa`). Accepts Jinja template returning an icon name        |
-| `card_template`                | string  | —          | Color preset. Accepts preset name or Jinja template returning one. See [Color Templates](#color-templates) |
-| `tap_action`                   | object  | —          | Action on tap. See [HA actions](https://www.home-assistant.io/dashboards/actions/) |
-| `hold_action`                  | object  | —          | Action on hold                                                                     |
-| `double_tap_action`            | object  | `none`     | Action on double-tap                                                               |
-| `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                     |
-| `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                  |
-| `entities`                     | list    | —          | Entity state indicators. See [Entity States](#entity-states)                       |
-| `show_glow`                    | boolean | `false`    | Enable glowing border. See [Glow](#glow)                                           |
-| `glow_condition`               | string  | —          | Jinja template controlling the glow. Glows when result is truthy                   |
-| `glow_color`                   | string  | —          | Custom glow color (supports templates). Empty = card preset color                  |
-| `glow_intensity`               | number  | `2`        | Glow strength `1`–`5` (blur/spread multiplier)                                     |
+| Name                           | Type    | Default    | Description                                                                                                                            |
+| :----------------------------- | :------ | :--------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                         | string  | _Required_ | Room name                                                                                                                              |
+| `icon`                         | string  | _Required_ | Room icon (e.g., `mdi:sofa`). Accepts Jinja template returning an icon name                                                            |
+| `card_template`                | string  | —          | Color preset. Accepts preset name or Jinja template returning one. See [Color Templates](#color-templates)                             |
+| `tap_action`                   | object  | —          | Action on tap. See [HA actions](https://www.home-assistant.io/dashboards/actions/)                                                     |
+| `hold_action`                  | object  | —          | Action on hold                                                                                                                         |
+| `double_tap_action`            | object  | `none`     | Action on double-tap                                                                                                                   |
+| `use_template_color_for_title` | boolean | `false`    | Use preset color for room name                                                                                                         |
+| `entities_reverse_order`       | boolean | `false`    | Align entity indicators to bottom                                                                                                      |
+| `entities_two_columns`         | boolean | `false`    | **Advanced.** Render entities in two columns (up to 8 candidates per column, 4 visible each). See [Two Columns](#two-columns-advanced) |
+| `entities`                     | list    | —          | Entity state indicators. See [Entity States](#entity-states)                                                                           |
+| `show_glow`                    | boolean | `false`    | Enable glowing border. See [Glow](#glow)                                                                                               |
+| `glow_condition`               | string  | —          | Jinja template controlling the glow. Glows when result is truthy                                                                       |
+| `glow_color`                   | string  | —          | Custom glow color (supports templates). Empty = card preset color                                                                      |
+| `glow_intensity`               | number  | `2`        | Glow strength `1`–`5` (blur/spread multiplier)                                                                                         |
 
 ### Templated Card Preset & Icon
 
@@ -127,7 +128,7 @@ show_glow: true
 glow_condition: "{{ is_state('binary_sensor.living_room_motion', 'on') }}"
 # optional, defaults to card preset color
 glow_color: "{{ 'red' if is_state('alarm_control_panel.home', 'triggered') else 'gold' }}"
-glow_intensity: 3  # 1 (subtle) to 5 (strong), default 2
+glow_intensity: 3 # 1 (subtle) to 5 (strong), default 2
 ```
 
 More examples:
@@ -232,30 +233,30 @@ background_image: "/local/images/room.jpg"
 
 ### Entity States
 
-You can configure up to 8 entity indicators, but only the first 4 **visible** entities are displayed on the card. Use `visibility_condition` to conditionally show/hide entities at runtime (e.g., hide AC in summer, show presence only when detected). Entities without a condition are always visible. When `entities_reverse_order` is enabled, the visible entities are aligned from bottom to top.
+You can configure up to 8 entity indicators. By default the first 4 **visible** entities are displayed on the card; set `entities_two_columns: true` to show all 8 in two columns (see [Two Columns](#two-columns-advanced) for caveats). Use `visibility_condition` to conditionally show/hide entities at runtime (e.g., hide AC in summer, show presence only when detected). Entities without a condition are always visible. When `entities_reverse_order` is enabled, the visible entities are aligned from bottom to top.
 
-| Name                   | Type    | Default    | Description                                            |
-| :--------------------- | :------ | :--------- | :----------------------------------------------------- |
-| `type`                 | enum    | _Required_ | `entity` or `template`                                 |
-| `title`                | string  | —          | Custom title for the editor (not displayed on card)    |
-| `icon`                 | string  | _Required_ | Icon when on/active                                    |
-| `icon_off`             | string  | —          | Icon when off (defaults to `icon`)                     |
-| `visibility_condition` | string  | —          | Jinja2 template. Non-empty/truthy = visible, empty = always visible |
-| `entity`               | string  | —          | Entity ID (required for `type: entity`)                |
-| `on_state`             | string  | —          | State value considered "on" (required for non-climate) |
-| `condition`            | string  | —          | Template condition (required for `type: template`)     |
-| `show_value`           | boolean | `false`    | Display custom state value as label on the circle      |
-| `value_template`       | string  | —          | Template for the value to be displayed as label        |
-| `color_on`             | string  | —          | Icon color when on (supports templates)                |
-| `color_off`            | string  | —          | Icon color when off (supports templates)               |
-| `background_color_on`  | string  | —          | Background when on (supports templates)                |
-| `background_color_off` | string  | —          | Background when off (supports templates)               |
-| `template_on`          | string  | —          | Color preset when on. Accepts preset name or Jinja template returning a preset name |
+| Name                   | Type    | Default    | Description                                                                          |
+| :--------------------- | :------ | :--------- | :----------------------------------------------------------------------------------- |
+| `type`                 | enum    | _Required_ | `entity` or `template`                                                               |
+| `title`                | string  | —          | Custom title for the editor (not displayed on card)                                  |
+| `icon`                 | string  | _Required_ | Icon when on/active                                                                  |
+| `icon_off`             | string  | —          | Icon when off (defaults to `icon`)                                                   |
+| `visibility_condition` | string  | —          | Jinja2 template. Non-empty/truthy = visible, empty = always visible                  |
+| `entity`               | string  | —          | Entity ID (required for `type: entity`)                                              |
+| `on_state`             | string  | —          | State value considered "on" (required for non-climate)                               |
+| `condition`            | string  | —          | Template condition (required for `type: template`)                                   |
+| `show_value`           | boolean | `false`    | Display custom state value as label on the circle                                    |
+| `value_template`       | string  | —          | Template for the value to be displayed as label                                      |
+| `color_on`             | string  | —          | Icon color when on (supports templates)                                              |
+| `color_off`            | string  | —          | Icon color when off (supports templates)                                             |
+| `background_color_on`  | string  | —          | Background when on (supports templates)                                              |
+| `background_color_off` | string  | —          | Background when off (supports templates)                                             |
+| `template_on`          | string  | —          | Color preset when on. Accepts preset name or Jinja template returning a preset name  |
 | `template_off`         | string  | —          | Color preset when off. Accepts preset name or Jinja template returning a preset name |
-| `use_light_color`      | boolean | `false`    | Use actual light color (for `light.*` entities)        |
-| `tap_action`           | object  | —          | Action on tap                                          |
-| `hold_action`          | object  | —          | Action on hold                                         |
-| `double_tap_action`    | object  | `none`     | Action on double-tap                                   |
+| `use_light_color`      | boolean | `false`    | Use actual light color (for `light.*` entities)                                      |
+| `tap_action`           | object  | —          | Action on tap                                                                        |
+| `hold_action`          | object  | —          | Action on hold                                                                       |
+| `double_tap_action`    | object  | `none`     | Action on double-tap                                                                 |
 
 **Entity example:**
 
@@ -325,6 +326,36 @@ entities:
       {{ 'red' if is_state('alarm_control_panel.home','triggered') else 'yellow' }}
 ```
 
+### Two Columns (Advanced)
+
+Set `entities_two_columns: true` to show entities in two columns. Each column has its own pool of up to 8 candidate entities; the first 4 **visible** entities from each pool are displayed on the card (up to 8 icons total). The card has a fixed height, so anything beyond that is clipped — use `visibility_condition` per entity to control which candidates show up at runtime.
+
+| Column | Position           | Config key       | Pool size | Visible |
+| :----- | :----------------- | :--------------- | :-------- | :------ |
+| Outer  | Next to room text  | `entities`       | 8         | First 4 |
+| Inner  | Closer to the text | `entities_inner` | 8         | First 4 |
+
+> ⚠️ **Warning:** the second column eats roughly 25% of the card width, leaving very little room for the room name and secondary/tertiary text. Long names will be truncated. On narrow dashboard columns (especially mobile) the result is unpredictable — verify it on every breakpoint you target.
+
+```yaml
+type: custom:room-card-minimalist
+name: Server
+icon: mdi:server
+entities_two_columns: true
+entities: # outer column
+  - { type: entity, entity: switch.privacy, icon: mdi:cctv, on_state: 'on' }
+  - { type: entity, entity: binary_sensor.internet, icon: mdi:web, on_state: 'on' }
+  - { type: entity, entity: binary_sensor.host, icon: mdi:ubuntu, on_state: 'on' }
+  - { type: entity, entity: switch.fan, icon: mdi:fan, on_state: 'on' }
+entities_inner: # inner column
+  - { type: entity, entity: sensor.cpu, icon: mdi:chip, on_state: 'on' }
+  - { type: entity, entity: sensor.disk, icon: mdi:harddisk, on_state: 'on' }
+  - { type: entity, entity: sensor.mem, icon: mdi:memory, on_state: 'on' }
+  - { type: entity, entity: sensor.gpu, icon: mdi:expansion-card, on_state: 'on' }
+```
+
+`entities_inner` is only read when `entities_two_columns: true`.
+
 ### Conditional Visibility
 
 ```yaml
@@ -337,7 +368,7 @@ entities:
 
   # Only visible in winter (Oct-Mar)
   - type: entity
-    title: "Heating (Winter)"
+    title: 'Heating (Winter)'
     entity: climate.living_room
     icon: mdi:thermostat
     use_multi_state: true
@@ -346,7 +377,7 @@ entities:
 
   # Only visible in summer (Apr-Sep)
   - type: entity
-    title: "AC (Summer)"
+    title: 'AC (Summer)'
     entity: climate.ac
     icon: mdi:air-conditioner
     on_state: 'cool'

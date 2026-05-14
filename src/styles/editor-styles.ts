@@ -31,6 +31,33 @@ export const editorStyles = css`
 		max-width: 100%;
 	}
 
+	.column-group {
+		margin-top: 12px;
+		padding: 10px 12px 12px;
+		border: 1px dashed var(--divider-color);
+		border-radius: 8px;
+	}
+
+	.column-group-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+
+	.column-group-title {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--primary-text-color);
+	}
+
+	.column-group-hint {
+		margin: 0 0 8px;
+		font-size: 11px;
+		color: var(--secondary-text-color);
+	}
+
 	.box:hover {
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}

@@ -1,3 +1,13 @@
+## [1.5.0-beta.3](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.2...v1.5.0-beta.3) (2026-05-14)
+
+### Features
+
+* allow templates for card preset and icon ([e5c599d](https://github.com/unbekannt3/room-card-minimalist/commit/e5c599d343e4f288b5a09e34008eccf96a39ee7b)), closes [#83](https://github.com/unbekannt3/room-card-minimalist/issues/83)
+
+### Other
+
+* npm updates ([dd546a9](https://github.com/unbekannt3/room-card-minimalist/commit/dd546a9718643ff5c3767bb50174d009cba705cd))
+
 ## [1.5.0-beta.2](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.1...v1.5.0-beta.2) (2026-05-10)
 
 ### Features

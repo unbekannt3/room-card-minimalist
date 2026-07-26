@@ -186,13 +186,25 @@ export class RoomCard extends LitElement {
 	}
 
 	/**
+	 * Lifecycle: Called before rendering
+	 * The template service resolves entity states during render, so it has to
+	 * see the current hass before render() runs - not in updated(), which is
+	 * too late and would render the previous state
+	 */
+	protected override willUpdate(changedProps: PropertyValues): void {
+		super.willUpdate(changedProps);
+		if (this.hass) {
+			this._templateService.setHass(this.hass);
+		}
+	}
+
+	/**
 	 * Lifecycle: Called when properties change
 	 */
 	protected override updated(changedProps: PropertyValues): void {
 		super.updated(changedProps);
 		if (!this._config || !this.hass) return;
 
-		this._templateService.setHass(this.hass);
 		this._subscribeTemplates();
 	}
 

@@ -17,11 +17,7 @@ import type {
 } from './types';
 
 // Constants
-import {
-	getMultiStatePreset,
-	getDomainIcon,
-	MAX_CONFIGURABLE_ENTITIES,
-} from './constants';
+import { getMultiStatePreset, getDomainIcon, MAX_CONFIGURABLE_ENTITIES } from './constants';
 
 type EntityGroup = 'outer' | 'inner';
 
@@ -320,11 +316,7 @@ export class RoomCardEditor extends LitElement {
 	/**
 	 * Handle entity form value changes
 	 */
-	private _valueChangedEntity(
-		group: EntityGroup,
-		entityIndex: number,
-		ev: CustomEvent
-	): void {
+	private _valueChangedEntity(group: EntityGroup, entityIndex: number, ev: CustomEvent): void {
 		if (!this._config || !this.hass) {
 			return;
 		}
@@ -448,8 +440,7 @@ export class RoomCardEditor extends LitElement {
 			const boxGroup = (box.dataset.group as EntityGroup) || 'outer';
 			const boxIndex = Number(box.dataset.index ?? -1);
 			const isSelf =
-				boxGroup === this._dragState?.dragGroup &&
-				boxIndex === this._dragState?.dragIndex;
+				boxGroup === this._dragState?.dragGroup && boxIndex === this._dragState?.dragIndex;
 			if (
 				!isSelf &&
 				ev.clientY >= rect.top &&
@@ -515,12 +506,8 @@ export class RoomCardEditor extends LitElement {
 		if (!this._config) return;
 		const updated: RoomCardConfig = {
 			...this._config,
-			...(dragGroup === 'inner'
-				? { entities_inner: srcList }
-				: { entities: srcList }),
-			...(dropGroup === 'inner'
-				? { entities_inner: dstList }
-				: { entities: dstList }),
+			...(dragGroup === 'inner' ? { entities_inner: srcList } : { entities: srcList }),
+			...(dropGroup === 'inner' ? { entities_inner: dstList } : { entities: dstList }),
 		};
 		this._dispatchConfigChanged(updated);
 	};
@@ -553,9 +540,7 @@ export class RoomCardEditor extends LitElement {
 		entity_idx: number
 	): TemplateResult {
 		const list =
-			group === 'inner'
-				? this._config?.entities_inner || []
-				: this._config?.entities || [];
+			group === 'inner' ? this._config?.entities_inner || [] : this._config?.entities || [];
 		const total = list.length;
 		return html`
 			<div class="box" data-group=${group} data-index=${entity_idx}>
@@ -568,10 +553,7 @@ export class RoomCardEditor extends LitElement {
 						>
 							<ha-icon .icon=${'mdi:drag'}></ha-icon>
 						</div>
-						<ha-icon
-							.icon=${this._getEntityIcon(entity)}
-							class="entity-icon"
-						></ha-icon>
+						<ha-icon .icon=${this._getEntityIcon(entity)} class="entity-icon"></ha-icon>
 						<span class="entity-title">
 							${this._getEntityDisplayName(entity, entity_idx)}
 						</span>
@@ -579,7 +561,11 @@ export class RoomCardEditor extends LitElement {
 							? html`<ha-icon
 									.icon=${'mdi:eye-check-outline'}
 									style="--mdc-icon-size: 16px; color: var(--secondary-text-color); margin-left: 4px;"
-									title="${localize(this.hass, 'has_visibility_condition', 'Has visibility condition')}"
+									title="${localize(
+										this.hass,
+										'has_visibility_condition',
+										'Has visibility condition'
+									)}"
 								></ha-icon>`
 							: ''}
 					</div>

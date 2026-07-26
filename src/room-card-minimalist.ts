@@ -20,11 +20,7 @@ import type {
 } from './types';
 
 // Constants
-import {
-	getRandomColorTemplate,
-	MAX_ENTITIES,
-	MAX_CONFIGURABLE_ENTITIES,
-} from './constants';
+import { getRandomColorTemplate, MAX_ENTITIES, MAX_CONFIGURABLE_ENTITIES } from './constants';
 
 // Services
 import {
@@ -279,38 +275,48 @@ export class RoomCard extends LitElement {
 			}
 		}
 		// Subscribe to entity templates (value/template/color/icon/background_color)
-		const allEntities = [
-			...this._config.entities,
-			...(this._config.entities_inner || []),
-		];
+		const allEntities = [...this._config.entities, ...(this._config.entities_inner || [])];
 		for (const entity of allEntities) {
+			const entityId = this._entityContext(entity);
+
 			// value template
 			if (entity.show_value && entity.value_template) {
-				this._templateService.subscribe(entity.value_template);
+				this._templateService.subscribe(entity.value_template, entityId);
 			}
 
 			// subscribe to any templated color/icon fields on the entity
 			for (const key of Object.keys(entity)) {
 				const val = (entity as any)[key];
 				if (typeof val === 'string' && isTemplate(val)) {
-					this._templateService.subscribe(val);
+					this._templateService.subscribe(val, entityId);
 				}
 			}
 		}
 	}
 
 	/**
+	 * Entity ID exposed to templates of this item as the `entity` variable
+	 * Template items have no entity of their own
+	 */
+	private _entityContext(item: EntityConfig): string | undefined {
+		return item.type === 'entity' ? (item as StandardEntityConfig).entity : undefined;
+	}
+
+	/**
 	 * Get value - either from template result or raw
 	 */
-	private _getValue(item: string | undefined): string | undefined {
-		return this._templateService.getEntityOrTemplateValue(item);
+	private _getValue(item: string | undefined, entityId?: string): string | undefined {
+		return this._templateService.getEntityOrTemplateValue(item, entityId);
 	}
 
 	/**
 	 * Get raw value or template result
 	 */
-	private _getValueRawOrTemplate(item: string | undefined): string | undefined {
-		return this._templateService.getValue(item);
+	private _getValueRawOrTemplate(
+		item: string | undefined,
+		entityId?: string
+	): string | undefined {
+		return this._templateService.getValue(item, entityId);
 	}
 
 	/**
@@ -325,7 +331,10 @@ export class RoomCard extends LitElement {
 		const tertiaryColor = this._getValueRawOrTemplate(this._config.tertiary_color);
 		const isVisible = (entity: EntityConfig): boolean => {
 			if (!entity.visibility_condition) return true;
-			const result = this._getValueRawOrTemplate(entity.visibility_condition);
+			const result = this._getValueRawOrTemplate(
+				entity.visibility_condition,
+				this._entityContext(entity)
+			);
 			return Boolean(result && result !== '' && result !== 'False' && result !== 'None');
 		};
 
@@ -417,7 +426,9 @@ export class RoomCard extends LitElement {
 				@touchend=${cardHandlers?.onTouchEnd}
 				@contextmenu=${cardHandlers?.onContextMenu}
 				.config=${this._config}
-				class="${isCardClickable ? 'clickable' : 'non-clickable'}${shouldGlow ? ' glow' : ''}"
+				class="${isCardClickable ? 'clickable' : 'non-clickable'}${shouldGlow
+					? ' glow'
+					: ''}"
 				style=${shouldGlow
 					? `${glowColor ? `--glow-color: ${glowColor};` : ''}--glow-intensity: ${this._config.glow_intensity}`
 					: ''}
@@ -570,9 +581,7 @@ export class RoomCard extends LitElement {
 									colors.icon_color
 								)};"
 							>
-								<ha-icon
-									.icon=${this._getValueRawOrTemplate(this._config?.icon)}
-								/>
+								<ha-icon .icon=${this._getValueRawOrTemplate(this._config?.icon)} />
 							</div>
 						`
 					: ''}
@@ -588,7 +597,10 @@ export class RoomCard extends LitElement {
 			return renderInvalidEntity(this.hass);
 		}
 
-		const stateResult = getEntityStateResult(item, this.hass, (i) => this._getValue(i));
+		const entityId = this._entityContext(item);
+		const stateResult = getEntityStateResult(item, this.hass, (i) =>
+			this._getValue(i, entityId)
+		);
 		const { isOn, currentHvacMode, currentEntityState, stateValue } = stateResult;
 
 		// Resolve any templated color/icon fields on the entity before applying templates
@@ -614,7 +626,7 @@ export class RoomCard extends LitElement {
 		if (item.show_value) {
 			if (item.value_template) {
 				// Use value_template if provided
-				displayValue = this._getValueRawOrTemplate(item.value_template);
+				displayValue = this._getValueRawOrTemplate(item.value_template, entityId);
 			} else if (item.type === 'entity') {
 				// Use entity state directly for entity type
 				const entityItem = item as StandardEntityConfig;
@@ -648,6 +660,7 @@ export class RoomCard extends LitElement {
 	 */
 	private _resolveEntityTemplateFields(entity: EntityConfig): EntityConfig {
 		const copy: any = { ...entity };
+		const entityId = this._entityContext(entity);
 		for (const key of Object.keys(entity)) {
 			// Only resolve color, icon and template (preset) related keys
 			if (
@@ -662,7 +675,7 @@ export class RoomCard extends LitElement {
 			) {
 				const val = (entity as any)[key];
 				if (typeof val === 'string') {
-					const resolved = this._getValueRawOrTemplate(val);
+					const resolved = this._getValueRawOrTemplate(val, entityId);
 					if (resolved !== undefined) {
 						copy[key] = key.startsWith('template_') ? resolved.trim() : resolved;
 					}

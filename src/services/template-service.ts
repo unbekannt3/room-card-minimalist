@@ -54,47 +54,101 @@ export class TemplateService implements ITemplateService {
 	}
 
 	/**
-	 * Subscribe to a template for live updates
+	 * Build the storage key for a template
+	 * The same template string can be rendered with different `entity` variables,
+	 * so the entity context is part of the key
 	 */
-	async subscribe(template: string): Promise<void> {
+	private _key(template: string, entityId?: string): string {
+		return entityId ? `${entityId}|${template}` : template;
+	}
+
+	/**
+	 * Subscribe to a template for live updates
+	 * When entityId is given, it is exposed to the template as the `entity` variable
+	 */
+	async subscribe(template: string, entityId?: string): Promise<void> {
+		const key = this._key(template, entityId);
+
 		// Skip if already subscribed, no hass, no config, or not a template
-		if (
-			this._subscriptions.has(template) ||
-			!this._hass ||
-			!this._config ||
-			!isTemplate(template)
-		) {
+		if (this._subscriptions.has(key) || !this._hass || !this._config || !isTemplate(template)) {
 			return;
 		}
 
 		try {
-			const sub = this._subscribeRenderTemplate(template, (result) => {
+			const sub = this._subscribeRenderTemplate(template, entityId, (result) => {
 				this._results = {
 					...this._results,
-					[template]: result,
+					[key]: result,
 				};
 				this._updateCallback?.(this._results);
 			});
 
-			this._subscriptions.set(template, sub);
+			this._subscriptions.set(key, sub);
 			await sub;
 		} catch (err) {
-			this._subscriptions.delete(template);
+			this._subscriptions.delete(key);
 		}
 	}
 
 	/**
 	 * Unsubscribe from a specific template
 	 */
-	async unsubscribe(template: string): Promise<void> {
-		const unsubPromise = this._subscriptions.get(template);
+	async unsubscribe(template: string, entityId?: string): Promise<void> {
+		return this._unsubscribeKey(this._key(template, entityId));
+	}
+
+	/**
+	 * Unsubscribe from all templates
+	 */
+	async unsubscribeAll(): Promise<void> {
+		const keys = Array.from(this._subscriptions.keys());
+		await Promise.all(keys.map((k) => this._unsubscribeKey(k)));
+		this._results = {};
+	}
+
+	/**
+	 * Get the result for a specific template
+	 */
+	getResult(template: string, entityId?: string): string | undefined {
+		return getTemplateResultString(this._results[this._key(template, entityId)]);
+	}
+
+	/**
+	 * Get value - returns raw value or template result
+	 * Used for values that might be either static or templates
+	 */
+	getValue(value: string | undefined, entityId?: string): string | undefined {
+		if (!value) return undefined;
+		if (isTemplate(value)) {
+			return this.getResult(value, entityId);
+		}
+		return value;
+	}
+
+	/**
+	 * Get entity state or template result
+	 * Used for values that are either entity IDs or templates
+	 */
+	getEntityOrTemplateValue(value: string | undefined, entityId?: string): string | undefined {
+		if (!value) return undefined;
+		if (isTemplate(value)) {
+			return this.getResult(value, entityId);
+		}
+		return this._hass?.states[value]?.state;
+	}
+
+	/**
+	 * Unsubscribe a single subscription by its storage key
+	 */
+	private async _unsubscribeKey(key: string): Promise<void> {
+		const unsubPromise = this._subscriptions.get(key);
 		if (!unsubPromise) return;
 
 		try {
 			const unsub = await unsubPromise;
 			unsub();
-			this._subscriptions.delete(template);
-			delete this._results[template];
+			this._subscriptions.delete(key);
+			delete this._results[key];
 		} catch (err: unknown) {
 			const error = err as { code?: string };
 			if (error.code !== 'not_found' && error.code !== 'template_error') {
@@ -104,50 +158,11 @@ export class TemplateService implements ITemplateService {
 	}
 
 	/**
-	 * Unsubscribe from all templates
-	 */
-	async unsubscribeAll(): Promise<void> {
-		const templates = Array.from(this._subscriptions.keys());
-		await Promise.all(templates.map((t) => this.unsubscribe(t)));
-		this._results = {};
-	}
-
-	/**
-	 * Get the result for a specific template
-	 */
-	getResult(template: string): string | undefined {
-		return getTemplateResultString(this._results[template]);
-	}
-
-	/**
-	 * Get value - returns raw value or template result
-	 * Used for values that might be either static or templates
-	 */
-	getValue(value: string | undefined): string | undefined {
-		if (!value) return undefined;
-		if (isTemplate(value)) {
-			return this.getResult(value);
-		}
-		return value;
-	}
-
-	/**
-	 * Get entity state or template result
-	 * Used for values that are either entity IDs or templates
-	 */
-	getEntityOrTemplateValue(value: string | undefined): string | undefined {
-		if (!value) return undefined;
-		if (isTemplate(value)) {
-			return this.getResult(value);
-		}
-		return this._hass?.states[value]?.state;
-	}
-
-	/**
 	 * Internal method to subscribe to render_template
 	 */
 	private async _subscribeRenderTemplate(
 		template: string,
+		entityId: string | undefined,
 		onChange: (result: TemplateResult) => void
 	): Promise<() => void> {
 		if (!this._hass) {
@@ -160,6 +175,7 @@ export class TemplateService implements ITemplateService {
 			variables: {
 				config: this._config,
 				user: this._hass.user?.name,
+				...(entityId ? { entity: entityId } : {}),
 			},
 			strict: true,
 		});

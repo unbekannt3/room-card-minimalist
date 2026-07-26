@@ -28,23 +28,23 @@ export interface TemplateSubscribeParams {
 	variables?: {
 		config?: RoomCardInternalConfig;
 		user?: string;
-		entity?: unknown;
+		entity?: string;
 	};
 	strict?: boolean;
 }
 
-// Template subscription map
+// Template subscription map (keyed by template, prefixed with the entity context if any)
 export type TemplateSubscriptions = Map<string, Promise<() => void>>;
 
 // Template service interface
 export interface ITemplateService {
 	setHass(hass: HomeAssistant): void;
 	setConfig(config: RoomCardInternalConfig): void;
-	subscribe(template: string): Promise<void>;
-	unsubscribe(template: string): Promise<void>;
+	subscribe(template: string, entityId?: string): Promise<void>;
+	unsubscribe(template: string, entityId?: string): Promise<void>;
 	unsubscribeAll(): Promise<void>;
-	getResult(template: string): string | undefined;
-	getValue(value: string): string | undefined;
+	getResult(template: string, entityId?: string): string | undefined;
+	getValue(value: string, entityId?: string): string | undefined;
 	get results(): TemplateResults;
 }
 

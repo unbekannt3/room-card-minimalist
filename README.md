@@ -30,6 +30,7 @@ Based on [patrickfnielsen/hass-room-card](https://github.com/patrickfnielsen/has
   - [Multi-State Entities](#multi-state-entities)
   - [Climate Entities](#climate-entities)
   - [Color Templates](#color-templates)
+  - [Template Variables](#template-variables)
 - [Examples](#examples)
 - [Layout & Theming](#layout--theming)
 - [Internationalization](#internationalization)
@@ -492,6 +493,29 @@ Available presets for `card_template`, `template_on`, `template_off`, and mode-s
 | `indigo`     | ![#3F51B5](https://dummyimage.com/15/3f51b5/3f51b5) Indigo      | `#3F51B5` |
 
 Templates use CSS variables (`--color-*`) which can be customized by themes like UI Lovelace Minimalist.
+
+### Template Variables
+
+Every Jinja2 template gets these variables in addition to the standard Home Assistant ones:
+
+| Variable | Available in                             | Value                       |
+| :------- | :--------------------------------------- | :-------------------------- |
+| `config` | all templates                            | The full card configuration |
+| `user`   | all templates                            | Name of the logged-in user  |
+| `entity` | templates on an entity of `type: entity` | That item's `entity` ID     |
+
+```yaml
+entities:
+  # `entity` refers to light.ceiling
+  - type: entity
+    entity: light.ceiling
+    icon: mdi:ceiling-light
+    on_state: 'on'
+    color_on: >
+      {{ iif(is_state(entity, 'on'), 'green', 'blue') }}
+```
+
+Templates are rendered in strict mode: using an undefined variable makes the template fail and logs an error in Home Assistant. Items of `type: template` have no `entity` of their own — reference the entity ID directly there.
 
 ---
 

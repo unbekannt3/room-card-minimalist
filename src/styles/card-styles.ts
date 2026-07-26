@@ -63,7 +63,8 @@ export const cardStyles = css`
 	}
 
 	@keyframes room-card-glow-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow:
 				0 0 calc(4px * var(--glow-intensity)) calc(0.5px * var(--glow-intensity))
 					var(--glow-color, var(--state-active-color, #ffc107)),
@@ -245,7 +246,6 @@ export const cardStyles = css`
 		padding-top: 0;
 		padding-bottom: 20px;
 	}
-
 
 	.state-item {
 		display: flex;

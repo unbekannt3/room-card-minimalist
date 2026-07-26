@@ -1,3 +1,13 @@
+## [1.5.0-beta.5](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.4...v1.5.0-beta.5) (2026-07-26)
+
+### Features
+
+* provide entity variable in entity templates ([#88](https://github.com/unbekannt3/room-card-minimalist/issues/88)) ([8ba1722](https://github.com/unbekannt3/room-card-minimalist/commit/8ba17226391b422986ecedf9c638b3f2b58e78e2))
+
+### Bug Fixes
+
+* entity states updating one cycle too late ([#88](https://github.com/unbekannt3/room-card-minimalist/issues/88)) ([49a71ab](https://github.com/unbekannt3/room-card-minimalist/commit/49a71ab51c8d98cd9d5ba130a8fdbc1acf8aae66))
+
 ## [1.5.0-beta.4](https://github.com/unbekannt3/room-card-minimalist/compare/v1.5.0-beta.3...v1.5.0-beta.4) (2026-05-14)
 
 ### Features

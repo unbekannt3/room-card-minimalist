@@ -5,7 +5,7 @@
 
 import { LitElement } from 'lit';
 import type { ActionsConfig } from '../types';
-import { HOLD_TIMEOUT_MS, DOUBLE_TAP_TIMEOUT_MS } from '../constants';
+import { HOLD_TIMEOUT_MS, HOLD_MOVE_TOLERANCE_PX, DOUBLE_TAP_TIMEOUT_MS } from '../constants';
 import { handleAction } from '../services';
 
 /**
@@ -60,6 +60,7 @@ export class ActionController {
 	private _holdFired = false;
 	private _dblTapTimeout: ReturnType<typeof setTimeout> | null = null;
 	private _pendingTapConfig: ActionsConfig | null = null;
+	private _removeHoldCancelListeners: (() => void) | null = null;
 
 	constructor(element: LitElement) {
 		this._element = element;
@@ -80,12 +81,19 @@ export class ActionController {
 	}
 
 	/**
-	 * Start the hold timer
+	 * Start the hold timer.
+	 *
+	 * When a touch start point is given, the pending hold is cancelled if the
+	 * finger moves more than HOLD_MOVE_TOLERANCE_PX or the page scrolls, so that
+	 * scrolling across the card does not trigger the hold action.
 	 */
-	startHoldTimer(callback: () => void): void {
+	startHoldTimer(callback: () => void, touchStart?: { x: number; y: number }): void {
 		this.clearHoldTimer();
 		this._holdFired = false;
+		if (touchStart) this._addHoldCancelListeners(touchStart);
 		this._holdTimeout = setTimeout(() => {
+			this._holdTimeout = null;
+			this._removeHoldListeners();
 			this._holdFired = true;
 			callback();
 		}, HOLD_TIMEOUT_MS);
@@ -95,9 +103,45 @@ export class ActionController {
 	 * Clear the hold timer
 	 */
 	clearHoldTimer(): void {
+		this._removeHoldListeners();
 		if (this._holdTimeout) {
 			clearTimeout(this._holdTimeout);
 			this._holdTimeout = null;
+		}
+	}
+
+	/**
+	 * While a hold is pending, listen (passively, on window) for finger movement,
+	 * scroll and touchcancel. Window-level listeners are used because the finger
+	 * may leave the card while scrolling.
+	 */
+	private _addHoldCancelListeners(start: { x: number; y: number }): void {
+		const cancel = () => this.clearHoldTimer();
+		const onTouchMove = (e: TouchEvent) => {
+			const touch = e.touches[0];
+			if (
+				!touch ||
+				Math.abs(touch.clientX - start.x) > HOLD_MOVE_TOLERANCE_PX ||
+				Math.abs(touch.clientY - start.y) > HOLD_MOVE_TOLERANCE_PX
+			) {
+				cancel();
+			}
+		};
+		const options: AddEventListenerOptions = { passive: true, capture: true };
+		window.addEventListener('touchmove', onTouchMove, options);
+		window.addEventListener('scroll', cancel, options);
+		window.addEventListener('touchcancel', cancel, options);
+		this._removeHoldCancelListeners = () => {
+			window.removeEventListener('touchmove', onTouchMove, options);
+			window.removeEventListener('scroll', cancel, options);
+			window.removeEventListener('touchcancel', cancel, options);
+		};
+	}
+
+	private _removeHoldListeners(): void {
+		if (this._removeHoldCancelListeners) {
+			this._removeHoldCancelListeners();
+			this._removeHoldCancelListeners = null;
 		}
 	}
 
@@ -174,7 +218,11 @@ export class ActionController {
 					if (target.closest(ignoreSelector)) return;
 				}
 				if (stopPropagation) e.stopPropagation();
-				this.startHoldTimer(() => handleAction(this._element, config, 'hold'));
+				const touch = e.touches[0];
+				this.startHoldTimer(
+					() => handleAction(this._element, config, 'hold'),
+					touch ? { x: touch.clientX, y: touch.clientY } : undefined
+				);
 			},
 
 			onTouchEnd: () => {

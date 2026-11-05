@@ -29,6 +29,12 @@ export const DEFAULT_ENTITY_OFF_COLORS: AppliedColorTemplate = {
 export const HOLD_TIMEOUT_MS = 500;
 
 /**
+ * Max finger movement (px) during a touch before a pending hold is cancelled.
+ * Prevents hold actions from firing while the user scrolls the dashboard.
+ */
+export const HOLD_MOVE_TOLERANCE_PX = 10;
+
+/**
  * Double-tap detection window in milliseconds
  */
 export const DOUBLE_TAP_TIMEOUT_MS = 300;
